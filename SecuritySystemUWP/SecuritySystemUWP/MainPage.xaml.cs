@@ -1,10 +1,10 @@
 ﻿using Windows.UI.Xaml.Controls;
-
 using DeviceProviders;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System;
 using Windows.Web.Http;
+using Windows.Devices.Gpio;
 using System.IO;
 using Windows.UI.Xaml.Media.Imaging;
 using Microsoft.WindowsAzure.Storage;
@@ -26,6 +26,11 @@ namespace SecuritySystemUWP
         private string blobType = "BlockBlob";
         private string sharedKeyAuthorizationScheme = "SharedKey";
 
+        private const int GPIO_NUM_MOTIONSENSOR = 18;
+        private GpioPin motionSensorPin;
+        private GpioPinValue pinValue;
+        private bool isMotionDetected;
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -34,6 +39,9 @@ namespace SecuritySystemUWP
 
         private async void Initialize()
         {
+
+            startMotionSensor();
+
             // Create and register the AllJoyn provider
             provider = new AllJoynProvider();
             provider.Services.VectorChanged += Services_VectorChanged;
@@ -139,6 +147,20 @@ namespace SecuritySystemUWP
             {
                 Debug.WriteLine(iface.IntrospectXml.ToString());
             }
+        }
+
+        private async void startMotionSensor()
+        {
+            var gpioController = GpioController.GetDefault();
+
+            motionSensorPin = gpioController.OpenPin(GPIO_NUM_MOTIONSENSOR);
+            motionSensorPin.SetDriveMode(GpioPinDriveMode.Input);
+            motionSensorPin.ValueChanged += (s, e) =>
+            {
+                pinValue = motionSensorPin.Read();
+                isMotionDetected = (e.Edge == GpioPinEdge.RisingEdge);
+            };
+
         }
     }
 }
