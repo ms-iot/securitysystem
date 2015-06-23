@@ -30,11 +30,6 @@ namespace SecuritySystemUWP
         private string blobType = "BlockBlob";
         private string sharedKeyAuthorizationScheme = "SharedKey";
 
-        private const int GPIO_NUM_MOTIONSENSOR = 18;
-        private GpioPin motionSensorPin;
-        private GpioPinValue pinValue;
-        private bool isMotionDetected;
-
         private DispatcherTimer uploadPicturesTimer;
         private readonly TimeSpan uploadPicturesIntervalDuration = new TimeSpan(0, 0, 10);
         private static Mutex uploadPicturesMutexLock = new Mutex();
@@ -47,8 +42,6 @@ namespace SecuritySystemUWP
 
         private async void Initialize()
         {
-
-            startMotionSensor();
 
             uploadPicturesTimer = new DispatcherTimer();
             uploadPicturesTimer.Interval = uploadPicturesIntervalDuration;
@@ -193,20 +186,6 @@ namespace SecuritySystemUWP
             {
                 uploadPicturesMutexLock.ReleaseMutex();
             }
-        }
-
-        private async void startMotionSensor()
-        {
-            var gpioController = GpioController.GetDefault();
-
-            motionSensorPin = gpioController.OpenPin(GPIO_NUM_MOTIONSENSOR);
-            motionSensorPin.SetDriveMode(GpioPinDriveMode.Input);
-            motionSensorPin.ValueChanged += (s, e) =>
-            {
-                pinValue = motionSensorPin.Read();
-                isMotionDetected = (e.Edge == GpioPinEdge.RisingEdge);
-            };
-
         }
     }
 }
