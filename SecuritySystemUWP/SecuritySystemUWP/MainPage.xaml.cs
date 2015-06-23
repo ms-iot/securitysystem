@@ -11,6 +11,10 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.Collections.Generic;
 using System.Linq;
+using Windows.UI.Xaml;
+using Windows.Storage.Search;
+using Windows.Storage;
+using System.Threading;
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace SecuritySystemUWP
@@ -31,6 +35,10 @@ namespace SecuritySystemUWP
         private GpioPinValue pinValue;
         private bool isMotionDetected;
 
+        private DispatcherTimer uploadPicturesTimer;
+        private readonly TimeSpan uploadPicturesIntervalDuration = new TimeSpan(0, 0, 10);
+        private static Mutex uploadPicturesMutexLock = new Mutex();
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -41,6 +49,12 @@ namespace SecuritySystemUWP
         {
 
             startMotionSensor();
+
+            uploadPicturesTimer = new DispatcherTimer();
+            uploadPicturesTimer.Interval = uploadPicturesIntervalDuration;
+            uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
+            uploadPicturesTimer.Start();
+
 
             // Create and register the AllJoyn provider
             provider = new AllJoynProvider();
@@ -146,6 +160,38 @@ namespace SecuritySystemUWP
             foreach (var iface in sender)
             {
                 Debug.WriteLine(iface.IntrospectXml.ToString());
+            }
+        }
+
+        private static async void uploadPicturesTimer_Tick(object sender, object e)
+        {
+            uploadPicturesMutexLock.WaitOne();
+
+            try
+            {
+                QueryOptions querySubfolders = new QueryOptions();
+                querySubfolders.FolderDepth = FolderDepth.Deep;
+               
+                StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
+                var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
+                var files = await result.GetFilesAsync();
+
+                foreach (StorageFile file in files)
+                {
+
+                    //send photo to Azure
+
+                    await file.DeleteAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception in uploadPicturesTimer_Tick() " + ex.Message);
+            }
+            finally
+            {
+                uploadPicturesMutexLock.ReleaseMutex();
             }
         }
 
