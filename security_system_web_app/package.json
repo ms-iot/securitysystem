@@ -17,6 +17,9 @@
     "jade": "~1.9.2",
     "morgan": "~1.5.3",
     "node-env-file": "^0.1.7",
+    "passport": "^0.2.2",
+    "passport-facebook": "^2.0.0",
+    "passport-github2": "^0.1.9",
     "serve-favicon": "~2.2.1"
   }
 }
