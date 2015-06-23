@@ -57,6 +57,25 @@ passport.use(new GitHubStrategy({
   }
 ));
 
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: "http://localhost:3000/auth/facebook/callback",
+    enableProof: false
+  },
+  function(accessToken, refreshToken, profile, done) {
+    console.log(profile);
+  if(userDictionary[profile.displayName])
+  {
+    console.log("found user");
+    return done(null, profile);
+  }else{
+    // redirect to error page
+    return done(null, null);
+  }
+  }
+));
+
 passport.serializeUser(function(user, done) {
   console.log("serializing");
   console.log(user);
@@ -72,8 +91,19 @@ passport.deserializeUser(function(user, done) {
 app.get('/auth/github',
   passport.authenticate('github', { scope: [ 'user:email' ] }));
 
-app.get('/auth/github/callback', 
+app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+  console.log("redirection happening");
+    res.redirect('/');
+  });
+
+app.get('/auth/facebook',
+  passport.authenticate('facebook'));
+
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home.
   console.log("redirection happening");
@@ -88,9 +118,9 @@ app.get('/',
 });
 
 function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { 
+  if (req.isAuthenticated()) {
     console.log('request authenticated');
-    return next(); 
+    return next();
   }
   console.log("not authenticated, going to login page");
   res.redirect('/login');
@@ -127,7 +157,7 @@ app.get('/images',
 app.get('/login', function(req, res){
   res.render('login');
 });
-  
+
 // app.use('/', routes);
 
 // catch 404 and forward to error handler
