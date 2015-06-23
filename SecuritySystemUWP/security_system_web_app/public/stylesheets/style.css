@@ -1,0 +1,169 @@
+body {
+  font: 14px 'Open Sans', sans-serif;
+  background-color: rgb(255,255,255);
+  color:black;
+}
+a {
+  color: #00B7FF;
+}
+/*Sidenav*/
+
+.stackRow {
+  padding-top:5px;
+  margin-left: 0px;
+  margin-right: 0px;
+  padding-bottom: 5px;
+}
+
+#mainList {
+  height: 85vh;
+  max-height:750px;
+  overflow: auto;
+  background-color:rgb(105,105,105);
+  margin-bottom: 0px;
+}
+
+#mainList > li {
+  border: 1px solid rgb(145,145,145);
+  background-color: rgb(210,210,210);
+  color: rgb(24,24,25);
+  padding-left: 45px;
+}
+
+#falseBadge {
+  float:none;
+  color:rgb(96,217,241); ;
+}
+
+#mainList > li > .badge > .glyphicon-record {
+  color: rgb(96,217,241);
+}
+
+.btn-group {
+  padding-left: 30px;
+}
+
+#subNavTitle {
+  padding-left:30px;
+}
+
+#sideNav {
+  position:fixed;
+  z-index:100;
+  background-color:rgb(244,244,244);
+  max-height: 100vh;
+  min-height: 100vh;
+  padding-left: 0;
+  padding-right: 0;
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+#motionFilterButton {
+  color:black;
+}
+
+.fakeLink {
+  cursor:pointer;
+}
+/*Navbar*/
+
+.navbar {
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+  min-height: 71px;
+}
+
+.navbar-right {
+  margin-right: 0px;
+  padding-right: 10px;
+  padding-top: 4px;
+  font-size:23px;
+  color: white;
+}
+.well {
+  color:black;
+  margin-bottom: 0px;
+}
+
+#hamburgerMenu {
+  margin-right:1px;
+  margin-right:0;
+}
+
+/*image*/
+
+#browseButtons {
+  padding-left:26%;
+  color:black;
+}
+
+#browseButtons > button {
+  margin-left:5px;
+  margin-right:5px;
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+#displayWindow {
+  box-shadow: .5px .5px 4px 2px rgba(0, 0, 0, 0.2);
+  margin-top:75px;
+  margin-left:50px;
+  margin-bottom:10px;
+  border:10px solid rgb(222,222,222);
+  border-radius:3px;
+}
+
+.glyphicon-menu-left, .glyphicon-menu-right, #imageTitle {
+  font-size: 20px;
+}
+
+.pull-right {
+  margin-right: 10px;
+}
+
+#hiddenButtons {
+  padding-left:200px;
+}
+
+@media (max-width: 1200px){
+  #displayWindow {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 900px){
+  #img {
+    max-width:425px;
+  }
+}
+
+@media (max-width: 700px) {
+
+  img {
+   max-width:425px;
+  }
+
+  #browseButtons {
+    padding-left:15%;
+    font-size: 15px;
+    color:black;
+  }
+
+#displayWindow {
+    margin-left: 70px;
+  }
+}
+@media (max-width: 500px) {
+  #displayWindow {
+    margin-left: 35px;
+  }
+
+  img {
+   max-width:350px;
+  }
+
+  #browseButtons {
+  padding-left:12%;
+  font-size: 15px;
+  color:black;
+}
+
+}
