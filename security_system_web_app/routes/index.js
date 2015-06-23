@@ -17,6 +17,7 @@ router.get('/images', function(req,res){
         blobService.listBlobsSegmented('imagecontainer', null, function(error, result, response){
           if(!error){
             images = result;
+            console.log(images.entries)
              for(var i = 0; i < images.entries.length; i++){
                 // using npm module bigInt, because the number of .NET ticks
                 // is a number with too many digits for vanilla JavaScript
@@ -28,7 +29,7 @@ router.get('/images', function(req,res){
                 var milliseconds = ticksSinceUnixEpoch.divide(10000)
                 //Converting millisecond to dateTime client side so it will
                 //display in the user's local timezone.
-                images.entries[i].milliseconds = milliseconds.toJSNumber();
+                images.entries[i].milliseconds = milliseconds.value
               }
             res.send(images);
           } else {
