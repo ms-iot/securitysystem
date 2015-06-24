@@ -3,8 +3,14 @@ body {
   background-color: rgb(255,255,255);
   color:black;
 }
+
 a {
   color: #00B7FF;
+}
+
+img {
+  min-width:600px;
+  height: 380px;
 }
 .cardBlock {
   margin-top: 125px;
@@ -13,8 +19,8 @@ a {
   background-color: rgb(248,248,248);
   border: 1px solid rgb(222,222,222);
 }
-.navbar-brand
-{
+
+.navbar-brand {
     position: absolute;
     width: 100%;
     left: 0;
@@ -129,13 +135,13 @@ a {
   margin-bottom: 0px;
 }
 
-@media (max-width: 1200px){
+@media (max-width: 1200px) {
   #displayWindow {
     margin-left: 0;
   }
 }
 
-@media (max-width: 900px){
+@media (max-width: 900px) {
   #img {
     max-width:425px;
   }
@@ -176,8 +182,8 @@ a {
 
 /*OAuth Login Social Buttons*/
 
-.btn-social {position:relative;padding-left:44px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.btn-social>:first-child {position:absolute;left:0;top:0;bottom:0;width:32px;line-height:34px;font-size:1.6em;text-align:center;border-right:1px solid rgba(0,0,0,0.2)}
+.btn-social{position:relative;padding-left:44px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn-social>:first-child{position:absolute;left:0;top:0;bottom:0;width:32px;line-height:34px;font-size:1.6em;text-align:center;border-right:1px solid rgba(0,0,0,0.2)}
 .btn-social.btn-lg{padding-left:61px;margin-top:35px !important}.btn-social.btn-lg>:first-child{line-height:45px;width:45px;font-size:1.8em}
 .btn-social-icon{position:relative;padding-left:44px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:34px;width:34px;padding:0}.btn-social-icon>:first-child{position:absolute;left:0;top:0;bottom:0;width:32px;line-height:34px;font-size:1.6em;text-align:center;border-right:1px solid rgba(0,0,0,0.2)}
 .btn-social-icon.btn-lg{padding-left:61px}.btn-social-icon.btn-lg>:first-child{line-height:45px;width:45px;font-size:1.8em}

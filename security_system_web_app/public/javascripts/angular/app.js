@@ -2,7 +2,6 @@ var securitySystem = angular.module('securitySystem', ['ngRoute', 'ui.bootstrap'
 
 securitySystem.config(['$routeProvider','$locationProvider',function($routeProvider, $locationProvider){
 
-  // $locationProvider.html5Mode(true);
 
   $routeProvider
   .when('/',{
