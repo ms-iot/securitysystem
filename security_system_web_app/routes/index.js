@@ -8,11 +8,16 @@ var bigInt = require('big-integer');
 var blobService = azure.createBlobService();
 
 
-router.get('/', function(req, res, next) {
-  res.render('index')
+router.get('/',
+  ensureAuthenticated,
+  function(req, res) {
+    console.log("opening home");
+    res.render('index');
 });
 
-router.get('/images', function(req,res){
+router.get('/images',
+  ensureAuthenticated,
+  function(req,res){
     var images = [];
         blobService.listBlobsSegmented('imagecontainer', null, function(error, result, response){
           if(!error){
@@ -38,5 +43,17 @@ router.get('/images', function(req,res){
         })
 })
 
+router.get('/login', function(req, res){
+  res.render('login');
+});
+
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    console.log('request authenticated');
+    return next();
+  }
+  console.log("not authenticated, going to login page");
+  res.redirect('/login');
+}
 
 module.exports = router;
