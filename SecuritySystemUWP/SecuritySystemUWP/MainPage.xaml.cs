@@ -30,8 +30,8 @@ namespace SecuritySystemUWP
         private string blobType = "BlockBlob";
         private string sharedKeyAuthorizationScheme = "SharedKey";
 
-        private DispatcherTimer deleteImageTimer;
         private DispatcherTimer uploadPicturesTimer;
+        private DispatcherTimer deletePicturesTimer;
         private static Mutex uploadPicturesMutexLock = new Mutex();
 
         public MainPage()
@@ -49,10 +49,10 @@ namespace SecuritySystemUWP
             uploadPicturesTimer.Start();
 
             //Timer controlling deletion of old pictures
-            deleteImageTimer = new DispatcherTimer();
-            deleteImageTimer.Interval = TimeSpan.FromHours(1);
-            deleteImageTimer.Tick += deletePicturesTimer_Tick;
-            deleteImageTimer.Start();
+            deletePicturesTimer = new DispatcherTimer();
+            deletePicturesTimer.Interval = TimeSpan.FromHours(1);
+            deletePicturesTimer.Tick += deletePicturesTimer_Tick;
+            deletePicturesTimer.Start();
         }
 
 
