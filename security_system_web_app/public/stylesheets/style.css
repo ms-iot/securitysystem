@@ -10,7 +10,8 @@ a {
   margin-top: 125px;
   min-height:200px;
   min-width:300px;
-  background-color: rgb(222,222,222);
+  background-color: rgb(248,248,248);
+  border: 1px solid rgb(222,222,222);
 }
 .navbar-brand
 {
@@ -48,15 +49,6 @@ a {
   padding-left: 45px;
 }
 
-#falseBadge {
-  float:none;
-  color:rgb(96,217,241); ;
-}
-
-#mainList > li > .badge > .glyphicon-record {
-  color: rgb(96,217,241);
-}
-
 .btn-group {
   padding-left: 30px;
 }
@@ -76,10 +68,6 @@ a {
   box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
 }
 
-#motionFilterButton {
-  color:black;
-}
-
 .fakeLink {
   cursor:pointer;
 }
@@ -95,10 +83,6 @@ a {
   padding-top: 4px;
   font-size:23px;
   color: white;
-}
-.well {
-  color:black;
-  margin-bottom: 0px;
 }
 
 #hamburgerMenu {
@@ -140,6 +124,11 @@ a {
   padding-left:200px;
 }
 
+.well {
+  color:black;
+  margin-bottom: 0px;
+}
+
 @media (max-width: 1200px){
   #displayWindow {
     margin-left: 0;
@@ -168,26 +157,27 @@ a {
     margin-left: 70px;
   }
 }
+@media (max-width: 500px) {
+  #displayWindow {
+    margin-left: 35px;
+  }
 
-.btn-social {
-  position:relative;
-  padding-left:44px;
-  text-align:left;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis
+  img {
+   max-width:350px;
+  }
+
+  #browseButtons {
+  padding-left:12%;
+  font-size: 15px;
+  color:black;
 }
-.btn-social>:first-child {
-  position:absolute;
-  left:0;
-  top:0;
-  bottom:0;
-  width:32px;
-  line-height:34px;
-  font-size:1.6em;
-  text-align:center;
-  border-right:1px solid rgba(0,0,0,0.2)
+
 }
+
+/*OAuth Login Social Buttons*/
+
+.btn-social {position:relative;padding-left:44px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn-social>:first-child {position:absolute;left:0;top:0;bottom:0;width:32px;line-height:34px;font-size:1.6em;text-align:center;border-right:1px solid rgba(0,0,0,0.2)}
 .btn-social.btn-lg{padding-left:61px;margin-top:35px !important}.btn-social.btn-lg>:first-child{line-height:45px;width:45px;font-size:1.8em}
 .btn-social-icon{position:relative;padding-left:44px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:34px;width:34px;padding:0}.btn-social-icon>:first-child{position:absolute;left:0;top:0;bottom:0;width:32px;line-height:34px;font-size:1.6em;text-align:center;border-right:1px solid rgba(0,0,0,0.2)}
 .btn-social-icon.btn-lg{padding-left:61px}.btn-social-icon.btn-lg>:first-child{line-height:45px;width:45px;font-size:1.8em}
@@ -208,19 +198,3 @@ a {
 
 
 
-@media (max-width: 500px) {
-  #displayWindow {
-    margin-left: 35px;
-  }
-
-  img {
-   max-width:350px;
-  }
-
-  #browseButtons {
-  padding-left:12%;
-  font-size: 15px;
-  color:black;
-}
-
-}
