@@ -1,6 +1,6 @@
 var users = {
-"daveraskin" : "taco",
-"David Raskin": "taco"
+"daveraskin" : "GitHubUsername",
+"David Raskin": "FacebookDisplayName"
 };
 
 module.exports = users;

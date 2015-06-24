@@ -22,7 +22,7 @@ router.get('/images',
         blobService.listBlobsSegmented('imagecontainer', null, function(error, result, response){
           if(!error){
             images = result;
-            console.log(images.entries)
+            // console.log(images.entries)
              for(var i = 0; i < images.entries.length; i++){
                 // using npm module bigInt, because the number of .NET ticks
                 // is a number with too many digits for vanilla JavaScript
