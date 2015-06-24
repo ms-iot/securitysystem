@@ -12,10 +12,6 @@ var authentication = require('./authenticationStrategies.js')
 //.env file
 env('./.env')
 
-var fs = require('fs');
-var azure = require('azure-storage');
-var bigInt = require('big-integer');
-var blobService = azure.createBlobService();
 var auth = require("./routes/auth");
 var index = require("./routes/index");
 

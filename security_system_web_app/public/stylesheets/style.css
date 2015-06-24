@@ -6,7 +6,7 @@ body {
 a {
   color: #00B7FF;
 }
-#loginBlock {
+.cardBlock {
   margin-top: 125px;
   min-height:200px;
   min-width:300px;

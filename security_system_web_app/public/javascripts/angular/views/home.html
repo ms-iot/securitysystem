@@ -12,21 +12,16 @@
         <label class="btn btn-success btn-sm" ng-model="checkModel.sun" btn-checkbox>S</label>
       </div>
         <button class="btn btn-info btn-sm pull-right" ng-click="getImages()"> <i class="glyphicon glyphicon-refresh"></i></button>
-        <button class="btn btn-sm pull-right" ng-class="{'btn-warning': checkModel.filter == true}" ng-click="toggleFilter()"> <i id="motionFilterButton" class="glyphicon glyphicon-record"></i> </button>
     </div>
     <div class="row stackRow">
         <ul class="list-group" id="mainList">
           <li class="list-group-item fakeLink" ng-click="switchImage(image)" ng-repeat="image in images">
-            <span ng-if="image.motion == true" class="badge"><i class="glyphicon glyphicon-record"></i></span>
-            <h4 ng-class="{active: image.motion == true}" class="list-group-item-heading">{{image.day}}</h4>
-            <p ng-class="{active: image.motion == true}" class="list-group-item-text">{{image.date}}</p>
+            <h4 class="list-group-item-heading">{{image.day}}</h4>
+            <p class="list-group-item-text">{{image.date}}</p>
           </li>
         </ul>
     </div>
     <div class="row stackRow text-center" id="legend">
-      <span class="badge" id="falseBadge">
-        <i class="glyphicon glyphicon-record"></i>
-      </span>  = Motion Detected
     </div>
   </div>
     <nav class="navbar navbar-default">

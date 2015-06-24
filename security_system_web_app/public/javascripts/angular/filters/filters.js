@@ -1,22 +1,3 @@
-securitySystem.filter('motionFilter', function(){
-
-  return function(input, filterOn){
-    if(!input)  return input
-
-    var filteredArray = [];
-    if(filterOn === true){
-       for(var i = 0; i < input.length; i++){
-          if(input[i].name.charAt(19) == '1'){
-            filteredArray.push(input[i])
-          }
-        }
-        return filteredArray;
-    }
-
-    return input
-  }
-});
-
 securitySystem.filter('dayFilter', function(){
 
   return function(input, checkModel){
