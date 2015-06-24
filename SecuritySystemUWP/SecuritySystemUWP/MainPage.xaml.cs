@@ -52,6 +52,7 @@ namespace SecuritySystemUWP
             deleteImageTimer = new DispatcherTimer();
             deleteImageTimer.Interval = TimeSpan.FromHours(1);
             deleteImageTimer.Tick += deletePicturesTimer_Tick;
+            deleteImageTimer.Start();
         }
 
 
