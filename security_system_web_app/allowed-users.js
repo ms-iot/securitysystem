@@ -1,6 +1,6 @@
 var users = {
-"daveraskin" : "draskin1991@gmail.com",
-"David Raskin": "10205045092262586"
+"daveraskin" : "taco",
+"David Raskin": "taco"
 };
 
 module.exports = users;
