@@ -6,7 +6,7 @@ var logger = require('morgan');
 var env = require('node-env-file');
 var bodyParser = require('body-parser');
 var passport = require('passport');
-var authentication = require('./authenticationStrategies.js')
+var authenticationStrategies = require('./authenticationStrategies.js')
 
 
 //.env file
@@ -49,8 +49,6 @@ passport.deserializeUser(function(user, done) {
   console.log(user);
   done(null, user);
 });
-
-
 
 
 // app.use('/', routes);
