@@ -43,7 +43,4 @@ securitySystem.filter('dayFilter', function(){
     }
     return filteredArray
   }
-
-
-
 })
