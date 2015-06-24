@@ -34,7 +34,7 @@ passport.use(new FacebookStrategy({
   },
   function(accessToken, refreshToken, profile, done) {
     console.log(profile);
-  if(userDictionary[profile.displayName])
+  if(userDictionary[profile.emails[0].value])
   {
     console.log("found user");
     return done(null, profile);

@@ -167,9 +167,9 @@ img {
   }
    img {
     max-width:435px;
-    max-height: 225px;
+    max-height: 300px;
     min-width:435px;
-    min-height: 225px;
+    min-height: 300px;
     height:225px;
     width:435px;
   }
@@ -178,23 +178,21 @@ img {
     padding-left:15%;
     font-size: 15px;
     color:black;
+    margin-left: 220px;
   }
 
 #displayWindow {
     margin-left: 280px;
   }
 
-#browseButtons {
-    margin-left: 220px;
 }
-}
-@media (min-width:600px) and (max-width: 768px) {
+@media (min-width:540px) and (max-width: 768px) {
   #displayWindow {
-    margin-left: 120px;
+    margin-left: 60px;
   }
 
   img {
-   max-width:450px !important;
+   max-width:450px;
   }
 
   #browseButtons {
@@ -205,13 +203,13 @@ img {
 
 }
 
-@media (max-width:600px) {
+@media (max-width:540px) {
   #displayWindow {
     margin-left: 30px;
   }
 
   img {
-   max-width:350px !important;
+   max-width:350px;
   }
 
   #browseButtons {
