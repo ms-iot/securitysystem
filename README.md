@@ -26,10 +26,7 @@ FACEBOOK_APP_SECRET={YOUR_FACEBOOK_APP_SECRET}
 ```
 var users = {
   "{USER_GITHUB_USERNAME}" : "taco",
-  "{USER_FACEBOOK_NAME}": "burrito"
-};
-```
-The Facebook name you enter must match the display name on your Facebook account exactly.  This will be case sensitive, and the first and last names should be separated by a space.  Since Passport is searching only for the key in this object, the value associated with each key can be anything you like.
+
 
 ##Setting Up Your Camera
 
