@@ -8,10 +8,6 @@ a {
   color: #00B7FF;
 }
 
-img {
-  min-width:600px;
-  height: 380px;
-}
 .cardBlock {
   margin-top: 125px;
   min-height:200px;
@@ -21,14 +17,14 @@ img {
 }
 
 .navbar-brand {
-    position: absolute;
-    width: 100%;
-    left: 0;
-    top: 0;
-    text-align: center;
-    margin: auto;
-    padding-top: 20px;
-    font-size: 28px;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 0;
+  text-align: center;
+  margin: auto;
+  padding-top: 20px;
+  font-size: 28px;
 }
 
 /*Sidenav*/
@@ -41,7 +37,7 @@ img {
 }
 
 #mainList {
-  height: 85vh;
+  height: 88vh;
   max-height:750px;
   overflow: auto;
   background-color:rgb(105,105,105);
@@ -57,12 +53,14 @@ img {
 
 .btn-group {
   padding-left: 30px;
+  padding-top: 15px;
+  padding-bottom: 10px;
 }
 
-#subNavTitle {
-  padding-left:30px;
+.btn-info {
+ margin-top: 15px;
+ margin-bottom: 10px;
 }
-
 #sideNav {
   position:fixed;
   z-index:100;
@@ -80,7 +78,7 @@ img {
 /*Navbar*/
 
 .navbar {
-  min-height: 73px;
+  min-height: 70px;
 }
 
 .navbar-right {
@@ -135,22 +133,45 @@ img {
   margin-bottom: 0px;
 }
 
-@media (max-width: 1200px) {
-  #displayWindow {
-    margin-left: 0;
-  }
-}
-
-@media (max-width: 900px) {
-  #img {
-    max-width:425px;
-  }
-}
-
-@media (max-width: 700px) {
-
+@media (min-width: 1200px) {
   img {
-   max-width:425px;
+  border: 10px solid black;
+  max-width:700px;
+  max-height: 450px;
+  min-width:700px;
+  min-height: 450px;
+  height:450px;
+  width:700px;
+}
+}
+
+@media (min-width: 992px) and (max-width:1200px) {
+ #displayWindow {
+    margin-left: 0px;
+  }
+
+img {
+  max-width:600px;
+  max-height: 375px;
+  min-width:600px;
+  min-height: 375px;
+  height:375px;
+  width:600px;
+}
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+
+   #displayWindow {
+    margin-left: 50px;
+  }
+   img {
+    max-width:435px;
+    max-height: 225px;
+    min-width:435px;
+    min-height: 225px;
+    height:225px;
+    width:435px;
   }
 
   #browseButtons {
@@ -160,16 +181,37 @@ img {
   }
 
 #displayWindow {
-    margin-left: 70px;
+    margin-left: 280px;
   }
+
+#browseButtons {
+    margin-left: 220px;
 }
-@media (max-width: 500px) {
+}
+@media (min-width:600px) and (max-width: 768px) {
   #displayWindow {
-    margin-left: 35px;
+    margin-left: 120px;
   }
 
   img {
-   max-width:350px;
+   max-width:450px !important;
+  }
+
+  #browseButtons {
+  padding-left:12%;
+  font-size: 15px;
+  color:black;
+}
+
+}
+
+@media (max-width:600px) {
+  #displayWindow {
+    margin-left: 30px;
+  }
+
+  img {
+   max-width:350px !important;
   }
 
   #browseButtons {

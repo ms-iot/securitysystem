@@ -52,28 +52,37 @@ $scope.loading = true;
     staticImagesArray = blobData.entries;
     $scope.images = dayFilterFilter(staticImagesArray, $scope.checkModel)
     $scope.viewImage = $scope.images[$scope.images.length - 1];
+    $scope.switchImage($scope.viewImage)
     $scope.loading = false;
   })
   }
 
   $scope.getImages();
-
+  $scope.imageUrl;
   $scope.switchImage = function(image, redirect){
-      $scope.viewImage = image;
-      if(redirect === true){
-        $location.path('/')
-      }
+      $http.get('/image/'+image.name)
+        .success(function(url){
+          console.log('made it : ', url)
+          $scope.imageUrl = url
+          $scope.viewImage = image;
+          if(redirect === true){
+            $location.path('/')
+          }
+        })
   }
+
 
   $scope.browsePicture = function(direction){
 
     var currentIndex =  $scope.images.indexOf($scope.viewImage);
     if(direction == 'left' && $scope.images.indexOf($scope.viewImage) != 0){
       $scope.viewImage = $scope.images[currentIndex - 1];
+      $scope.switchImage($scope.viewImage)
     } else if(direction == 'left'){
       return;
     }else if($scope.images.indexOf($scope.viewImage) != $scope.images.length - 1) {
       $scope.viewImage = $scope.images[currentIndex + 1];
+      $scope.switchImage($scope.viewImage)
     }
   }
 
