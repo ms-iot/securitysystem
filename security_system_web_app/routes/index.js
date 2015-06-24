@@ -43,6 +43,31 @@ router.get('/images',
         })
 })
 
+
+router.get('/image/:imagename', ensureAuthenticated, function(req, res){
+  console.log(req.params.imagename);
+  var startDate = new Date();
+  var expiryDate = new Date(startDate);
+  expiryDate.setMinutes(startDate.getMinutes() + 100);
+  startDate.setMinutes(startDate.getMinutes() - 100);
+
+  var sharedAccessPolicy = {
+    AccessPolicy: {
+      Permissions: azure.BlobUtilities.SharedAccessPermissions.READ,
+      Start: startDate,
+      Expiry: expiryDate
+    },
+  };
+  var token = blobService.generateSharedAccessSignature('imagecontainer', req.params.imagename, sharedAccessPolicy);
+  var tempUrl = blobService.getUrl('imagecontainer', req.params.imagename, token);
+
+  console.log('tempUrl');
+  console.log(tempUrl);
+
+  res.send(tempUrl);
+});
+
+
 router.get('/login', function(req, res){
   res.render('login');
 });
