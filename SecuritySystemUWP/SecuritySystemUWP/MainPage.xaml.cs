@@ -32,7 +32,6 @@ namespace SecuritySystemUWP
 
         private DispatcherTimer deleteImageTimer;
         private DispatcherTimer uploadPicturesTimer;
-        private readonly TimeSpan uploadPicturesIntervalDuration = new TimeSpan(0, 0, 10);
         private static Mutex uploadPicturesMutexLock = new Mutex();
 
         public MainPage()
@@ -45,13 +44,13 @@ namespace SecuritySystemUWP
         {
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
-            uploadPicturesTimer.Interval = uploadPicturesIntervalDuration;
+            uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
             uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
             uploadPicturesTimer.Start();
 
             //Timer controlling deletion of old pictures
             deleteImageTimer = new DispatcherTimer();
-            deleteImageTimer.Interval = TimeSpan.FromMilliseconds(TimeSpan.FromHours(1).TotalMilliseconds);
+            deleteImageTimer.Interval = TimeSpan.FromHours(1);
             deleteImageTimer.Tick += deletePicturesTimer_Tick;
         }
 
