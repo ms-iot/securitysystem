@@ -6,9 +6,8 @@ var logger = require('morgan');
 var env = require('node-env-file');
 var bodyParser = require('body-parser');
 var passport = require('passport');
-var GitHubStrategy = require('passport-github2').Strategy;
-var FacebookStrategy = require('passport-facebook').Strategy;
-var userDictionary = require('./allowed-users.js');
+var authentication = require('./authentication.js')
+
 
 //.env file
 env('./.env')
@@ -17,6 +16,8 @@ var fs = require('fs');
 var azure = require('azure-storage');
 var bigInt = require('big-integer');
 var blobService = azure.createBlobService();
+var auth = "./routes/auth";
+var index = "./routes/index";
 
 var app = express();
 
@@ -37,44 +38,9 @@ app.use(session({
   saveUninitialized: false}));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('/auth', auth);
+app.use('/', index);
 
-passport.use(new GitHubStrategy({
-    clientID: process.env.GITHUB_CLIENT_ID,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/github/callback"
-  },
-  function(accessToken, refreshToken, profile, done) {
-    // console.log(profile.id);
-  console.log(profile);
-  if(userDictionary[profile.username])
-  {
-    console.log("found user");
-    return done(null, profile);
-  }else{
-    // redirect to error page
-    return done(null, null);
-  }
-  }
-));
-
-passport.use(new FacebookStrategy({
-    clientID: process.env.FACEBOOK_APP_ID,
-    clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: "http://localhost:3000/auth/facebook/callback",
-    enableProof: false
-  },
-  function(accessToken, refreshToken, profile, done) {
-    console.log(profile);
-  if(userDictionary[profile.displayName])
-  {
-    console.log("found user");
-    return done(null, profile);
-  }else{
-    // redirect to error page
-    return done(null, null);
-  }
-  }
-));
 
 passport.serializeUser(function(user, done) {
   console.log("serializing");
