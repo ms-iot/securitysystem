@@ -24,8 +24,9 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private string accountName = "securitysystemstorage";
-        private string accountKey = "BzbVAphWQwVAk9/ooBS14G5zzKABfIAEqAhaDC6MU1Be0ReBTyymqB3ibZmm0VXniMP7Uw6Y5bewWib6tuKqPw==";
+        //TODO: Input account name and account key in variables below
+        private string accountName = "";
+        private string accountKey = "";
         private string blobType = "BlockBlob";
         private string sharedKeyAuthorizationScheme = "SharedKey";
 
