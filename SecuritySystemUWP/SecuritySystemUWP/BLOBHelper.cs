@@ -357,5 +357,31 @@ namespace SecuritySystemUWP
                 throw;
             }
         }
+
+        public async Task<bool> DeleteBlob(string container, string blob)
+        {
+            try
+            {
+                HttpRequestMessage request = CreateStreamRESTRequest("DELETE", container + "/" + blob);
+                HttpClient httpClient = new HttpClient();
+                HttpResponseMessage response = await httpClient.SendRequestAsync(request);
+                if (response.StatusCode == HttpStatusCode.Accepted)
+                {
+                    return true;
+                }
+                else
+                {
+                    Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return false;
+                throw;
+            }
+        }
+
     }
 }
