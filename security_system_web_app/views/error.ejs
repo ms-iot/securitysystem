@@ -1,10 +1,12 @@
-extends layout
-
-block content
-  h1= message
-  h2= error.status
-  pre #{error.stack}
-
-
-<%= message %>
-<%= error.status%>
+<% include partials/header.ejs %>
+<div class="container">
+  <div class="col-sm-4 col-sm-offset-4 text-center cardBlock">
+    <h1> Whoops... </h1>
+    <h3> There's been an error: </h3>
+    <h4>
+      <%= message %>
+      <%= error.status%>
+    </h4>
+  </div>
+</div>
+<% include partials/footer.ejs %>

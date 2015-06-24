@@ -1,5 +1,5 @@
 
-securitySystem.controller('homeCtrl', ['$scope', '$http', 'motionFilterFilter', 'dayFilterFilter', '$location', function($scope, $http, motionFilterFilter, dayFilterFilter, $location){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilterFilter', function($scope, $http, $location , dayFilterFilter){
 
 
 var staticImagesArray = [];
@@ -11,8 +11,7 @@ $scope.checkModel = {
     thu: false,
     fri: false,
     sat: false,
-    sun: false,
-    filter: false
+    sun: false
   };
 $scope.loading = true;
 
@@ -49,15 +48,9 @@ $scope.loading = true;
               blobData.entries[i].day = days[0];
               break;
           }
-          if(blobData.entries[i].name.charAt(19) == '1'){
-            blobData.entries[i].motion = true;
-          } else {
-            blobData.entries[i].motion = false;
-          }
         }
     staticImagesArray = blobData.entries;
-    $scope.images = motionFilterFilter(
-      dayFilterFilter(staticImagesArray, $scope.checkModel), $scope.checkModel.filter)
+    $scope.images = dayFilterFilter(staticImagesArray, $scope.checkModel)
     $scope.viewImage = $scope.images[$scope.images.length - 1];
     $scope.loading = false;
   })
@@ -84,13 +77,8 @@ $scope.loading = true;
     }
   }
 
-  $scope.toggleFilter = function(){
-    $scope.checkModel.filter = !$scope.checkModel.filter;
-  }
-
   $scope.$watchCollection('checkModel', function(newValue, oldValue){
-      $scope.images = motionFilterFilter(
-      dayFilterFilter(staticImagesArray, $scope.checkModel), $scope.checkModel.filter)
+      $scope.images = dayFilterFilter(staticImagesArray, $scope.checkModel)
       $scope.viewImage = $scope.images[$scope.images.length - 1];
   })
 
