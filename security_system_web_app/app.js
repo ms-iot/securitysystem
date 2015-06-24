@@ -6,7 +6,7 @@ var logger = require('morgan');
 var env = require('node-env-file');
 var bodyParser = require('body-parser');
 var passport = require('passport');
-var authentication = require('./authentication.js')
+var authentication = require('./authenticationStrategies.js')
 
 
 //.env file

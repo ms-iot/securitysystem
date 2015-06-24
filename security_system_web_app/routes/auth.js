@@ -9,25 +9,23 @@ var userDictionary = require('../allowed-users.js');
 var session = require('express-session');
 
 
-router.get('/auth/github',
+router.get('/github',
   passport.authenticate('github', { scope: [ 'user:email' ] }));
 
-router.get('/auth/github/callback',
+router.get('/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home.
-  console.log("redirection happening");
     res.redirect('/');
   });
 
-router.get('/auth/facebook',
+router.get('/facebook',
   passport.authenticate('facebook'));
 
-router.get('/auth/facebook/callback',
+router.get('/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home.
-  console.log("redirection happening");
     res.redirect('/');
   });
 
