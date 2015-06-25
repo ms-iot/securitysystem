@@ -34,6 +34,30 @@ From this point, you can grant access to as many GitHub users as you like, but i
 
 
 ##Setting Up Your Camera
+1. Factory reset your camera by pressing the reset button under the power light. Use a paper clip to press and hold the button for 10 seconds.
+2. Connect the camera to the same router/Ethernet switch as your PC and Pi, then connect the power supply to the camera.
+3. Set up a D-Link account from https://www.mydlink.com/download. Make a note of your camera IP Address.
+4. Enter the IP address on your browser and sign in to the camera portal. 
+5. Navigate to Setup->FTP and configure the FTP transfer of pictures. Use the following information:
+   FTP SERVER
+   - Host Name: The IP address of your Raspberry Pi 2
+   - Port: 21
+   - Username: administrator
+   - Password: The password set for you Pi (default: p@ssw0rd)
+   - Path: \Users\DefaultAccount\Pictures
+
+   TIME SCHEDULE
+   - Check "Motion/Sound Detection"
+   - Choose the Image Frequency of your choice
+   - Select "Date/Time Suffix" and check Create sub folder by 0.5hrs.
+
+6. Next, change the motion detection setting of the camera.
+   MOTION DETECTION SETTINGS
+   - Motion Detection: Select "Enable"
+   - Time: Select "Always"
+   - Sensitivity: Enter a value of your choice.
+   - Detection Areas: Select all areas unless there are some area where motion need not be detected.
+
 
 ##Debugging
 
