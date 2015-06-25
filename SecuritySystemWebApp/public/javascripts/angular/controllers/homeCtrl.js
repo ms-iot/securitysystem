@@ -1,4 +1,4 @@
-securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilterFilter', 'btnFormatFilterFilter', function($scope, $http, $location , dayFilterFilter, btnFormatFilterFilter){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilter', 'btnFormatFilter', function($scope, $http, $location , dayFilter, btnFormatFilter){
 
 
   var staticImagesArray = [];
@@ -19,7 +19,7 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilte
           blobData.entries[i].day = days[day - 1]
         }
     staticImagesArray = blobData.entries;
-    $scope.images = dayFilterFilter(staticImagesArray, $scope.checkFilterModel)
+    $scope.images = dayFilter(staticImagesArray, $scope.checkFilterModel)
     $scope.viewImage = $scope.images[$scope.images.length - 1];
     $scope.switchImage($scope.viewImage)
     $scope.loading = false;
@@ -40,6 +40,17 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilte
         })
   };
 
+   $scope.imagePosition = function(){
+    var first = true, last = true;
+
+    if($scope.images.length !== 0){
+      first = $scope.images.indexOf($scope.viewImage) == 0;
+      last = $scope.images.indexOf($scope.viewImage) == $scope.images.length - 1;
+    }
+
+    return {first: first, last: last}
+  };
+
   $scope.browsePicture = function(direction){
     var currentIndex = $scope.images.indexOf($scope.viewImage);
     if(direction == 'left'){
@@ -52,11 +63,11 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilte
   };
 
   $scope.$watchCollection('checkFilterModel', function(newValue, oldValue){
-      $scope.images = dayFilterFilter(staticImagesArray, $scope.checkFilterModel, days)
+      $scope.images = dayFilter(staticImagesArray, $scope.checkFilterModel, days)
       if($scope.images[$scope.images.length - 1]) {
         $scope.switchImage($scope.images[$scope.images.length - 1])
       };
-      var btnFormat = btnFormatFilterFilter(newValue);
+      var btnFormat = btnFormatFilter(newValue);
       $scope.dayList = btnFormat.strikeThrough;
       $scope.btnClass = btnFormat.btnClass;
   });

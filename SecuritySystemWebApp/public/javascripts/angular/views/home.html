@@ -37,12 +37,12 @@
           <img id="displayWindow" src="{{imageUrl}}">
           <div class="well" ng-if="loading">Loading...</div>
           <br>
-          <span id="browseButtons">
-            <button class="btn btn-sm btn-success" ng-class="{disabled: images.indexOf(viewImage) == 0}" ng-click="browsePicture('left')">
+           <span id="browseButtons">
+            <button class="btn btn-sm btn-success" ng-class="{disabled: imagePosition().first}" ng-click="browsePicture('left')">
               <i class="glyphicon glyphicon-menu-left"></i>
             </button>
             <span id="imageTitle">{{viewImage.date || 'No images to display.'}}</span>
-            <button class="btn btn-sm btn-success" ng-class="{disabled: images.indexOf(viewImage) == images.length - 1}" ng-click="browsePicture('right')">
+            <button class="btn btn-sm btn-success" ng-class="{disabled: imagePosition().last}" ng-click="browsePicture('right')">
               <i class="glyphicon glyphicon-menu-right"></i>
             </button>
           </span>

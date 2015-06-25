@@ -1,4 +1,4 @@
-securitySystem.filter('dayFilter', function(){
+securitySystem.filter('day', function(){
 
   return function(input, checkModel, days){
     if(!days) return input;
@@ -11,7 +11,7 @@ securitySystem.filter('dayFilter', function(){
     return filteredArray
   }
 })
-securitySystem.filter('btnFormatFilter', function(){
+securitySystem.filter('btnFormat', function(){
   return function(input){
     var strikeThroughArray = [];
     var btnClassArray = [];
