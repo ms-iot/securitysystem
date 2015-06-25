@@ -1,9 +1,10 @@
 #SecuritySystem
 
 
-##Setting Up Azure
+##Setting Up Azure Credentials
 1. Create a .env file in the root of `security_system_web_app` and add:
 ```
+
 AZURE_STORAGE_ACCOUNT={YOUR_ACCOUNT_NAME}
 AZURE_STORAGE_ACCESS_KEY={YOUR_ACCOUNT_KEY}
 ```
@@ -23,6 +24,7 @@ FACEBOOK_APP_SECRET={YOUR_FACEBOOK_APP_SECRET}
 
 3. Rather than creating an entire database structure to house the user information, all users you'd like to be able to access this app must be added manually to 'allowed-users.js' in the following format:
 ```
+
 var users = {
   "{USER_GITHUB_USERNAME}" : "GitHubUsername",
   "{USER_FACEBOOK_EMAIL}" : "FacebookEmail"

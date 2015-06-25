@@ -1,19 +1,19 @@
 
-securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilterFilter', function($scope, $http, $location , dayFilterFilter){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilterFilter', 'btnFormatFilterFilter', function($scope, $http, $location , dayFilterFilter, btnFormatFilterFilter){
 
 
-var staticImagesArray = [];
-var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-$scope.checkModel = {
-    mon: false,
-    tue: false,
-    wed: false,
-    thu: false,
-    fri: false,
-    sat: false,
-    sun: false
-  };
-$scope.loading = true;
+  var staticImagesArray = [];
+  var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  $scope.checkModel = {
+      mon: false,
+      tue: false,
+      wed: false,
+      thu: false,
+      fri: false,
+      sat: false,
+      sun: false
+    };
+  $scope.loading = true;
 
   $scope.getImages = function(){
     $scope.loading = true;
@@ -54,8 +54,8 @@ $scope.loading = true;
     $scope.viewImage = $scope.images[$scope.images.length - 1];
     $scope.switchImage($scope.viewImage)
     $scope.loading = false;
-  })
-  }
+    });
+  };
 
   $scope.getImages();
   $scope.imageUrl;
@@ -69,29 +69,26 @@ $scope.loading = true;
             $location.path('/')
           }
         })
-  }
+  };
 
 
   $scope.browsePicture = function(direction){
 
     var currentIndex =  $scope.images.indexOf($scope.viewImage);
-    if(direction == 'left' && $scope.images.indexOf($scope.viewImage) != 0){
+    if(direction == 'left'){
       $scope.viewImage = $scope.images[currentIndex - 1];
       $scope.switchImage($scope.viewImage)
-    } else if(direction == 'left'){
-      return;
-    }else if($scope.images.indexOf($scope.viewImage) != $scope.images.length - 1) {
+    } else {
       $scope.viewImage = $scope.images[currentIndex + 1];
       $scope.switchImage($scope.viewImage)
     }
-  }
+  };
 
   $scope.$watchCollection('checkModel', function(newValue, oldValue){
       $scope.images = dayFilterFilter(staticImagesArray, $scope.checkModel)
       $scope.viewImage = $scope.images[$scope.images.length - 1];
-  })
-
-
-
-
-}])
+      var btnFormat = btnFormatFilterFilter(newValue);
+      $scope.dayList = btnFormat.strikeThrough;
+      $scope.btnClass = btnFormat.btnClass;
+  });
+}]);

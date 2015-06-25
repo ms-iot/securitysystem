@@ -8,6 +8,9 @@ a {
   color: #00B7FF;
 }
 
+s {
+  color: black;
+}
 .cardBlock {
   margin-top: 125px;
   min-height:200px;
@@ -71,6 +74,9 @@ a {
   padding-right: 0;
   box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
 }
+.innerStrikeThrough {
+  color: black;
+}
 
 .fakeLink {
   cursor:pointer;
@@ -97,7 +103,7 @@ a {
 /*image*/
 
 #browseButtons {
-  padding-left:26%;
+  padding-left:27.5%;
   color:black;
 }
 
@@ -110,7 +116,7 @@ a {
 #displayWindow {
   box-shadow: .5px .5px 4px 2px rgba(0, 0, 0, 0.2);
   margin-top:75px;
-  margin-left:50px;
+  margin-left:20px;
   margin-bottom:10px;
   border:10px solid rgb(222,222,222);
   border-radius:3px;
@@ -118,6 +124,9 @@ a {
 
 .glyphicon-menu-left, .glyphicon-menu-right, #imageTitle {
   font-size: 20px;
+}
+#imageTitle {
+  min-width:200px;
 }
 
 .pull-right {
@@ -146,26 +155,27 @@ a {
 }
 
 @media (min-width: 992px) and (max-width:1200px) {
- #displayWindow {
+  #displayWindow {
     margin-left: 0px;
   }
 
-img {
-  max-width:600px;
-  max-height: 375px;
-  min-width:600px;
-  min-height: 375px;
-  height:375px;
-  width:600px;
-}
+  img {
+    max-width:600px;
+    max-height: 375px;
+    min-width:600px;
+    min-height: 375px;
+    height:375px;
+    width:600px;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
 
-   #displayWindow {
-    margin-left: 50px;
+  #displayWindow {
+    margin-left: 315px;
   }
-   img {
+
+  img {
     max-width:435px;
     max-height: 300px;
     min-width:435px;
@@ -175,20 +185,16 @@ img {
   }
 
   #browseButtons {
-    padding-left:15%;
+    padding-left:17%;
     font-size: 15px;
     color:black;
-    margin-left: 220px;
-  }
-
-#displayWindow {
-    margin-left: 280px;
+    margin-left: 255px;
   }
 
 }
 @media (min-width:540px) and (max-width: 768px) {
   #displayWindow {
-    margin-left: 60px;
+    margin-left: 100px;
   }
 
   img {
@@ -196,7 +202,7 @@ img {
   }
 
   #browseButtons {
-  padding-left:12%;
+  padding-left:23%;
   font-size: 15px;
   color:black;
 }
@@ -205,22 +211,30 @@ img {
 
 @media (max-width:540px) {
   #displayWindow {
-    margin-left: 30px;
+    margin-left: 10px;
   }
 
   img {
-   max-width:350px;
+   max-width:300px;
   }
 
   #browseButtons {
-  padding-left:12%;
+  padding-left:0;
   font-size: 15px;
   color:black;
-}
+  }
+
+  .btn-sm {
+   padding: 2px 6px;
+  }
+
+  .navbar-right {
+    font-size: 18px;
+  }
 
 }
 
-/*OAuth Login Social Buttons*/
+/*Social Sign-In Buttons for Bootstrap: http://lipis.github.io/bootstrap-social/ */
 
 .btn-social{position:relative;padding-left:44px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .btn-social>:first-child{position:absolute;left:0;top:0;bottom:0;width:32px;line-height:34px;font-size:1.6em;text-align:center;border-right:1px solid rgba(0,0,0,0.2)}
