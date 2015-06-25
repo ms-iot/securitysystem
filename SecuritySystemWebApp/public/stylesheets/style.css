@@ -11,6 +11,7 @@ a {
 s {
   color: black;
 }
+
 .cardBlock {
   margin-top: 125px;
   min-height:200px;
@@ -64,6 +65,7 @@ s {
  margin-top: 15px;
  margin-bottom: 10px;
 }
+
 #sideNav {
   position:fixed;
   z-index:100;
@@ -74,6 +76,7 @@ s {
   padding-right: 0;
   box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
 }
+
 .innerStrikeThrough {
   color: black;
 }
@@ -125,6 +128,7 @@ s {
 .glyphicon-menu-left, .glyphicon-menu-right, #imageTitle {
   font-size: 20px;
 }
+
 #imageTitle {
   min-width:200px;
 }
