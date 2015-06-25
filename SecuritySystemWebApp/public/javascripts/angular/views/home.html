@@ -2,13 +2,13 @@
   <div class="col-md-4 col-lg-3 col-sm-5 hidden-xs" id="sideNav">
     <div class="row stackRow">
      <div class="btn-group">
-        <label class="btn btn-success btn-sm" ng-model="checkModel.mon" btn-checkbox>M</label>
-        <label class="btn btn-success btn-sm" ng-model="checkModel.tue" btn-checkbox>T</label>
-        <label class="btn btn-success btn-sm" ng-model="checkModel.wed" btn-checkbox>W</label>
-        <label class="btn btn-success btn-sm" ng-model="checkModel.thu" btn-checkbox>Th</label>
-        <label class="btn btn-success btn-sm" ng-model="checkModel.fri" btn-checkbox>F</label>
-        <label class="btn btn-success btn-sm" ng-model="checkModel.sat" btn-checkbox>Sa</label>
-        <label class="btn btn-success btn-sm" ng-model="checkModel.sun" btn-checkbox>S</label>
+        <label class="btn btn-success btn-sm" ng-class="btnClass[0]" ng-model="checkModel.mon" ng-bind-html="dayList[0]" btn-checkbox>M</label>
+        <label class="btn btn-success btn-sm" ng-class="btnClass[1]" ng-model="checkModel.tue" ng-bind-html="dayList[1]" btn-checkbox>T</label>
+        <label class="btn btn-success btn-sm" ng-class="btnClass[2]" ng-model="checkModel.wed" ng-bind-html="dayList[2]" btn-checkbox>W</label>
+        <label class="btn btn-success btn-sm" ng-class="btnClass[3]" ng-model="checkModel.thu" ng-bind-html="dayList[3]" btn-checkbox>Th</label>
+        <label class="btn btn-success btn-sm" ng-class="btnClass[4]" ng-model="checkModel.fri" ng-bind-html="dayList[4]" btn-checkbox>F</label>
+        <label class="btn btn-success btn-sm" ng-class="btnClass[5]" ng-model="checkModel.sat" ng-bind-html="dayList[5]" btn-checkbox>Sa</label>
+        <label class="btn btn-success btn-sm" ng-class="btnClass[6]" ng-model="checkModel.sun" ng-bind-html="dayList[6]" btn-checkbox>S</label>
       </div>
         <button class="btn btn-info btn-sm pull-right" ng-click="getImages()"> <i class="glyphicon glyphicon-refresh"></i></button>
     </div>
@@ -41,7 +41,7 @@
           <br>
           <span id="browseButtons">
             <button class="btn btn-sm btn-success" ng-class="{disabled: images.indexOf(viewImage) == 0}" ng-click="browsePicture('left')"><i class="glyphicon glyphicon-menu-left"></i></button>
-            <span id="imageTitle">{{viewImage.date}}</span>
+            <span id="imageTitle">{{viewImage.date || 'No images to display.'}}</span>
             <button class="btn btn-sm btn-success" ng-class="{disabled: images.indexOf(viewImage) == images.length - 1}" ng-click="browsePicture('right')"><i class="glyphicon glyphicon-menu-right"></i></button>
           </span>
         </div>
