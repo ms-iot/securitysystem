@@ -44,11 +44,10 @@ router.get('/images',
 })
 
 router.get('/image/:imagename', ensureAuthenticated, function(req, res){
-  console.log(req.params.imagename);
   var startDate = new Date();
   var expiryDate = new Date(startDate);
-  expiryDate.setMinutes(startDate.getMinutes() + 100);
-  startDate.setMinutes(startDate.getMinutes() - 100);
+  expiryDate.setMinutes(startDate.getMinutes() + 5);
+  startDate.setMinutes(startDate.getMinutes() - 5);
 
   var sharedAccessPolicy = {
     AccessPolicy: {
@@ -59,10 +58,7 @@ router.get('/image/:imagename', ensureAuthenticated, function(req, res){
   };
   var token = blobService.generateSharedAccessSignature('imagecontainer', req.params.imagename, sharedAccessPolicy);
   var tempUrl = blobService.getUrl('imagecontainer', req.params.imagename, token);
-  
-  console.log('tempUrl');
-  console.log(tempUrl);
-  
+
   res.send(tempUrl);
 });
 
@@ -72,8 +68,7 @@ router.get('/login', function(req, res){
 });
 
 function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    console.log('request authenticated');
+  if (req.isAuthenticated() || req.session.passportInitialized === false) {
     return next();
   }
   console.log("not authenticated, going to login page");

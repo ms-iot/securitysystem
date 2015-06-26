@@ -1,56 +1,26 @@
-
-securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilterFilter', 'btnFormatFilterFilter', function($scope, $http, $location , dayFilterFilter, btnFormatFilterFilter){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', function($scope, $http, $location, $anchorScroll){
 
 
   var staticImagesArray = [];
-  var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  $scope.checkModel = {
-      mon: false,
-      tue: false,
-      wed: false,
-      thu: false,
-      fri: false,
-      sat: false,
-      sun: false
-    };
+  var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  $scope.dayList = ["M", "T", "W", "Th", "F", "Sa", "S"]
   $scope.loading = true;
+  $scope.imageUrl;
 
   $scope.getImages = function(){
     $scope.loading = true;
-
     $http.get('/images')
       .success(function(blobData){
-        console.log(blobData);
         for(var i = 0; i < blobData.entries.length; i++){
           //DateTime formatting.
           var date = new Date(blobData.entries[i].milliseconds).toLocaleString();
           blobData.entries[i].date = date;
-          switch(new Date(date).getDay()){
-            case 1:
-              blobData.entries[i].day = days[1];
-              break;
-            case 2:
-              blobData.entries[i].day = days[2];
-              break;
-            case 3:
-              blobData.entries[i].day = days[3];
-              break;
-            case 4:
-              blobData.entries[i].day = days[4];
-              break;
-            case 5:
-              blobData.entries[i].day = days[5];
-              break;
-            case 6:
-              blobData.entries[i].day = days[6];
-              break;
-            case 7:
-              blobData.entries[i].day = days[0];
-              break;
-          }
+          var day = new Date(blobData.entries[i].milliseconds).getDay();
+          console.log(date);
+          blobData.entries[i].day = days[day - 1]
         }
     staticImagesArray = blobData.entries;
-    $scope.images = dayFilterFilter(staticImagesArray, $scope.checkModel)
+    $scope.images = staticImagesArray;
     $scope.viewImage = $scope.images[$scope.images.length - 1];
     $scope.switchImage($scope.viewImage)
     $scope.loading = false;
@@ -58,11 +28,11 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilte
   };
 
   $scope.getImages();
-  $scope.imageUrl;
+
+
   $scope.switchImage = function(image, redirect){
       $http.get('/image/'+image.name)
         .success(function(url){
-          console.log('made it : ', url)
           $scope.imageUrl = url
           $scope.viewImage = image;
           if(redirect === true){
@@ -71,24 +41,25 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilte
         })
   };
 
+   $scope.imagePosition = function(){
+    var first = true, last = true;
 
-  $scope.browsePicture = function(direction){
-
-    var currentIndex =  $scope.images.indexOf($scope.viewImage);
-    if(direction == 'left'){
-      $scope.viewImage = $scope.images[currentIndex - 1];
-      $scope.switchImage($scope.viewImage)
-    } else {
-      $scope.viewImage = $scope.images[currentIndex + 1];
-      $scope.switchImage($scope.viewImage)
+    if($scope.images.length !== 0){
+      first = $scope.images.indexOf($scope.viewImage) == 0;
+      last = $scope.images.indexOf($scope.viewImage) == $scope.images.length - 1;
     }
+
+    return {first: first, last: last}
   };
 
-  $scope.$watchCollection('checkModel', function(newValue, oldValue){
-      $scope.images = dayFilterFilter(staticImagesArray, $scope.checkModel)
-      $scope.viewImage = $scope.images[$scope.images.length - 1];
-      var btnFormat = btnFormatFilterFilter(newValue);
-      $scope.dayList = btnFormat.strikeThrough;
-      $scope.btnClass = btnFormat.btnClass;
-  });
+  $scope.browsePicture = function(direction){
+    var currentIndex = $scope.images.indexOf($scope.viewImage);
+    $scope.viewImage = $scope.images[currentIndex + direction];
+    $scope.switchImage($scope.viewImage);
+  };
+
+  $scope.scrollSpy = function(index){
+    $anchorScroll(days[index])
+  }
+
 }]);
