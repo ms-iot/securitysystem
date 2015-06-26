@@ -24,14 +24,14 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private string accountName = "securitysystemstorage";
-        private string accountKey = "BzbVAphWQwVAk9/ooBS14G5zzKABfIAEqAhaDC6MU1Be0ReBTyymqB3ibZmm0VXniMP7Uw6Y5bewWib6tuKqPw==";
+        //TODO: Input account name and account key in variables below
+        private string accountName = "";
+        private string accountKey = "";
         private string blobType = "BlockBlob";
         private string sharedKeyAuthorizationScheme = "SharedKey";
 
-        private DispatcherTimer deleteImageTimer;
         private DispatcherTimer uploadPicturesTimer;
-        private readonly TimeSpan uploadPicturesIntervalDuration = new TimeSpan(0, 0, 10);
+        private DispatcherTimer deletePicturesTimer;
         private static Mutex uploadPicturesMutexLock = new Mutex();
 
         public MainPage()
@@ -44,14 +44,15 @@ namespace SecuritySystemUWP
         {
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
-            uploadPicturesTimer.Interval = uploadPicturesIntervalDuration;
+            uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
             uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
             uploadPicturesTimer.Start();
 
             //Timer controlling deletion of old pictures
-            deleteImageTimer = new DispatcherTimer();
-            deleteImageTimer.Interval = TimeSpan.FromMilliseconds(TimeSpan.FromHours(1).TotalMilliseconds);
-            deleteImageTimer.Tick += deletePicturesTimer_Tick;
+            deletePicturesTimer = new DispatcherTimer();
+            deletePicturesTimer.Interval = TimeSpan.FromHours(1);
+            deletePicturesTimer.Tick += deletePicturesTimer_Tick;
+            deletePicturesTimer.Start();
         }
 
 
