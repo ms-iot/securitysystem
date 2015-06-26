@@ -1,8 +1,9 @@
-securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', 'dayFilter', 'btnFormatFilter', function($scope, $http, $location, $anchorScroll, dayFilter, btnFormatFilter){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', 'dayFilter', function($scope, $http, $location, $anchorScroll, dayFilter){
 
 
   var staticImagesArray = [];
   var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  $scope.dayList = ["M", "T", "W", "Th", "F", "Sa", "S"]
   $scope.checkFilterModel = [false, false, false, false, false, false, false];
   $scope.loading = true;
   $scope.imageUrl;
@@ -72,9 +73,6 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
       if($scope.images[$scope.images.length - 1]) {
         $scope.switchImage($scope.images[$scope.images.length - 1])
       };
-      var btnFormat = btnFormatFilter(newValue);
-      $scope.dayList = btnFormat.strikeThrough;
-      $scope.btnClass = btnFormat.btnClass;
   });
 
 }]);
