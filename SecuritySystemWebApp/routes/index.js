@@ -68,8 +68,7 @@ router.get('/login', function(req, res){
 });
 
 function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    console.log('request authenticated');
+  if (req.isAuthenticated() || req.session.passportInitialized === false) {
     return next();
   }
   console.log("not authenticated, going to login page");

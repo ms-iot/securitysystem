@@ -1,4 +1,4 @@
-securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilter', 'btnFormatFilter', function($scope, $http, $location , dayFilter, btnFormatFilter){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', 'dayFilter', 'btnFormatFilter', function($scope, $http, $location, $anchorScroll, dayFilter, btnFormatFilter){
 
 
   var staticImagesArray = [];
@@ -15,7 +15,8 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilte
           //DateTime formatting.
           var date = new Date(blobData.entries[i].milliseconds).toLocaleString();
           blobData.entries[i].date = date;
-          var day = new Date(date).getDay();
+          var day = new Date(blobData.entries[i].milliseconds).getDay();
+          console.log(date);
           blobData.entries[i].day = days[day - 1]
         }
     staticImagesArray = blobData.entries;
@@ -61,6 +62,10 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', 'dayFilte
       $scope.switchImage($scope.viewImage)
     }
   };
+
+  $scope.scrollSpy = function(index){
+    $anchorScroll(days[index])
+  }
 
   $scope.$watchCollection('checkFilterModel', function(newValue, oldValue){
       $scope.images = dayFilter(staticImagesArray, $scope.checkFilterModel, days)
