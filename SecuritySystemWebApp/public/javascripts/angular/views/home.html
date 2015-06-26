@@ -2,7 +2,7 @@
   <div class="col-md-4 col-lg-3 col-sm-5 hidden-xs" id="sideNav">
     <div class="row stackRow">
      <div class="btn-group">
-        <label ng-repeat="label in checkFilterModel track by $index" ng-click="scrollSpy($index)" class="btn btn-success btn-sm">{{dayList[$index]}}</label>
+        <label ng-repeat="label in dayList track by $index" ng-click="scrollSpy($index)" class="btn btn-success btn-sm">{{dayList[$index]}}</label>
       </div>
         <button class="btn btn-info btn-sm pull-right" ng-click="getImages()">
           <i class="glyphicon glyphicon-refresh"></i>

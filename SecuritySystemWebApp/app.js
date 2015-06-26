@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 var authenticationStrategies = require('./authenticationStrategies.js')
 
-var authenticationOn = false;
+var authenticationOn = false
 
 
 //.env file

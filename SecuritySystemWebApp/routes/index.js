@@ -46,8 +46,8 @@ router.get('/images',
 router.get('/image/:imagename', ensureAuthenticated, function(req, res){
   var startDate = new Date();
   var expiryDate = new Date(startDate);
-  expiryDate.setMinutes(startDate.getMinutes() + 100);
-  startDate.setMinutes(startDate.getMinutes() - 100);
+  expiryDate.setMinutes(startDate.getMinutes() + 5);
+  startDate.setMinutes(startDate.getMinutes() - 5);
 
   var sharedAccessPolicy = {
     AccessPolicy: {

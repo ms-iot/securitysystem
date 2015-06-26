@@ -1,10 +1,9 @@
-securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', 'dayFilter', function($scope, $http, $location, $anchorScroll, dayFilter){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', function($scope, $http, $location, $anchorScroll){
 
 
   var staticImagesArray = [];
   var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   $scope.dayList = ["M", "T", "W", "Th", "F", "Sa", "S"]
-  $scope.checkFilterModel = [false, false, false, false, false, false, false];
   $scope.loading = true;
   $scope.imageUrl;
 
@@ -21,7 +20,7 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
           blobData.entries[i].day = days[day - 1]
         }
     staticImagesArray = blobData.entries;
-    $scope.images = dayFilter(staticImagesArray, $scope.checkFilterModel)
+    $scope.images = staticImagesArray;
     $scope.viewImage = $scope.images[$scope.images.length - 1];
     $scope.switchImage($scope.viewImage)
     $scope.loading = false;
@@ -55,24 +54,12 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
 
   $scope.browsePicture = function(direction){
     var currentIndex = $scope.images.indexOf($scope.viewImage);
-    if(direction == 'left'){
-      $scope.viewImage = $scope.images[currentIndex - 1];
-      $scope.switchImage($scope.viewImage)
-    } else {
-      $scope.viewImage = $scope.images[currentIndex + 1];
-      $scope.switchImage($scope.viewImage)
-    }
+    $scope.viewImage = $scope.images[currentIndex + direction];
+    $scope.switchImage($scope.viewImage);
   };
 
   $scope.scrollSpy = function(index){
     $anchorScroll(days[index])
   }
-
-  $scope.$watchCollection('checkFilterModel', function(newValue, oldValue){
-      $scope.images = dayFilter(staticImagesArray, $scope.checkFilterModel, days)
-      if($scope.images[$scope.images.length - 1]) {
-        $scope.switchImage($scope.images[$scope.images.length - 1])
-      };
-  });
 
 }]);
