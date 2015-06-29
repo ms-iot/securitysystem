@@ -60,12 +60,6 @@ router.get('/image/:imagename', ensureAuthenticated, function(req, res){
   var token = blobService.generateSharedAccessSignature('imagecontainer', req.params.imagename, sharedAccessPolicy);
   var tempUrl = blobService.getUrl('imagecontainer', req.params.imagename, token);
 
-<<<<<<< HEAD:security_system_web_app/routes/index.js
-  console.log('tempUrl');
-  console.log(tempUrl);
-
-=======
->>>>>>> master:SecuritySystemWebApp/routes/index.js
   res.send(tempUrl);
 });
 

@@ -8,13 +8,6 @@ a {
   color: #00B7FF;
 }
 
-<<<<<<< HEAD:security_system_web_app/public/stylesheets/style.css
-=======
-s {
-  color: black;
-}
-
->>>>>>> master:SecuritySystemWebApp/public/stylesheets/style.css
 .cardBlock {
   margin-top: 125px;
   min-height:200px;
@@ -79,10 +72,6 @@ s {
   box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
 }
 
-.innerStrikeThrough {
-  color: black;
-}
-
 .fakeLink {
   cursor:pointer;
 }
@@ -113,6 +102,7 @@ s {
 }
 
 #browseButtons > button {
+  border-radius: 0;
   margin-left:5px;
   margin-right:5px;
   box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
