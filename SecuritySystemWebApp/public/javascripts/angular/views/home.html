@@ -1,0 +1,54 @@
+<div class="row">
+  <div class="col-md-4 col-lg-3 col-sm-5 hidden-xs" id="sideNav">
+    <div class="row stackRow">
+     <div class="btn-group">
+        <label ng-repeat="label in dayList track by $index" ng-click="scrollSpy($index)" class="btn btn-success btn-sm">{{dayList[$index]}}</label>
+      </div>
+        <button class="btn btn-info btn-sm pull-right" ng-click="getImages()">
+          <i class="glyphicon glyphicon-refresh"></i>
+        </button>
+    </div>
+    <div class="row stackRow">
+        <ul class="list-group" id="mainList">
+          <li id="{{image.day}}" class="list-group-item fakeLink" ng-click="switchImage(image)" ng-repeat="image in images">
+              <h4 class="list-group-item-heading">{{image.day}}</h4>
+              <p class="list-group-item-text">{{image.date}}</p>
+          </li>
+        </ul>
+    </div>
+    <div class="row stackRow text-center">
+    </div>
+  </div>
+    <nav class="navbar navbar-default">
+      <div>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="navbar-text text-center">
+            Security System Footage
+            <a href="#!/mobileNav" type="button" id="hamburgerMenu" class="btn-sm btn pull-right visible-xs">
+              <i class="glyphicon glyphicon-menu-hamburger"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 col-md-offset-4 col-sm-12">
+          <img id="displayWindow" src="{{imageUrl}}">
+          <div class="well" ng-if="loading">Loading...</div>
+
+          <br>
+           <span id="browseButtons">
+            <button class="btn btn-sm btn-success" ng-class="{disabled: imagePosition().first}" ng-click="browsePicture(-1)">
+              <i class="glyphicon glyphicon-menu-left"></i>
+            </button>
+            <span id="imageTitle">{{viewImage.date || 'No images to display.'}}</span>
+            <button class="btn btn-sm btn-success" ng-class="{disabled: imagePosition().last}" ng-click="browsePicture(1)">
+              <i class="glyphicon glyphicon-menu-right"></i>
+            </button>
+          </span>
+        </div>
+      </div>
+  </div>
+</div>
+

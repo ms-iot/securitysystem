@@ -10,9 +10,20 @@
   <link rel="stylesheet" href="stylesheets/style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.1/angular.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.1/angular-route.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.1/angular-sanitize.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap.js"></script>
   <script src="javascripts/angular/app.js"></script>
   <script src="javascripts/angular/controllers/homeCtrl.js"></script>
   <script src="javascripts/angular/filters/filters.js"></script>
+  <script type="text/javascript">
+    var appInsights=window.appInsights||function(config){
+        function s(config){t[config]=function(){var i=arguments;t.queue.push(function(){t[config].apply(t,i)})}}var t={config:config},r=document,f=window,e="script",o=r.createElement(e),i,u;for(o.src=config.url||"//az416426.vo.msecnd.net/scripts/a/ai.0.js",r.getElementsByTagName(e)[0].parentNode.appendChild(o),t.cookie=r.cookie,t.queue=[],i=["Event","Exception","Metric","PageView","Trace"];i.length;)s("track"+i.pop());return config.disableExceptionTracking||(i="onerror",s("_"+i),u=f[i],f[i]=function(config,r,f,e,o){var s=u&&u(config,r,f,e,o);return s!==!0&&t["_"+i](config,r,f,e,o),s}),t
+    }({
+        instrumentationKey:"7295e666-4ffd-4e52-860d-850011b6d14b"
+    });
+
+    window.appInsights=appInsights;
+    appInsights.trackPageView();
+</script>
 </head>
 <body ng-app="securitySystem" ng-controller="homeCtrl">

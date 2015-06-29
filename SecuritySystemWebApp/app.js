@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 var authenticationStrategies = require('./authenticationStrategies.js')
 
+var authenticationOn = false
+
 
 //.env file
 env('./.env')
@@ -32,26 +34,35 @@ app.use(session({
   secret: ';alsk08usahjl123n4123',
   resave: false,
   saveUninitialized: false}));
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(function (req, res, next) {
+  req.session.passportInitialized = authenticationOn
+  next();
+});
+
+if(authenticationOn == true) {
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  passport.serializeUser(function(user, done) {
+    console.log("serializing");
+    console.log(user);
+    done(null, user);
+  });
+
+  passport.deserializeUser(function(user, done) {
+    console.log("deserializing");
+    console.log(user);
+    done(null, user);
+  });
+  app.use('/auth', auth);
+}
+
+
 app.use('/', index);
-app.use('/auth', auth);
 
 
-passport.serializeUser(function(user, done) {
-  console.log("serializing");
-  console.log(user);
-  done(null, user);
-});
-
-passport.deserializeUser(function(user, done) {
-  console.log("deserializing");
-  console.log(user);
-  done(null, user);
-});
 
 
-// app.use('/', routes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
