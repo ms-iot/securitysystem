@@ -1,4 +1,4 @@
-var securitySystem = angular.module('securitySystem', ['ngRoute', 'ui.bootstrap', 'ngSanitize']);
+var securitySystem = angular.module('securitySystem', ['ngRoute', 'ngSanitize']);
 
 securitySystem.config(['$routeProvider','$locationProvider',function($routeProvider, $locationProvider){
 

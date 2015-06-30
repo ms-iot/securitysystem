@@ -16,7 +16,6 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
           var date = new Date(blobData.entries[i].milliseconds).toLocaleString();
           blobData.entries[i].date = date;
           var day = new Date(blobData.entries[i].milliseconds).getDay();
-          console.log(date);
           blobData.entries[i].day = days[day - 1]
         }
     staticImagesArray = blobData.entries;
@@ -44,7 +43,7 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
    $scope.imagePosition = function(){
     var first = true, last = true;
 
-    if($scope.images.length !== 0){
+    if($scope.images && $scope.images.length !== 0){
       first = $scope.images.indexOf($scope.viewImage) == 0;
       last = $scope.images.indexOf($scope.viewImage) == $scope.images.length - 1;
     }
