@@ -12,9 +12,13 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Controls;
 using Windows.Storage.Search;
 using Windows.Storage;
 using System.Threading;
+
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace SecuritySystemUWP
@@ -24,12 +28,16 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        //TODO: Input account name and account key in variables below
+        //TODO: Select storage type: 0 for OneDrive, 1 for Azure
+        public byte storageType = 0;
+
+        //TODO: If Azure, input account name and account key in variables below
         private string accountName = "";
         private string accountKey = "";
+
         private string blobType = "BlockBlob";
         private string sharedKeyAuthorizationScheme = "SharedKey";
-
+        static readonly UInt32 reloadContentFileCount = 10;
         private DispatcherTimer uploadPicturesTimer;
         private DispatcherTimer deletePicturesTimer;
         private static Mutex uploadPicturesMutexLock = new Mutex();
@@ -42,21 +50,93 @@ namespace SecuritySystemUWP
 
         private void Initialize()
         {
-            //Timer controlling camera pictures with motion
-            uploadPicturesTimer = new DispatcherTimer();
-            uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
-            uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
-            uploadPicturesTimer.Start();
+            if (storageType == 1)
+            {
+                //Timer controlling camera pictures with motion
+                uploadPicturesTimer = new DispatcherTimer();
+                uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
+                uploadPicturesTimer.Tick += Azure_uploadPicturesTimer_Tick;
+                uploadPicturesTimer.Start();
 
-            //Timer controlling deletion of old pictures
-            deletePicturesTimer = new DispatcherTimer();
-            deletePicturesTimer.Interval = TimeSpan.FromHours(1);
-            deletePicturesTimer.Tick += deletePicturesTimer_Tick;
-            deletePicturesTimer.Start();
+                //Timer controlling deletion of old pictures
+                deletePicturesTimer = new DispatcherTimer();
+                deletePicturesTimer.Interval = TimeSpan.FromHours(1);
+                deletePicturesTimer.Tick += Azure_deletePicturesTimer_Tick;
+                deletePicturesTimer.Start();
+            }
+            else
+            {
+                //Timer controlling camera pictures with motion
+                uploadPicturesTimer = new DispatcherTimer();
+                uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
+                uploadPicturesTimer.Tick += OneDrive_uploadPicturesTimer_Tick;
+                uploadPicturesTimer.Start();
+            }
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            if (storageType == 0)
+            {
+                if (OneDriveHelper.isLoggedin)
+                {
+                    OnedriveLogin.Content = "Logout from OneDrive";
+                }
+                else
+                {
+                    OnedriveLogin.Content = "Login to OneDrive";
+                }
+            }
+        }
+
+        private async void OnedriveLogin_Click(object sender, RoutedEventArgs e)
+        {
+            if (OneDriveHelper.isLoggedin)
+            {
+                await OneDriveHelper.logout();
+                OnedriveLogin.Content = "Login to OneDrive";
+            }
+            else
+            {
+                this.Frame.Navigate(typeof(OnedriveLoginPage));
+            }
+
+        }
+        private async void OneDrive_uploadPicturesTimer_Tick(object sender, object e)
+        {
+            // enter mutex critical section to make this thread-safe
+            uploadPicturesMutexLock.WaitOne();
+            try
+            {
+                QueryOptions querySubfolders = new QueryOptions();
+                querySubfolders.FolderDepth = FolderDepth.Deep;
+
+                StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
+                var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
+                var files = await result.GetFilesAsync();
+
+                foreach (StorageFile file in files)
+                { 
+                    var imageName = DateTime.UtcNow.Ticks.ToString() + ".jpg";
+                    if (OneDriveHelper.isLoggedin)
+                    {
+                        await OneDriveHelper.UploadFile(file, imageName);
+                        await file.DeleteAsync();
+                    }                  
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception in processPictures(): " + ex.Message);
+            }
+            finally
+            {
+                uploadPicturesMutexLock.ReleaseMutex();
+            }
         }
 
 
-        private async void uploadPicturesTimer_Tick(object sender, object e)
+        private async void Azure_uploadPicturesTimer_Tick(object sender, object e)
         {
             uploadPicturesMutexLock.WaitOne();
             BlobHelper BlobHelper = new BlobHelper(accountName, accountKey);
@@ -101,7 +181,7 @@ namespace SecuritySystemUWP
             }
         }
 
-        private async void deletePicturesTimer_Tick(object sender, object e)
+        private async void Azure_deletePicturesTimer_Tick(object sender, object e)
         {
             BlobHelper BlobHelper = new BlobHelper(accountName, accountKey);
 

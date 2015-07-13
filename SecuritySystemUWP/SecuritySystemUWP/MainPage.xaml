@@ -8,8 +8,11 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <StackPanel>
-            <Image x:Name = "image" HorizontalAlignment = "Center" Margin = "10" Height = "100" Width = "100" />
-        </StackPanel>
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+        <Button Name="OnedriveLogin" FontWeight="Light" Content="Login to OneDrive" FontSize="29.333" Click="OnedriveLogin_Click" Height="52" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </Page>

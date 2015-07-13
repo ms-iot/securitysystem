@@ -98,6 +98,8 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OneDriveHelper.cs" />
+    <Compile Include="OnedriveLoginPage.xaml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RESTHelper.cs" />
   </ItemGroup>
@@ -123,6 +125,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="OnedriveLoginPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

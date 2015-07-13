@@ -123,7 +123,6 @@ namespace SecuritySystemUWP
                         foreach (XElement blob in x.Element("Blobs").Elements("Blob"))
                         {
                             blobs.Add(blob.Element("Name").Value);
-                            //Debug.WriteLine(blob.Element("Name").Value);
                         }
                     }
                 }
