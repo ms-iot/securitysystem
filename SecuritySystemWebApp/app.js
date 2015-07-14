@@ -8,9 +8,11 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 var authenticationStrategies = require('./authenticationStrategies.js')
 
+//set to 'true' if you want authentication AND are using Azure Blob storage.
 var authenticationOn = false
 
-var storageService = "oneDrive"
+// must be set to "oneDrive" or "azure"
+var storageService = "azure"
 
 
 //.env file

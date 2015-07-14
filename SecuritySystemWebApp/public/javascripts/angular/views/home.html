@@ -1,4 +1,4 @@
-<div id="securityBody" layout="vertical">
+<div id="securityBody" layout-align-sm="center center" layout="vertical">
   <md-sidenav class="md-sidenav-left" md-component-id="left"  md-is-locked-open="$mdMedia('gt-md')">
       <md-toolbar>
         <span>
@@ -32,7 +32,7 @@
   </div>
   <div id="pictureView" layout-gt-sm="row" layout-xs="column" flex-offset-sm="20" flex-offset-gt-md="20" flex-gt-md="80" flex-md="100" layout-align-gt-md="space-around center" layout-align="space-around center" ng-if="loading === false">
     <div layout="column" layout-align="center">
-      <md-button ng-disabled="imagePosition().first" id="browseLeft" class="md-fab md-primary" ng-click="browsePicture(-1)">
+      <md-button hide-sm show-gt-sm ng-disabled="imagePosition().first" id="browseLeft" class="md-fab md-primary" ng-click="browsePicture(-1)">
         <i class="fa fa-chevron-left fa-2x"></i>
       </md-button>
     </div>
@@ -43,7 +43,10 @@
         <h3> {{viewImage.date}} </h3>
       </md-content>
     </md-card>
-    <div layout="column" layout-align="center">
+    <div id="buttonRow" layout-gt-md="column" layout-md="row" layout-align-md="space-around center">
+       <md-button hide-gt-sm ng-disabled="imagePosition().first" id="browseLeft" class="md-fab md-primary" ng-click="browsePicture(-1)">
+        <i class="fa fa-chevron-left fa-2x"></i>
+      </md-button>
       <md-button ng-disabled="imagePosition().last" id="browseRight" class="md-fab md-primary" ng-click="browsePicture(1)">
         <i class="fa fa-chevron-right fa-2x"></i>
       </md-button>

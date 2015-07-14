@@ -23,6 +23,7 @@ router.post('/images', function(req, res) {
   var accessToken = url.slice(tokenStart + 13, tokenEnd);
   request('https://api.onedrive.com/v1.0/drive/special/photos:/securitysystem:/children?access_token=' + accessToken, function(error, response, body) {
     var parsedBody = JSON.parse(body).value
+    if(parsedBody) {
       for(var i = 0; i < parsedBody.length; i++){
                 // using npm module bigInt, because the number of .NET ticks
                 // is a number with too many digits for vanilla JavaScript
@@ -36,6 +37,7 @@ router.post('/images', function(req, res) {
                 //display in the user's local timezone.
                 parsedBody[i].milliseconds = milliseconds.value
               }
+    }
     res.send({images: parsedBody, storageService: "oneDrive"})
   })
 

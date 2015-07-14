@@ -22,14 +22,14 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
           response.images[i].date = localDate;
           var day = new Date(response.images[i].milliseconds).getDay();
           response.images[i].day = days[day]
-          var dateOnly = localDate.slice(0, localDate.search(','))
-          if($scope.dateList.indexOf((new Date(dateOnly)).toISOString().slice(0,10)) === -1){
-            $scope.dateList.push((new Date(dateOnly)).toISOString().slice(0,10))
-            $scope.dayList.push(days[(new Date(dateOnly)).getDay()])
+          var dateOnly = localDate.slice(0, localDate.search(',')),
+          dateObject = new Date(dateOnly)
+          if($scope.dateList.indexOf(dateObject.toISOString().slice(0,10)) === -1){
+            $scope.dateList.push(dateObject.toISOString().slice(0,10))
+            $scope.dayList.push(days[dateObject.getDay()])
           }
         }
-        staticImagesArray = response.images;
-        staticImagesArray = staticImagesArray.reverse()
+        staticImagesArray = response.images.reverse();
         $scope.images = staticImagesArray;
         $scope.viewImage = $scope.images[0];
         $scope.switchImage($scope.viewImage);
@@ -47,6 +47,7 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
           $scope.viewImage = image;
         })
     } else {
+      $scope.viewImage = image;
       $scope.imageUrl = image["@content.downloadUrl"]
     }
   };
@@ -76,7 +77,8 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
     var day = (new Date(index)).getDay()
     $location.hash(days[day])
     $anchorScroll()
-    $location.hash('')
+    $location.hash(null)
+    $scope.selectedDate = null
   }
 
 }]);
