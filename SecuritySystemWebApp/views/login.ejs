@@ -1,26 +1,14 @@
 <% include partials/header.ejs %>
-<nav class="navbar navbar-default" role="navigation">
-  <!-- Brand and toggle get grouped for better mobile display -->
-  <div class="navbar-header">
-    <a class="navbar-brand text-center">Security System Footage</a>
-  </div>
-
-  </div><!-- /.navbar-collapse -->
-</nav>
-  <div class="container">
-    <div class="row">
-      <div class="col-xs-12 col-sm-4 col-sm-offset-4 text-center cardBlock">
-        <a class="btn btn-block btn-lg btn-social btn-github" href="/auth/github">
+  <div id="loginBlock" layout="column" layout-align="center center">
+    <md-card>
+        <md-button class="btn btn-block btn-lg btn-social btn-github" href="/auth/github">
           <i class="fa fa-github"></i>
           Sign in with GitHub
-        </a>
-         <a class="btn btn-block btn-lg btn-social btn-facebook" href="/auth/facebook">
+        </md-button>
+         <md-button class="btn btn-block btn-lg btn-social btn-facebook" href="/auth/facebook">
           <i class="fa fa-facebook"></i>
           Sign in with Facebook
-        </a>
-
-      </div>
-    </div>
+        </md-button>
+    </md-card>
   </div>
-
 <% include partials/footer.ejs %>

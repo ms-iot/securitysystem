@@ -1,43 +1,55 @@
-securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', function($scope, $http, $location, $anchorScroll){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', '$mdSidenav', '$rootScope', function($scope, $http, $location, $anchorScroll, $mdSidenav, $rootScope){
 
 
-  var staticImagesArray = [];
-  var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  $scope.dayList = ["M", "T", "W", "Th", "F", "Sa", "S"]
+  var staticImagesArray = [],
+      days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      storageService;
+  $scope.dateList = []
+  $scope.dayList = []
   $scope.loading = true;
   $scope.imageUrl;
+  $scope.selectedDate;
 
   $scope.getImages = function(){
     $scope.loading = true;
-    $http.get('/images')
-      .success(function(blobData){
-        for(var i = 0; i < blobData.entries.length; i++){
+    $http.post('/images', {url: $location.absUrl()})
+      .success(function(response){
+        storageService = response.storageService
+        for(var i = 0; i < response.images.length; i++){
           //DateTime formatting.
-          var date = new Date(blobData.entries[i].milliseconds).toLocaleString();
-          blobData.entries[i].date = date;
-          var day = new Date(blobData.entries[i].milliseconds).getDay();
-          blobData.entries[i].day = days[day - 1]
+          var date = new Date(response.images[i].milliseconds)
+          var localDate = date.toLocaleString();
+          response.images[i].date = localDate;
+          var day = new Date(response.images[i].milliseconds).getDay();
+          response.images[i].day = days[day]
+          var dateOnly = localDate.slice(0, localDate.search(',')),
+          dateObject = new Date(dateOnly)
+          if($scope.dateList.indexOf(dateObject.toISOString().slice(0,10)) === -1){
+            $scope.dateList.push(dateObject.toISOString().slice(0,10))
+            $scope.dayList.push(days[dateObject.getDay()])
+          }
         }
-    staticImagesArray = blobData.entries;
-    $scope.images = staticImagesArray;
-    $scope.viewImage = $scope.images[$scope.images.length - 1];
-    $scope.switchImage($scope.viewImage)
-    $scope.loading = false;
+        staticImagesArray = response.images.reverse();
+        $scope.images = staticImagesArray;
+        $scope.viewImage = $scope.images[0];
+        $scope.switchImage($scope.viewImage);
+        $scope.loading = false;
     });
   };
-
   $scope.getImages();
 
 
   $scope.switchImage = function(image, redirect){
+    if(storageService === "azure") {
       $http.get('/image/'+image.name)
         .success(function(url){
           $scope.imageUrl = url
           $scope.viewImage = image;
-          if(redirect === true){
-            $location.path('/')
-          }
         })
+    } else {
+      $scope.viewImage = image;
+      $scope.imageUrl = image["@content.downloadUrl"]
+    }
   };
 
    $scope.imagePosition = function(){
@@ -57,8 +69,16 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
     $scope.switchImage($scope.viewImage);
   };
 
+  $rootScope.toggleSidenav = function(id) {
+      $mdSidenav(id).toggle()
+   }
+
   $scope.scrollSpy = function(index){
-    $anchorScroll(days[index])
+    var day = (new Date(index)).getDay()
+    $location.hash(days[day])
+    $anchorScroll()
+    $location.hash(null)
+    $scope.selectedDate = null
   }
 
 }]);
