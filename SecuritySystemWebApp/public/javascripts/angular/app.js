@@ -1,4 +1,4 @@
-var securitySystem = angular.module('securitySystem', ['ngRoute', 'ui.bootstrap', 'ngSanitize']);
+var securitySystem = angular.module('securitySystem', ['ngRoute', 'ngMaterial']);
 
 securitySystem.config(['$routeProvider','$locationProvider',function($routeProvider, $locationProvider){
 
@@ -6,9 +6,6 @@ securitySystem.config(['$routeProvider','$locationProvider',function($routeProvi
   $routeProvider
   .when('/',{
     templateUrl:'javascripts/angular/views/home.html'
-  })
-  .when('/mobileNav',{
-    templateUrl:'javascripts/angular/views/mobileNav.html'
   })
 
   $locationProvider.hashPrefix('!')

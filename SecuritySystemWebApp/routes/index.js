@@ -15,7 +15,7 @@ router.get('/',
     res.render('index');
 });
 
-router.get('/images',
+router.post('/images',
   ensureAuthenticated,
   function(req,res){
     var images = [];
@@ -36,7 +36,8 @@ router.get('/images',
                 //display in the user's local timezone.
                 images.entries[i].milliseconds = milliseconds.value
               }
-            res.send(images);
+            console.log(images)
+            res.send({images: images.entries, storageService: "azure"});
           } else {
             res.send(error);
           }

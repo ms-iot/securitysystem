@@ -4,17 +4,18 @@
   <title>Security System</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" media="screen" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="stylesheets/style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.1/angular.js"></script>
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.10.0/angular-material.css">
+  <link rel="stylesheet" href="stylesheets/style.css">
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.1/angular-route.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.1/angular-sanitize.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.10.0/angular-material.js"></script>
   <script src="javascripts/angular/app.js"></script>
   <script src="javascripts/angular/controllers/homeCtrl.js"></script>
-  <script src="javascripts/angular/filters/filters.js"></script>
   <script type="text/javascript">
     var appInsights=window.appInsights||function(config){
         function s(config){t[config]=function(){var i=arguments;t.queue.push(function(){t[config].apply(t,i)})}}var t={config:config},r=document,f=window,e="script",o=r.createElement(e),i,u;for(o.src=config.url||"//az416426.vo.msecnd.net/scripts/a/ai.0.js",r.getElementsByTagName(e)[0].parentNode.appendChild(o),t.cookie=r.cookie,t.queue=[],i=["Event","Exception","Metric","PageView","Trace"];i.length;)s("track"+i.pop());return config.disableExceptionTracking||(i="onerror",s("_"+i),u=f[i],f[i]=function(config,r,f,e,o){var s=u&&u(config,r,f,e,o);return s!==!0&&t["_"+i](config,r,f,e,o),s}),t
@@ -26,4 +27,17 @@
     appInsights.trackPageView();
 </script>
 </head>
-<body ng-app="securitySystem" ng-controller="homeCtrl">
+<div layout="column" layout-fill id="mainView">
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <a href="#!/">
+        <span id="brandIcon"><i class="fa fa-windows fa-2x"></i></span>
+      </a>
+        <span>Security System</span>
+        <span flex></span>
+        <md-button class="md-mini md-fab md-primary" hide-gt-md ng-click="toggleSidenav('left')">
+          <i class="fa fa-bars"></i>
+        </md-button>
+    </div>
+  </md-toolbar>
+<body ng-app="securitySystem">

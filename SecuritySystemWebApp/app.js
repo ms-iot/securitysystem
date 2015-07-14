@@ -10,11 +10,14 @@ var authenticationStrategies = require('./authenticationStrategies.js')
 
 var authenticationOn = false
 
+var storageService = "oneDrive"
+
 
 //.env file
 env('./.env')
 
 var auth = require("./routes/auth");
+var oneDrive = require("./routes/oneDrive")
 var index = require("./routes/index");
 
 var app = express();
@@ -57,12 +60,11 @@ if(authenticationOn == true) {
   app.use('/auth', auth);
 }
 
-
-app.use('/', index);
-
-
-
-
+if(storageService === "oneDrive") {
+  app.use('/', oneDrive)
+} else {
+  app.use('/', index);
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

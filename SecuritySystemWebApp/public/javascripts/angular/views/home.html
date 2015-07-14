@@ -1,54 +1,53 @@
-<div class="row">
-  <div class="col-md-4 col-lg-3 col-sm-5 hidden-xs" id="sideNav">
-    <div class="row stackRow">
-     <div class="btn-group">
-        <label ng-repeat="label in dayList track by $index" ng-click="scrollSpy($index)" class="btn btn-success btn-sm">{{dayList[$index]}}</label>
-      </div>
-        <button class="btn btn-info btn-sm pull-right" ng-click="getImages()">
-          <i class="glyphicon glyphicon-refresh"></i>
-        </button>
-    </div>
-    <div class="row stackRow">
-        <ul class="list-group" id="mainList">
-          <li id="{{image.day}}" class="list-group-item fakeLink" ng-click="switchImage(image)" ng-repeat="image in images">
-              <h4 class="list-group-item-heading">{{image.day}}</h4>
-              <p class="list-group-item-text">{{image.date}}</p>
-          </li>
-        </ul>
-    </div>
-    <div class="row stackRow text-center">
-    </div>
+<div id="securityBody" layout="vertical">
+  <md-sidenav class="md-sidenav-left" md-component-id="left"  md-is-locked-open="$mdMedia('gt-md')">
+      <md-toolbar>
+        <span>
+        <h1 class="md-toolbar-tools">Photos
+        <span flex></span>
+        <input type="date" id="datePicker" ng-model="selectedDate" ng-change="scrollSpy(selectedDate)" name="date" list="thesedates">
+          <datalist id="thesedates">
+              <option ng-repeat="date in dateList track by $index" label="{{dayList[$index]}}" value="{{date}}"></option>
+          </datalist>
+        <md-button ng-click="getImages()" class="md-mini md-fab md-primary">
+          <i class="fa fa-refresh"></i>
+        </md-button></h1>
+        </span>
+      </md-toolbar>
+      <md-content  ui-view layout-fill>
+         <md-list class="list-group" id="mainList">
+          <md-list-item ng-if="loading === true">
+            Loading...
+          </md-list-item>
+          <md-list-item class="md-2-line" id="{{image.day}}" ng-click="switchImage(image)" ng-repeat="image in images">
+            <div class="md-list-item-text">
+              <h3>{{::image.day}}</h3>
+              <p>{{::image.date}}</p>
+            </div>
+          </md-list-item>
+        </md-list>
+      </md-content>
+  </md-sidenav>
+  <div flex-offset="20" flex="80" layout="column" layout-align="center center" ng-if="loading === true">
+    <md-progress-circular class="md-primary" md-diameter="75" md-mode="indeterminate"></md-progress-circular>
   </div>
-    <nav class="navbar navbar-default">
-      <div>
-        <ul class="nav navbar-nav navbar-right">
-          <li class="navbar-text text-center">
-            Security System Footage
-            <a href="#!/mobileNav" type="button" id="hamburgerMenu" class="btn-sm btn pull-right visible-xs">
-              <i class="glyphicon glyphicon-menu-hamburger"></i>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-8 col-md-offset-4 col-sm-12">
-          <img id="displayWindow" src="{{imageUrl}}">
-          <div class="well" ng-if="loading">Loading...</div>
+  <div id="pictureView" layout-gt-sm="row" layout-xs="column" flex-offset-sm="20" flex-offset-gt-md="20" flex-gt-md="80" flex-md="100" layout-align-gt-md="space-around center" layout-align="space-around center" ng-if="loading === false">
+    <div layout="column" layout-align="center">
+      <md-button ng-disabled="imagePosition().first" id="browseLeft" class="md-fab md-primary" ng-click="browsePicture(-1)">
+        <i class="fa fa-chevron-left fa-2x"></i>
+      </md-button>
+    </div>
+    <md-card>
+      <md-content id="imageBorder">
+        <img id="displayWindow" src="{{imageUrl}}">
+        <h2> {{viewImage.day}} </h2>
+        <h3> {{viewImage.date}} </h3>
+      </md-content>
+    </md-card>
+    <div layout="column" layout-align="center">
+      <md-button ng-disabled="imagePosition().last" id="browseRight" class="md-fab md-primary" ng-click="browsePicture(1)">
+        <i class="fa fa-chevron-right fa-2x"></i>
+      </md-button>
+    </div>
 
-          <br>
-           <span id="browseButtons">
-            <button class="btn btn-sm btn-success" ng-class="{disabled: imagePosition().first}" ng-click="browsePicture(-1)">
-              <i class="glyphicon glyphicon-menu-left"></i>
-            </button>
-            <span id="imageTitle">{{viewImage.date || 'No images to display.'}}</span>
-            <button class="btn btn-sm btn-success" ng-class="{disabled: imagePosition().last}" ng-click="browsePicture(1)">
-              <i class="glyphicon glyphicon-menu-right"></i>
-            </button>
-          </span>
-        </div>
-      </div>
   </div>
 </div>
-
