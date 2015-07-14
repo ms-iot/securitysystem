@@ -19,8 +19,8 @@ var storageService = "azure"
 env('./.env')
 
 var auth = require("./routes/auth");
-var oneDrive = require("./routes/oneDrive")
-var index = require("./routes/index");
+var storageServiceRoute = require("./routes/" + storageService)
+
 
 var app = express();
 
@@ -62,11 +62,7 @@ if(authenticationOn == true) {
   app.use('/auth', auth);
 }
 
-if(storageService === "oneDrive") {
-  app.use('/', oneDrive)
-} else {
-  app.use('/', index);
-}
+  app.use('/', storageServiceRoute)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
