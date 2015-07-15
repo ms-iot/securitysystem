@@ -1,5 +1,4 @@
 ﻿using Windows.UI.Xaml.Controls;
-using DeviceProviders;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System;
