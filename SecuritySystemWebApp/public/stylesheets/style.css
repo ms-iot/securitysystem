@@ -145,6 +145,15 @@ md-slider {
 md-icon {
   padding-top:3px;
 }
+@media (min-width: 500px) and (max-width: 650px) {
+  #buttonRow {
+    text-align: center;
+  }
+  #buttonRow > button {
+    margin-left:30px;
+    margin-right:30px;
+  }
+}
 @media screen and (max-width: 500px) {
   #displayWindow {
   height:200px;

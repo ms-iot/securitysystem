@@ -6,7 +6,7 @@
         <span flex></span>
         <input type="date" id="datePicker" ng-model="selectedDate" ng-change="scrollSpy(selectedDate)" name="date" list="thesedates">
           <datalist id="thesedates">
-              <option ng-repeat="date in dateList track by $index" label="{{dayList[$index]}}" value="{{date}}"></option>
+              <option ng-repeat="date in dayList[0] track by $index" label="{{dayList[1][$index]}}" value="{{date}}"></option>
           </datalist>
         <md-button ng-click="getImages()" class="md-mini md-fab md-primary">
           <i class="fa fa-refresh"></i>
