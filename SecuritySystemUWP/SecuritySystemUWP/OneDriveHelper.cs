@@ -13,25 +13,30 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace SecuritySystemUWP
 {
-    public static class OneDriveHelper
+    public  class OneDriveHelper
     {
         public static Boolean isLoggedin { get; private set; } = false;
                 
         //Obtained during onedrive login
         private static String accessToken = "";
         private static String refreshToken = "";
-
-        //TODO: Input the client ID that is tied to your Windows Developer account
-        internal const string clientId = "";
-        internal const string clientSecret = "";
+        public static string clientId = "";
+        private static string clientSecret = "";
         internal const string scope = "wl.offline_access onedrive.readwrite";
         internal const string redirectUri = "https://login.live.com/oauth20_desktop.srf";
         
         private static HttpClient httpClient;
         private static CancellationTokenSource cts;
+
+        public OneDriveHelper(string clientId_, string clientSecret_)
+        {
+            clientId = clientId_;
+            clientSecret = clientSecret_;
+        }
 
         public static async Task authorize(string accessCode)
         {
@@ -121,9 +126,9 @@ namespace SecuritySystemUWP
             isLoggedin = false;
         }
 
-        public static async Task UploadFile(StorageFile file, string name)
+        public static async Task UploadFile(string foldername, string imagename, StorageFile file)
         {
-            String url = "https://api.onedrive.com/v1.0/drive/root:" + "/Pictures/" + name + ":/content";
+            String url = "https://api.onedrive.com/v1.0/drive/root:" + "/Pictures/"+ foldername + "/" + imagename + ":/content";
 
             await SendFileAsync(
                 url,  // example: "https://api.onedrive.com/v1.0/drive/root:/Documents/test.jpg:/content"
@@ -132,10 +137,85 @@ namespace SecuritySystemUWP
                 );
         }
 
+        public static async Task<bool> DeleteFile(string foldername, string imagename)
+        {
+            try
+            {
+                String uriString = "https://api.onedrive.com/v1.0/drive/root:" + "/Pictures/" + foldername + "/" + imagename;
+
+                Uri uri = new Uri(uriString);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri);
+                HttpResponseMessage response = await httpClient.SendRequestAsync(request);
+                if (response.StatusCode == HttpStatusCode.NoContent)
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return false;
+                throw;
+            }
+            return false;
+        }
+   
+
+        public static async Task<List<string>> ListImages(string foldername)
+        {
+            String uriString = "https://api.onedrive.com/v1.0/drive/root:" + "/Pictures/" + foldername + ":/children";
+            List<string> files = new List<string>();
+
+            try
+            {
+                Uri uri = new Uri(uriString);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+                HttpResponseMessage response = await httpClient.SendRequestAsync(request);
+
+                if (response.StatusCode == HttpStatusCode.Ok)
+                {
+                    var inputStream = await response.Content.ReadAsInputStreamAsync();
+                    var memStream = new MemoryStream();
+                    Stream testStream = inputStream.AsStreamForRead();
+                    await testStream.CopyToAsync(memStream);
+
+                    memStream.Position = 0;
+                    using (StreamReader reader = new StreamReader(memStream))
+                    {
+                        string result = reader.ReadToEnd();
+                        string[] parts = result.Split('"');
+                        foreach (string part in parts)
+                        {
+                            if(part.Contains(".jpg"))
+                            {
+                                files.Add(part);
+                            }                      
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
+                    return null;
+                }
+
+                return files;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+                throw;
+            }
+        }
+    
+
         public static void CreateHttpClient (ref HttpClient httpClient)
         {
             if (httpClient != null) httpClient.Dispose();
-            IHttpFilter filter = new HttpBaseProtocolFilter();
+            var filter = new HttpBaseProtocolFilter();
+            filter.CacheControl.ReadBehavior = HttpCacheReadBehavior.MostRecent;
+            filter.CacheControl.WriteBehavior = HttpCacheWriteBehavior.NoCache;
             //filter = new PlugInFilter(filter); // Adds a custom header to every request and response message.
             httpClient = new HttpClient(filter);
             //httpClient.DefaultRequestHeaders.UserAgent.Add(new HttpProductInfoHeaderValue("HttpClienUtil", "v1"));
@@ -145,29 +225,6 @@ namespace SecuritySystemUWP
         {
             if (httpClient == null) return;
             httpClient.DefaultRequestHeaders.Authorization = new HttpCredentialsHeaderValue (scheme, token);
-        }
-
-        public static async void debugLibPath ()
-        {
-            try
-            {
-                StorageFolder picsFolder = KnownFolders.PicturesLibrary;
-                IReadOnlyList<StorageFile> fileList = await picsFolder.GetFilesAsync();
-                if (picsFolder != null && fileList != null)
-                {
-                    foreach (StorageFile file in fileList)
-                    {
-                        Debug.WriteLine(" debug ** found at least one file at: " + file.Path);
-                        break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                    // Log telemetry event about this exception
-
-                    Debug.WriteLine("debugLibPath err = " + ex.Message);
-            }
         }
 
         public static async Task SendFileAsync (String url, StorageFile sFile, HttpMethod httpMethod)
@@ -183,7 +240,6 @@ namespace SecuritySystemUWP
             {
                 Debug.WriteLine("SendFileAsync() - Cannot open file. Err= " + ex.Message);
                 Debug.WriteLine("  File Path = " + (sFile != null ? sFile.Path : "?"));
-                //debugLibPath();
             }
             if (streamContent == null) return;
 
@@ -245,10 +301,5 @@ namespace SecuritySystemUWP
                 output.Append(header.Key + ": " + header.Value + "\r\n");
             }
         }
-
-
     }
-
-
-
 }
