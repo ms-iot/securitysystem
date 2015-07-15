@@ -40,14 +40,10 @@ router.post('/images', function(req, res) {
     }
     res.send({images: parsedBody, storageService: "return image['@content.downloadUrl']"})
   })
-
-
-
 })
 
 
 router.get('/oneDrive/callback', function(req,res) {
-  console.log("I'm here at the callback : ", req.originalUrl)
   res.render('index')
 })
 
