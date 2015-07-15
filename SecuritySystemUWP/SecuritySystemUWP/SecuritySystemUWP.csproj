@@ -102,13 +102,16 @@
     <Compile Include="OnedriveLoginPage.xaml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RESTHelper.cs" />
+    <Compile Include="StorageFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="ApplicationInsights.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="SecuritySystemUWP_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +184,9 @@
     <SDKReference Include="WindowsIoT, Version=10.0.10069.0">
       <Name>Windows IoT Extension SDK</Name>
     </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Themes\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

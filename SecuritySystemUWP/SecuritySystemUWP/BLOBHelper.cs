@@ -381,6 +381,5 @@ namespace SecuritySystemUWP
                 throw;
             }
         }
-
     }
 }
