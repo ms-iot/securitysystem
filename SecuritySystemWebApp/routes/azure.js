@@ -31,8 +31,9 @@ router.post('/images',
         Expiry: expiryDate
       },
       };
-        blobService.listBlobsSegmented('imagecontainer', null, function(error, result, response){
+        blobService.listBlobsSegmented('imagecontainer', req.body.token, {maxResults: 50}, function(error, result, response){
           if(!error){
+            console.log("token: ", result.continuationToken)
             images = result;
              for(var i = 0; i < images.entries.length; i++){
                 // using npm module bigInt, because the number of .NET ticks
@@ -47,10 +48,9 @@ router.post('/images',
                 //display in the user's local timezone.
                 images.entries[i].milliseconds = milliseconds.value
                 var token = blobService.generateSharedAccessSignature('imagecontainer', images.entries[i].name, sharedAccessPolicy);
-                images.entries[i].imageUrl = blobService.getUrl('imagecontainer', images.entries[i].name, token);
+                images.entries[i]['@content.downloadUrl'] = blobService.getUrl('imagecontainer', images.entries[i].name, token);
               }
-            console.log(images)
-            res.send({images: images.entries, storageService: "return image['imageUrl']"});
+            res.send({images: images.entries, token: result.continuationToken});
           } else {
             res.send(error);
           }

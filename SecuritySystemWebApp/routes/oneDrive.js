@@ -38,7 +38,7 @@ router.post('/images', function(req, res) {
         parsedBody[i].milliseconds = milliseconds.value
       }
     }
-    res.send({images: parsedBody, storageService: "return image['@content.downloadUrl']"})
+    res.send({images: parsedBody})
   })
 })
 
