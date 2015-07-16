@@ -52,13 +52,13 @@ namespace SecuritySystemUWP
             string response = args.Uri.AbsoluteUri;
             int index = response.IndexOf("code=") + 5;
             string accessCode = response.Substring(index);
-            await OneDriveHelper.authorize(accessCode);
+            await OneDrive.authorize(accessCode);
             this.Frame.Navigate(typeof(MainPage));
         }
 
         private void getAccessCode()
         {
-            string uri = "https://login.live.com/oauth20_authorize.srf?client_id=" + OneDriveHelper.clientId + "&scope=" + OneDriveHelper.scope + "&response_type=code&redirect_uri=" + OneDriveHelper.redirectUri;
+            string uri = "https://login.live.com/oauth20_authorize.srf?client_id=" + OneDrive.clientId + "&scope=" + OneDrive.scope + "&response_type=code&redirect_uri=" + OneDrive.redirectUri;
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, new Uri(uri));
             browser.NavigateWithHttpRequestMessage(request);
         }

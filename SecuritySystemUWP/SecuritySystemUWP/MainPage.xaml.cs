@@ -22,17 +22,16 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        //TODO: Select storage type: ONEDRIVE for OneDrive, AZURE for Azure
-        private byte storageType = StorageFactory.ONEDRIVE;
-
-        //TODO: If Azure, input account name and account key in variables below
-
-
+        //TODO: Add storage settings here
+        private string storageType = ""; //Azure or OneDrive
+        private string accountId = ""; //For Azure, enter your storage account name. For OneDrive, enter client ID.
+        private string accountSecret = "=="; //For Azure, enter primary access key. For OneDrive, enter client secret.
+        
+        private string folderName = "imagecontainer";
         private DispatcherTimer uploadPicturesTimer;
         private DispatcherTimer deletePicturesTimer;
         private static Mutex uploadPicturesMutexLock = new Mutex();
-        private StorageFactory storageFactory;
-
+        private IStorage storage;
         public MainPage()
         {
             this.InitializeComponent();
@@ -41,7 +40,7 @@ namespace SecuritySystemUWP
 
         private void Initialize()
         {
-            storageFactory = new StorageFactory(storageType);
+            storage = StorageFactory.Get(storageType, accountId, accountSecret);
 
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
@@ -58,8 +57,8 @@ namespace SecuritySystemUWP
         }
 
         private void Start_Click(object sender, RoutedEventArgs e)
-        {
-            this.Frame.Navigate(storageFactory.getNavigationType());
+        {           
+            this.Frame.Navigate(storage.loginType());
         }
 
         private async void uploadPicturesTimer_Tick(object sender, object e)
@@ -77,7 +76,8 @@ namespace SecuritySystemUWP
 
                 foreach (StorageFile file in files)
                 {
-                    if(await storageFactory.uploadPicture(file))
+                    string imageName = DateTime.UtcNow.Ticks.ToString() + ".jpg";
+                    if (await storage.uploadPicture(folderName, imageName, file))
                     {
                         Debug.WriteLine("Image uploaded");
                         await file.DeleteAsync();
@@ -96,7 +96,21 @@ namespace SecuritySystemUWP
 
         private async void deletePicturesTimer_Tick(object sender, object e)
         {
-            await storageFactory.deleteExpiredPictures();
+            try {
+                List<string> pictures = await storage.listPictures(folderName);
+                foreach (string picture in pictures)
+                {
+                    long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(7).Ticks;
+                    if (picture.CompareTo(oldestTime.ToString()) < 0)
+                    {
+                        await storage.deletePicture(folderName, picture);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception in deletePicturesTimer_Tick() " + ex.Message);
+            }
         }
     }
 }
