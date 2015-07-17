@@ -14,13 +14,13 @@ namespace SecuritySystemUWP
 {
     public class OneDrive : IStorage
     {
-        //TODO: Add your account name and acount key
-        public static string clientId = "";
+        public static string clientId { get; private set; } = "";
         private static string clientSecret = "";
 
         //Obtained during onedrive login
         private static String accessToken = "";
         private static String refreshToken = "";
+
         internal const string scope = "wl.offline_access onedrive.readwrite";
         internal const string redirectUri = "https://login.live.com/oauth20_desktop.srf";
 
@@ -145,13 +145,14 @@ namespace SecuritySystemUWP
             cts = new CancellationTokenSource();
             isLoggedin = true;
         }
+
         /*******************************************************************************************
         * PRIVATE METHODS
         ********************************************************************************************/
-        private static async Task getTokens(string accessCode, string grantType)
+        private static async Task getTokens(string accessCodeOrRefreshToken, string grantType)
         {
             string uri = "https://login.live.com/oauth20_token.srf";
-            string content = getRequestContentString(accessCode, grantType);
+            string content = "client_id=" + clientId + "&redirect_uri=" + redirectUri + "&client_secret=" + clientSecret + "&code=" + accessCodeOrRefreshToken + "&grant_type=" + grantType;
             HttpClient client = new HttpClient();
 
             HttpRequestMessage reqMessage = new HttpRequestMessage(HttpMethod.Post, new Uri(uri));
@@ -166,21 +167,6 @@ namespace SecuritySystemUWP
             accessToken = getAccessToken(responseContentString);
             refreshToken = getRefreshToken(responseContentString);
 
-        }
-
-        private static string getRequestContentString(string accessCode, string grantType)
-        {
-            string contentString = "";
-            if (grantType.Equals("authorization_code"))
-            {
-                contentString = "client_id=" + clientId + "&redirect_uri=" + redirectUri + "&client_secret=" + clientSecret + "&code=" + accessCode + "&grant_type=authorization_code";
-            }
-            else if (grantType.Equals("refresh_token"))
-            {
-                contentString = "client_id=" + clientId + "&redirect_uri=" + redirectUri + "&client_secret=" + clientSecret + "&refresh_token" + refreshToken + "&grant_type=refresh_token";
-            }
-
-            return contentString;
         }
 
         private static string getAccessToken(string responseContent)
@@ -211,14 +197,13 @@ namespace SecuritySystemUWP
                 return;
             }
 
-            await getTokens("", "refresh_token");
+            await getTokens(refreshToken, "refresh_token");
         }
 
         private static async Task logout()
         {
             string uri = "https://login.live.com/oauth20_logout.srf?client_id=" + clientId + "&redirect_uri=" + redirectUri;
-            HttpClient client = new HttpClient();
-            await client.GetAsync(new Uri(uri));
+            await httpClient.GetAsync(new Uri(uri));
             accessToken = "";
             refreshToken = "";
             isLoggedin = false;
