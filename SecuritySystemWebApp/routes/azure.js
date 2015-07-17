@@ -31,7 +31,7 @@ router.post('/images',
         Expiry: expiryDate
       },
       };
-        blobService.listBlobsSegmented('imagecontainer', req.body.token, {maxResults: 50}, function(error, result, response){
+        blobService.listBlobsSegmented('imagecontainer', null, function(error, result, response){
           if(!error){
             console.log("token: ", result.continuationToken)
             images = result;
