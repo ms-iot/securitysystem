@@ -2,8 +2,8 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
 
 
   var staticImagesArray = [],
-      days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      positionToken = null;
+      days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  $scope.positionToken = null;
   $scope.dayList = [[],[]];
   $scope.loading = true;
   $scope.imageUrl;
@@ -11,11 +11,10 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
 
 
   $scope.getImages = function(){
-    $scope.loading = true;
-    $http.post('/images', {url: $location.absUrl(), token: positionToken})
+    if($scope.positionToken === null && staticImagesArray.length === 0) $scope.loading = true;
+    $http.post('/images', {url: $location.absUrl(), token: $scope.positionToken})
       .success(function(response){
-        console.log('token:', response.token)
-        staticImagesArray.reverse()
+        // staticImagesArray.reverse()
         for(var i = 0; i < response.images.length; i++){
            //DateTime formatting.
           var date = new Date(response.images[i].milliseconds),
@@ -31,8 +30,8 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
             $scope.dayList[1].push(days[dateObject.getDay()]);
           }
         }
-        staticImagesArray.reverse();
-        if(response.token) positionToken = response.token;
+        // staticImagesArray.reverse();
+        if(response.token) $scope.positionToken = response.token;
         $scope.images = staticImagesArray;
         $scope.viewImage = $scope.images[0];
         $scope.switchImage($scope.viewImage);
@@ -71,5 +70,7 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
     $anchorScroll();
     $location.hash(null);
   }
+
+
 
 }]);

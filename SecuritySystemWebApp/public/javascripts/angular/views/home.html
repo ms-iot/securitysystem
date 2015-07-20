@@ -1,4 +1,4 @@
-<div id="securityBody" layout-align-sm="center center" layout="vertical">
+<div id="securityBody" layout-align-sm="center center" layout="vertical" >
   <md-sidenav class="md-sidenav-left" md-component-id="left"  md-is-locked-open="$mdMedia('gt-md')">
       <md-toolbar>
         <span>
@@ -13,16 +13,16 @@
         </md-button></h1>
         </span>
       </md-toolbar>
-      <md-content  ui-view layout-fill>
+      <md-content infinitescroll="getImages()" id="content" ui-view layout-fill>
          <md-list class="list-group" id="mainList">
-          <md-list-item ng-if="loading === true">
-            Loading...
-          </md-list-item>
           <md-list-item class="md-2-line" id="{{image.day}}" ng-click="switchImage(image)" ng-repeat="image in images">
             <div class="md-list-item-text">
               <h3>{{::image.day}}</h3>
               <p>{{::image.date}}</p>
             </div>
+          </md-list-item>
+          <md-list-item ng-if="loading === true">
+            Loading...
           </md-list-item>
         </md-list>
       </md-content>

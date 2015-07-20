@@ -6,6 +6,7 @@
     "start": "node ./server.js"
   },
   "dependencies": {
+    "angular-scroll": "^0.7.1",
     "azure-storage": "^0.4.5",
     "big-integer": "^1.4.6",
     "body-parser": "~1.12.4",

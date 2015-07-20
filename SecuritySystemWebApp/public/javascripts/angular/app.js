@@ -1,4 +1,4 @@
-var securitySystem = angular.module('securitySystem', ['ngRoute', 'ngMaterial', 'infinite-scroll']);
+var securitySystem = angular.module('securitySystem', ['ngRoute', 'ngMaterial']);
 
 securitySystem.config(['$routeProvider','$locationProvider',function($routeProvider, $locationProvider){
 
