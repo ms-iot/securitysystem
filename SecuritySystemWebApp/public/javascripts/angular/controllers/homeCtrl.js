@@ -1,4 +1,4 @@
-securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', '$mdSidenav', '$rootScope', function($scope, $http, $location, $anchorScroll, $mdSidenav, $rootScope){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', '$mdSidenav', '$rootScope', '$mdDialog', function($scope, $http, $location, $anchorScroll, $mdSidenav, $rootScope, $mdDialog){
 
 
   var staticImagesArray = [],
