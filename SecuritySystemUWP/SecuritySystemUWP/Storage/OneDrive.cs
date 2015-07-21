@@ -160,7 +160,6 @@ namespace SecuritySystemUWP
             reqMessage.Content.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
             HttpResponseMessage responseMessage = await client.SendRequestAsync(reqMessage);
 
-            //TODO: catch errors more cleanly
             responseMessage.EnsureSuccessStatusCode();
 
             string responseContentString = await responseMessage.Content.ReadAsStringAsync();

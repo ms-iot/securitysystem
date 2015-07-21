@@ -25,13 +25,17 @@ namespace SecuritySystemUWP
         //TODO: Add storage settings here
         private string storageType = ""; //Azure or OneDrive
         private string accountId = ""; //For Azure, enter your storage account name. For OneDrive, enter client ID.
-        private string accountSecret = "=="; //For Azure, enter primary access key. For OneDrive, enter client secret.
+        private string accountSecret = ""; //For Azure, enter primary access key. For OneDrive, enter client secret.
         
+        //TODO: Select the number of days for which the images will be stored
+        private const int storageDuration = 7;
+
         private string folderName = "imagecontainer";
         private DispatcherTimer uploadPicturesTimer;
         private DispatcherTimer deletePicturesTimer;
         private static Mutex uploadPicturesMutexLock = new Mutex();
         private IStorage storage;
+        private string[] cameras = { "Cam1" };
         public MainPage()
         {
             this.InitializeComponent();
@@ -76,7 +80,7 @@ namespace SecuritySystemUWP
 
                 foreach (StorageFile file in files)
                 {
-                    string imageName = DateTime.UtcNow.Ticks.ToString() + ".jpg";
+                    string imageName = cameras[0] + "/" + DateTime.Now.ToString("MM_dd_yyyy/HH") + "_" + DateTime.Now.Ticks.ToString() + ".jpg";
                     if (await storage.uploadPicture(folderName, imageName, file))
                     {
                         Debug.WriteLine("Image uploaded");
@@ -100,8 +104,9 @@ namespace SecuritySystemUWP
                 List<string> pictures = await storage.listPictures(folderName);
                 foreach (string picture in pictures)
                 {
-                    long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(7).Ticks;
-                    if (picture.CompareTo(oldestTime.ToString()) < 0)
+                    long oldestTime = DateTime.Now.Ticks - TimeSpan.FromDays(storageDuration).Ticks;
+                    string picName = (picture.Contains('/')) ? picture.Split('_')[3] : picture.Split('_')[1];
+                    if (picName.CompareTo(oldestTime.ToString()) < 0)
                     {
                         await storage.deletePicture(folderName, picture);
                     }

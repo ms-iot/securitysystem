@@ -232,18 +232,14 @@ namespace SecuritySystemUWP
                     md5
                     );
 
-            //Debug.WriteLine(MessageSignature);
             var key = CryptographicBuffer.DecodeFromBase64String(storageKey);
             var msg = CryptographicBuffer.ConvertStringToBinary(MessageSignature, BinaryStringEncoding.Utf8);
 
             MacAlgorithmProvider objMacProv = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);
-            //CryptographicKey cryptKey = objMacProv.CreateKey(key);
-            //var buff = CryptographicEngine.Sign(cryptKey, msg);
             CryptographicHash hash = objMacProv.CreateHash(key);
             hash.Append(msg);
 
             var authorizationHeader = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("SharedKey", storageAccount + ":" + CryptographicBuffer.EncodeToBase64String(hash.GetValueAndReset()));
-            //Debug.WriteLine(authorizationHeader.ToString());
             return authorizationHeader;
         }
         public string GetCanonicalizedHeaders(HttpRequestMessage request)
@@ -286,8 +282,6 @@ namespace SecuritySystemUWP
             }
             return list;
         }
-
-        // Get canonicalized resource.
 
         public string GetCanonicalizedResource(Uri address, string accountName)
         {
