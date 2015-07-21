@@ -12,7 +12,7 @@ var authenticationStrategies = require('./authenticationStrategies.js')
 var authenticationOn = false
 
 // must be set to "oneDrive" or "azure"
-var storageService = "oneDrive"
+var storageService = "azure"
 
 
 //.env file

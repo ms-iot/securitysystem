@@ -20,8 +20,10 @@ router.post('/images',
   ensureAuthenticated,
   function(req,res){
     var images = [],
+        days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
         startDate = new Date(),
-        expiryDate = new Date(startDate);
+        expiryDate = new Date(startDate),
+        searchDate = req.body.date;
     expiryDate.setMinutes(startDate.getMinutes() + 10);
     startDate.setMinutes(startDate.getMinutes() - 10);
     var sharedAccessPolicy = {
@@ -31,23 +33,28 @@ router.post('/images',
         Expiry: expiryDate
       },
       };
-        blobService.listBlobsSegmented('imagecontainer', null, function(error, result, response){
+        blobService.listBlobsSegmentedWithPrefix('imagecontainer', "Cam1/" + searchDate, null, function(error, result, response){
           if(!error){
-            console.log("token: ", result.continuationToken)
+            console.log(searchDate)
+            console.log("result:,",result)
             images = result;
              for(var i = 0; i < images.entries.length; i++){
                 // using npm module bigInt, because the number of .NET ticks
                 // is a number with too many digits for vanilla JavaScript
                 // to perform accurate math on.
-                var ticks = images.entries[i].name.slice(0,18),
+                var ticks = images.entries[i].name.slice(19,37);
                     ticksAtUnixEpoch = bigInt("621355968000000000"),
                     ticksInt = bigInt(ticks),
                     ticksSinceUnixEpoch = ticksInt.minus(ticksAtUnixEpoch),
-                    milliseconds = ticksSinceUnixEpoch.divide(10000);
-                //Converting millisecond to dateTime client side so it will
-                //display in the user's local timezone.
-                images.entries[i].milliseconds = milliseconds.value
-                var token = blobService.generateSharedAccessSignature('imagecontainer', images.entries[i].name, sharedAccessPolicy);
+                    milliseconds = ticksSinceUnixEpoch.divide(10000),
+                    date = new Date(milliseconds.value),
+                    day = days[date.getDay()],
+                    localDate = date.toLocaleString(),
+                    token = blobService.generateSharedAccessSignature('imagecontainer', images.entries[i].name, sharedAccessPolicy);
+                console.log(localDate);
+                console.log(day);
+                images.entries[i].date = localDate;
+                images.entries[i].day = day;
                 images.entries[i]['@content.downloadUrl'] = blobService.getUrl('imagecontainer', images.entries[i].name, token);
               }
             res.send({images: images.entries, token: result.continuationToken});

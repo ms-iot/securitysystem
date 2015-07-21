@@ -1,17 +1,15 @@
 <div id="securityBody" layout-align-sm="center center" layout="vertical">
   <md-sidenav class="md-sidenav-left" md-component-id="left"  md-is-locked-open="$mdMedia('gt-md')">
-      <md-toolbar>
+      <md-toolbar class="md-tall">
         <span>
         <h1 class="md-toolbar-tools">Photos
         <span flex></span>
-        <input type="date" id="datePicker" ng-model="selectedDate" ng-change="scrollSpy(selectedDate)" name="date" list="thesedates">
-          <datalist id="thesedates">
-              <option ng-repeat="date in dayList[0] track by $index" label="{{dayList[1][$index]}}" value="{{date}}"></option>
-          </datalist>
         <md-button ng-click="getImages()" class="md-mini md-fab md-primary">
           <i class="fa fa-refresh"></i>
         </md-button></h1>
         </span>
+        <h2 id="datePicker"><input type="date" id="datePicker" ng-model="selectedDate" ng-change="getImages(selectedDate)" name="date" >
+        <input type="select"></h2></h2>
       </md-toolbar>
       <md-content  ui-view layout-fill>
          <md-list class="list-group" id="mainList">
@@ -22,6 +20,12 @@
             <div class="md-list-item-text">
               <h3>{{::image.day}}</h3>
               <p>{{::image.date}}</p>
+            </div>
+          </md-list-item>
+          <md-list-item class="md-2-line" ng-if="images.length === 0">
+            <div class="md-list-item-text">
+              <h3>No photos available.</h3>
+              <p>Try picking a different date.</p>
             </div>
           </md-list-item>
         </md-list>
