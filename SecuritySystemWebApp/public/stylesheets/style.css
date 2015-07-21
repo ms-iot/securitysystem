@@ -145,6 +145,9 @@ md-slider {
 md-icon {
   padding-top:3px;
 }
+#datePicker {
+  margin-left: 10px;
+}
 @media (min-width: 500px) and (max-width: 650px) {
   #buttonRow {
     text-align: center;

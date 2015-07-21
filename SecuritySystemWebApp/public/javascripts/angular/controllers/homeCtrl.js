@@ -1,40 +1,32 @@
-securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', '$mdSidenav', '$rootScope', '$mdDialog', function($scope, $http, $location, $anchorScroll, $mdSidenav, $rootScope, $mdDialog){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSidenav', '$rootScope', function($scope, $http, $location, $mdSidenav, $rootScope){
 
 
   var staticImagesArray = [],
-      days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  $scope.positionToken = null;
+      positionToken = null;
   $scope.dayList = [[],[]];
   $scope.loading = true;
   $scope.imageUrl;
   $scope.selectedDate;
 
-
-  $scope.getImages = function(){
-    if($scope.positionToken === null && staticImagesArray.length === 0) $scope.loading = true;
-    $http.post('/images', {url: $location.absUrl(), token: $scope.positionToken})
+  $scope.getImages = function(date){
+    $scope.loading = true;
+    var todaysDate = null,
+        today = date ? date : new Date(),
+        month = (today.getMonth() + 1).toString(),
+        day = (today.getDate()).toString(),
+        year = (today.getFullYear()).toString();
+    if(day.length === 1) day = "0" + day;
+    if(month.length === 1) month = "0" + month;
+    todaysDate = month + "_" + day + "_" + year;
+    $http.post('/images', {url: $location.absUrl(), token: positionToken, date: todaysDate})
       .success(function(response){
-        // staticImagesArray.reverse()
-        for(var i = 0; i < response.images.length; i++){
-           //DateTime formatting.
-          var date = new Date(response.images[i].milliseconds),
-              localDate = date.toLocaleString(),
-              day = new Date(response.images[i].milliseconds).getDay(),
-              dateObject = new Date(localDate.slice(0, localDate.search(','))),
-              formattedDate = dateObject.toISOString().slice(0,10);
-          response.images[i].date = localDate;
-          response.images[i].day = days[day];
-          staticImagesArray.push(response.images[i])
-          if($scope.dayList[0].indexOf(formattedDate) === -1){
-            $scope.dayList[0].push(formattedDate);
-            $scope.dayList[1].push(days[dateObject.getDay()]);
-          }
-        }
-        // staticImagesArray.reverse();
-        if(response.token) $scope.positionToken = response.token;
+        staticImagesArray = response.images.reverse();
+        if(response.token) positionToken = response.token;
         $scope.images = staticImagesArray;
+        if($scope.images.length > 0) {
         $scope.viewImage = $scope.images[0];
         $scope.switchImage($scope.viewImage);
+        }
         $scope.loading = false;
     });
   };
@@ -63,14 +55,5 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
   $rootScope.toggleSidenav = function(id) {
       $mdSidenav(id).toggle();
    }
-
-  $scope.scrollSpy = function(index){
-    var day = (new Date(index)).getDay();
-    $location.hash(days[day]);
-    $anchorScroll();
-    $location.hash(null);
-  }
-
-
 
 }]);
