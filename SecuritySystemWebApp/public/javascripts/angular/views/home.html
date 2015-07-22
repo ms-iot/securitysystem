@@ -1,17 +1,22 @@
 <div id="securityBody" layout-align-sm="center center" layout="vertical" >
   <md-sidenav class="md-sidenav-left" md-component-id="left"  md-is-locked-open="$mdMedia('gt-md')">
-      <md-toolbar class="md-tall">
+      <md-toolbar>
         <span>
         <h1 class="md-toolbar-tools">Photos
-        <span flex></span>
-        <md-button ng-click="getImages()" class="md-mini md-fab md-primary">
-          <i class="fa fa-refresh"></i>
-        </md-button></h1>
+          <span flex></span>
+          <md-button ng-click="openTimeSelector()" ng-if="images.length > 0" class="md-mini md-fab md-primary">
+            <i class="fa fa-clock-o"></i>
+          </md-button>
+          <md-button ng-click="openCalendar($event)" class="md-mini md-fab md-primary">
+            <i class="fa fa-calendar"></i>
+          </md-button>
+          <md-button ng-click="getImages(start)" class="md-mini md-fab md-primary">
+            <i class="fa fa-refresh"></i>
+          </md-button>
+        </h1>
         </span>
-        <h2 id="datePicker"><input type="date" id="datePicker" ng-model="selectedDate" ng-change="getImages(selectedDate)" name="date" >
-        <input type="select"></h2></h2>
       </md-toolbar>
-      <md-content infinitescroll="getImages()" id="content" ui-view layout-fill>
+      <md-content id="content" ui-view layout-fill>
          <md-list class="list-group" id="mainList">
           <md-list-item class="md-2-line" id="{{image.day}}" ng-click="switchImage(image)" ng-repeat="image in images">
             <div class="md-list-item-text">
@@ -22,10 +27,10 @@
           <md-list-item ng-if="loading === true">
             Loading...
           </md-list-item>
-          <md-list-item class="md-2-line" ng-if="images.length === 0">
+          <md-list-item class="md-2-line" ng-if="noPhotos()">
             <div class="md-list-item-text">
               <h3>No photos available.</h3>
-              <p>Try picking a different date.</p>
+              <p>Try picking a different time or date.</p>
             </div>
           </md-list-item>
         </md-list>

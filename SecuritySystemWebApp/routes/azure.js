@@ -51,10 +51,9 @@ router.post('/images',
                     day = days[date.getDay()],
                     localDate = date.toLocaleString(),
                     token = blobService.generateSharedAccessSignature('imagecontainer', images.entries[i].name, sharedAccessPolicy);
-                console.log(localDate);
-                console.log(day);
                 images.entries[i].date = localDate;
                 images.entries[i].day = day;
+                images.entries[i].hour = images.entries[i].name.slice(16,18)
                 images.entries[i]['@content.downloadUrl'] = blobService.getUrl('imagecontainer', images.entries[i].name, token);
               }
             res.send({images: images.entries, token: result.continuationToken});

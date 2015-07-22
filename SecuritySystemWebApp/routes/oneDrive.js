@@ -6,7 +6,7 @@ env('./.env')
 var urlApi = require('url')
 var bigInt = require('big-integer');
 
-/* GET home page. */
+
 router.get('/',
 function(req, res, next) {
   res.render('oneDriveLogin', { title: 'Express' });
@@ -25,13 +25,12 @@ router.post('/images', function(req, res) {
       accessToken = url.slice(tokenStart + 13, tokenEnd);
   request('https://api.onedrive.com/v1.0/drive/root:/pictures/imagecontainer/Cam1/' + req.body.date +':/children?access_token=' + accessToken, function(error, response, body) {
     var parsedBody = JSON.parse(body).value
-    console.log(parsedBody)
     if(parsedBody) {
       for(var i = 0; i < parsedBody.length; i++){
         // using npm module bigInt, because the number of .NET ticks
         // is a number with too many digits for vanilla JavaScript
         // to perform accurate math on.
-        var ticks = parsedBody[i].name.slice(19,37);
+        var ticks = parsedBody[i].name.slice(3,21);
             ticksAtUnixEpoch = bigInt("621355968000000000"),
             ticksInt = bigInt(ticks),
             ticksSinceUnixEpoch = ticksInt.minus(ticksAtUnixEpoch),
@@ -40,8 +39,10 @@ router.post('/images', function(req, res) {
             day = days[date.getDay()],
             localDate = date.toLocaleString();
 
+
         parsedBody[i].date = localDate;
         parsedBody[i].day = day;
+        parsedBody[i].hour = parsedBody[i].name.slice(0,2);
       }
       res.send({images: parsedBody})
     }else {

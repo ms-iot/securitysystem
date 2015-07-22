@@ -3,9 +3,6 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   background-color:rgb(26,26,27);
 }
-md-content {
-  background-color:rgb(26,26,27);
-}
 .cardBlock {
   background-color: white;
 }
@@ -26,6 +23,7 @@ a {
 }
 #viewWindow {
   height: 92%;
+  background-color:rgb(26,26,27);
 }
 #brandIcon {
   padding-right: 15px;
@@ -97,13 +95,6 @@ md-sidenav {
 #lightSwitch {
 background-color: #FF9800;
 }
-md-dialog {
-  background-color: #FF9800;
-  color:white;
-}
-md-dialog > h3{
-  text-align: center;
-}
 .fakeLink {
   cursor: pointer;
 }
@@ -136,17 +127,8 @@ md-slider {
   margin: 20px;
   width:220px;
 }
-#datePicker {
-  background-color:transparent;
-  color:white;
-  border: none;
-  font-size:12px;
-}
 md-icon {
   padding-top:3px;
-}
-#datePicker {
-  margin-left: 10px;
 }
 @media (min-width: 500px) and (max-width: 650px) {
   #buttonRow {

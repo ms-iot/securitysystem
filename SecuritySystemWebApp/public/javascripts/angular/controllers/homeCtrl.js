@@ -1,12 +1,9 @@
-securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSidenav', '$rootScope', function($scope, $http, $location, $mdSidenav, $rootScope){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSidenav', '$rootScope', '$mdDialog', function($scope, $http, $location, $mdSidenav, $rootScope, $mdDialog){
 
 
-  var staticImagesArray = [],
-      positionToken = null;
-  $scope.dayList = [[],[]];
+  var staticImagesArray = [];
   $scope.loading = true;
   $scope.imageUrl;
-  $scope.selectedDate;
 
   $scope.getImages = function(date){
     $scope.loading = true;
@@ -18,23 +15,20 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSiden
     if(day.length === 1) day = "0" + day;
     if(month.length === 1) month = "0" + month;
     todaysDate = month + "_" + day + "_" + year;
-    $http.post('/images', {url: $location.absUrl(), token: positionToken, date: todaysDate})
+    $http.post('/images', {url: $location.absUrl(), date: todaysDate})
       .success(function(response){
         staticImagesArray = response.images.reverse();
-        if(response.token) positionToken = response.token;
         $scope.images = staticImagesArray;
-        if($scope.images.length > 0) {
         $scope.viewImage = $scope.images[0];
         $scope.switchImage($scope.viewImage);
-        }
         $scope.loading = false;
     });
   };
   $scope.getImages();
 
   $scope.switchImage = function(image){
-    $scope.imageUrl = image['@content.downloadUrl'];
-    $scope.viewImage = image;
+      $scope.imageUrl = image ? image['@content.downloadUrl'] : null;
+      $scope.viewImage = image ? image : null;
   };
 
    $scope.imagePosition = function(){
@@ -55,5 +49,52 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSiden
   $rootScope.toggleSidenav = function(id) {
       $mdSidenav(id).toggle();
    }
+
+  $scope.openCalendar = function(event) {
+    $mdDialog.show({
+      templateUrl: 'javascripts/angular/views/calendar.html',
+      scope: $scope,
+      preserveScope: true,
+      targetEvent: event,
+      clickOutsideToClose: true,
+      escapeToClose: true
+    })
+    .then(function(date) {
+      if(date) $scope.getImages(date)
+    })
+  }
+
+  $scope.openTimeSelector = function(event) {
+    $mdDialog.show({
+      templateUrl:'javascripts/angular/views/timePicker.html',
+      scope: $scope,
+      preserveScope: true,
+      targetEvent: event,
+      clickOutsideToClose: true,
+      escapeToClose: true
+    })
+    .then(function(time) {
+      if(time) {
+        var timeString = time.toString(),
+            endPosition = timeString.search(':'),
+            hour = timeString.slice(endPosition - 2, endPosition);
+        $scope.images = [];
+        for(var i = 0; i < staticImagesArray.length; i++){
+          if(staticImagesArray[i].hour === hour){
+            $scope.images.push(staticImagesArray[i]);
+          }
+        }
+      }
+    })
+
+  }
+  $scope.closeDialog = function(data, dialog) {
+    if(data && dialog === "date") $mdDialog.hide(data);
+    if(data && dialog === "time") $mdDialog.hide(data);
+    $mdDialog.hide()
+  }
+  $scope.noPhotos = function() {
+    if($scope.images && $scope.images.length === 0 && $scope.loading === false) return true
+  }
 
 }]);
