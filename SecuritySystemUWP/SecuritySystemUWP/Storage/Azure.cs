@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Linq;
@@ -10,6 +11,8 @@ using Windows.Web.Http;
 using Windows.Storage;
 using Windows.Security.Cryptography.Core;
 using Windows.Security.Cryptography;
+using Windows.Storage.Search;
+
 
 namespace SecuritySystemUWP
 {
@@ -19,25 +22,86 @@ namespace SecuritySystemUWP
         private static string storageAccount = "";
         private static string storageKey = "";
 
-        private static string endpoint; 
-
-        public Azure(string accountId, string accountSecret)
+        private static string endpoint;
+        private static Mutex uploadPicturesMutexLock = new Mutex();
+        public Azure()
         {
-            storageAccount = accountId;
-            storageKey = accountSecret;
+            storageAccount = Config.AzureAccountName;
+            storageKey = Config.AzureAccessKey;
             endpoint = "http://" + storageAccount + ".blob.core.windows.net/";
         }
         /*******************************************************************************************
         * PUBLIC METHODS
         *******************************************************************************************/
 
-        public Type loginType()
+        public Type LoginType()
         {
             return typeof(MainPage);
         }
-
-        public async Task<bool> uploadPicture(string folderPath, string imageName, StorageFile imageFile)
+        public async void UploadPictures(string camera)
         {
+            uploadPicturesMutexLock.WaitOne();
+
+            try
+            {
+                QueryOptions querySubfolders = new QueryOptions();
+                querySubfolders.FolderDepth = FolderDepth.Deep;
+
+                StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
+                var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
+                var files = await result.GetFilesAsync();
+
+                foreach (StorageFile file in files)
+                {
+                    string imageName = camera + "/" + DateTime.Now.ToString("MM_dd_yyyy/HH") + "_" + DateTime.UtcNow.Ticks.ToString() + ".jpg";
+                    if (await uploadPicture(Config.FolderName, imageName, file))
+                    {
+                        Debug.WriteLine("Image uploaded");
+                        await file.DeleteAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception in uploadPictures() " + ex.Message);
+            }
+            finally
+            {
+                uploadPicturesMutexLock.ReleaseMutex();
+            }
+        }
+
+        public async void DeleteExpiredPictures(string camera)
+        {
+            try
+            {
+                List<string> pictures = await listPictures(Config.FolderName);
+                foreach (string picture in pictures)
+                {
+                    long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(Config.StorageDuration).Ticks;
+                    string picName = (picture.Contains('/')) ? picture.Split('_')[3] : picture.Split('_')[1];
+                    if (picName.CompareTo(oldestTime.ToString()) < 0)
+                    {
+                        if (await deletePicture(Config.FolderName, picture))
+                        {
+                            Debug.WriteLine("Image deleted");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception in deleteExpiredPictures() " + ex.Message);
+            }
+        }
+
+
+        /*******************************************************************************************
+        * PRIVATE METHODS
+        ********************************************************************************************/
+        private async Task<bool> uploadPicture(string folderPath, string imageName, StorageFile imageFile)
+        {
+            bool returnStatus = false;
             var memStream = new MemoryStream();
             Stream testStream = await imageFile.OpenStreamForReadAsync();
             await testStream.CopyToAsync(memStream);
@@ -54,22 +118,29 @@ namespace SecuritySystemUWP
 
                 if (response.StatusCode == HttpStatusCode.Created)
                 {
-                    return true;
+                    returnStatus =  true;
                 }
                 else
                 {
                     Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
-                    return false;
+                    returnStatus = false;
                 }
+                memStream.Dispose();
+                testStream.Dispose();
+                request.Content.Dispose();
+                request.Dispose();
+                httpClient.Dispose();
+                response.Dispose();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                return false;
+                returnStatus = false;
                 throw;
             }
+            return returnStatus;
         }
-        public async Task<List<string>> listPictures(string folderPath)
+        private async Task<List<string>> listPictures(string folderPath)
         {
             List<string> blobs = new List<string>();
 
@@ -97,13 +168,18 @@ namespace SecuritySystemUWP
                             blobs.Add(blob.Element("Name").Value);
                         }
                     }
+                    inputStream.Dispose();
+                    memStream.Dispose();
+                    testStream.Dispose();
                 }
                 else
                 {
                     Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
-                    return null;
+                    blobs = null;
                 }
-
+                request.Dispose();
+                httpClient.Dispose();
+                response.Dispose();
                 return blobs;
             }
             catch (Exception ex)
@@ -114,8 +190,9 @@ namespace SecuritySystemUWP
             }
         }
 
-        public async Task<bool> deletePicture(string folderPath, string imageName)
+        private async Task<bool> deletePicture(string folderPath, string imageName)
         {
+            bool returnStatus = false;
             try
             {
                 HttpRequestMessage request = CreateStreamRESTRequest("DELETE", folderPath + "/" + imageName);
@@ -123,26 +200,27 @@ namespace SecuritySystemUWP
                 HttpResponseMessage response = await httpClient.SendRequestAsync(request);
                 if (response.StatusCode == HttpStatusCode.Accepted)
                 {
-                    return true;
+                    returnStatus = true;
                 }
                 else
                 {
                     Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
-                    return false;
+                    returnStatus = false;
                 }
+                request.Dispose();
+                httpClient.Dispose();
+                response.Dispose();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                return false;
+                returnStatus = false;
                 throw;
             }
+            return returnStatus;
+
         }
 
-
-        /*******************************************************************************************
-        * PRIVATE METHODS
-        ********************************************************************************************/
         private HttpRequestMessage CreateRESTRequest(string method, string resource, string requestBody = null, Dictionary<string, string> headers = null, string ifMatch = "", string md5 = "")
         {
             byte[] byteArray = null;
@@ -150,8 +228,7 @@ namespace SecuritySystemUWP
             Uri uri = new Uri(endpoint + resource);
             HttpMethod httpMethod = new HttpMethod(method);
             int contentLength = 0;
-
-            var httpClient = new HttpClient();
+         
             HttpRequestMessage request = new HttpRequestMessage(httpMethod, uri);
             request.Headers.Add("x-ms-date", now.ToString("R", System.Globalization.CultureInfo.InvariantCulture));
             request.Headers.Add("x-ms-version", "2009-09-19");
@@ -175,6 +252,10 @@ namespace SecuritySystemUWP
                 request.Content = content;
 
                 contentLength = byteArray.Length;
+
+                stream.Dispose();
+                streamContent.Dispose();
+                content.Dispose();
             }
 
             var authorizationHeader = AuthorizationHeader(method, now, request, contentLength, ifMatch, md5);
@@ -190,7 +271,6 @@ namespace SecuritySystemUWP
             HttpMethod httpMethod = new HttpMethod(method);
             long contentLength = 0;
 
-            var httpClient = new HttpClient();
             HttpRequestMessage request = new HttpRequestMessage(httpMethod, uri);
             request.Headers.Add("x-ms-date", now.ToString("R", System.Globalization.CultureInfo.InvariantCulture));
             request.Headers.Add("x-ms-version", "2009-09-19");
@@ -238,7 +318,6 @@ namespace SecuritySystemUWP
             MacAlgorithmProvider objMacProv = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);
             CryptographicHash hash = objMacProv.CreateHash(key);
             hash.Append(msg);
-
             var authorizationHeader = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("SharedKey", storageAccount + ":" + CryptographicBuffer.EncodeToBase64String(hash.GetValueAndReset()));
             return authorizationHeader;
         }

@@ -9,6 +9,7 @@ using Windows.Web.Http;
 using Windows.Web.Http.Filters;
 using Windows.Web.Http.Headers;
 using Windows.Storage;
+using Windows.Storage.Search;
 
 namespace SecuritySystemUWP
 {
@@ -27,21 +28,84 @@ namespace SecuritySystemUWP
         private static HttpClient httpClient;
         private static CancellationTokenSource cts;
         private static bool isLoggedin = false;
-
-        public OneDrive(string accountId, string accountSecret)
+        private static Mutex uploadPicturesMutexLock = new Mutex();
+        public OneDrive()
         {
-            clientId = accountId;
-            clientSecret = accountSecret;
+            clientId = Config.OneDriveClientId;
+            clientSecret = Config.OneDriveClientSecret;
         }
         /*******************************************************************************************
         * PUBLIC METHODS
         *******************************************************************************************/
 
-        public Type loginType()
+        public Type LoginType()
         {
             return typeof(OnedriveLoginPage);
         }
-        public async Task<bool> uploadPicture(string folderName, string imageName, StorageFile imageFile)
+
+        public async void UploadPictures(string camera)
+        {
+            uploadPicturesMutexLock.WaitOne();
+
+            try
+            {
+                QueryOptions querySubfolders = new QueryOptions();
+                querySubfolders.FolderDepth = FolderDepth.Deep;
+
+                StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
+                var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
+                var files = await result.GetFilesAsync();
+
+                foreach (StorageFile file in files)
+                {
+                    string imageName = camera + "/" + DateTime.Now.ToString("MM_dd_yyyy/HH") + "_" + DateTime.UtcNow.Ticks.ToString() + ".jpg";
+                    if (await uploadPicture(Config.FolderName, imageName, file))
+                    {
+                        Debug.WriteLine("Image uploaded");
+                        await file.DeleteAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception in uploadPictures() " + ex.Message);
+            }
+            finally
+            {
+                uploadPicturesMutexLock.ReleaseMutex();
+            }
+        }
+
+        public async void DeleteExpiredPictures(string camera)
+        {
+            try
+            {
+                string folder = Config.FolderName + "/" + camera + "/" + DateTime.Now.Subtract(TimeSpan.FromDays(Config.StorageDuration)).ToString("MM_dd_yyyy");
+                List<string> pictures = await listPictures(folder);
+                foreach (string picture in pictures)
+                {
+                    await deletePicture(folder, picture);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception in deleteExpiredPictures() " + ex.Message);
+            }
+        }
+        public static async Task authorize(string accessCode)
+        {
+            CreateHttpClient(ref httpClient);
+
+            await getTokens(accessCode, "authorization_code");
+            SetAuthorization("Bearer", accessToken);
+
+            cts = new CancellationTokenSource();
+            isLoggedin = true;
+        }
+        /*******************************************************************************************
+        * PRIVATE METHODS
+        ********************************************************************************************/
+        private async Task<bool> uploadPicture(string folderName, string imageName, StorageFile imageFile)
         {
             try
             {
@@ -64,7 +128,7 @@ namespace SecuritySystemUWP
             return false;
         }
 
-        public async Task<List<string>> listPictures(string folderName)
+        private async Task<List<string>> listPictures(string folderName)
         {
             String uriString = "https://api.onedrive.com/v1.0/drive/root:" + "/Pictures/" + folderName + ":/children";
             List<string> files = new List<string>();
@@ -97,12 +161,17 @@ namespace SecuritySystemUWP
                                 }
                             }
                         }
+                        inputStream.Dispose();
+                        memStream.Dispose();
+                        testStream.Dispose();
                     }
                     else
                     {
                         Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
-                        return null;
+                        files = null;
                     }
+                    request.Dispose();
+                    response.Dispose();
                     return files;
                 }
             }
@@ -112,8 +181,9 @@ namespace SecuritySystemUWP
             }
             return null;
         }
-        public async Task<bool> deletePicture(string folderName, string imageName)
+        private async Task<bool> deletePicture(string folderName, string imageName)
         {
+            bool returnStatus = false;
             try
             {
                 if (isLoggedin)
@@ -125,30 +195,18 @@ namespace SecuritySystemUWP
                     HttpResponseMessage response = await httpClient.SendRequestAsync(request);
                     if (response.StatusCode == HttpStatusCode.NoContent)
                     {
-                        return true;
+                        returnStatus = true;
                     }
+                    request.Dispose();
+                    response.Dispose();
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
             }
-            return false;
+            return returnStatus;
         }
-        public static async Task authorize(string accessCode)
-        {
-            CreateHttpClient(ref httpClient);
-
-            await getTokens(accessCode, "authorization_code");
-            SetAuthorization("Bearer", accessToken);
-
-            cts = new CancellationTokenSource();
-            isLoggedin = true;
-        }
-
-        /*******************************************************************************************
-        * PRIVATE METHODS
-        ********************************************************************************************/
         private static async Task getTokens(string accessCodeOrRefreshToken, string grantType)
         {
             string uri = "https://login.live.com/oauth20_token.srf";
@@ -165,7 +223,9 @@ namespace SecuritySystemUWP
             string responseContentString = await responseMessage.Content.ReadAsStringAsync();
             accessToken = getAccessToken(responseContentString);
             refreshToken = getRefreshToken(responseContentString);
-
+            client.Dispose();
+            reqMessage.Dispose();
+            responseMessage.Dispose();
         }
 
         private static string getAccessToken(string responseContent)
@@ -206,6 +266,7 @@ namespace SecuritySystemUWP
             accessToken = "";
             refreshToken = "";
             isLoggedin = false;
+            httpClient.Dispose();
         }
 
 
@@ -238,8 +299,13 @@ namespace SecuritySystemUWP
                 Debug.WriteLine("SendFileAsync() - Cannot open file. Err= " + ex.Message);
                 Debug.WriteLine("  File Path = " + (sFile != null ? sFile.Path : "?"));
             }
-            if (streamContent == null) return;
-
+            if (streamContent == null)
+            {
+                Debug.WriteLine("SendFileAsync() - Cannot open file.");
+                Debug.WriteLine("  File Path = " + (sFile != null ? sFile.Path : "?"));
+                streamContent.Dispose();
+                return;
+            }
             try
             {
                 Uri resourceAddress = new Uri(url);
@@ -250,6 +316,9 @@ namespace SecuritySystemUWP
                 HttpResponseMessage response = await httpClient.SendRequestAsync(request).AsTask(cts.Token);
 
                 await DebugTextResultAsync(response);
+                request.Content.Dispose();
+                request.Dispose();
+                response.Dispose();
             }
             catch (TaskCanceledException ex)
             {
@@ -261,6 +330,7 @@ namespace SecuritySystemUWP
             }
             finally
             {
+                streamContent.Dispose();
                 Debug.WriteLine("SendFileAsync() - final.");
             }
         }

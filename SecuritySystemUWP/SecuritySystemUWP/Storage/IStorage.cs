@@ -9,9 +9,8 @@ namespace SecuritySystemUWP
 {
     public interface IStorage
     {
-        Type loginType();
-        Task<bool> uploadPicture(string folderPath, string imageName, StorageFile imageFile);
-        Task<List<string>> listPictures(string folderPath);
-        Task<bool> deletePicture(string folderPath, string imageName);
+        Type LoginType();
+        void UploadPictures(string camera);
+        void DeleteExpiredPictures(string camera);
     }
 }
