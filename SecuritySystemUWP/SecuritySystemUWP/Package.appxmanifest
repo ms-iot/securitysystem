@@ -20,7 +20,7 @@
   </Properties>
 
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.10192.0" MaxVersionTested="10.0.10192.0" />
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.10240.0" MaxVersionTested="10.0.10240.0" />
   </Dependencies>
 
   <Resources>
@@ -44,7 +44,6 @@
 
   <Capabilities>
     <Capability Name="internetClient" />
-    <Capability Name="allJoyn" />
     <uap:Capability Name="picturesLibrary"/>
   </Capabilities>
 </Package>
