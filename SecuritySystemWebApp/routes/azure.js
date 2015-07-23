@@ -35,7 +35,7 @@ router.post('/images',
           if(!error){
             images = result;
              for(var i = 0; i < images.entries.length; i++){
-                images.entries[i] = timeFormat.timeFormat(images.entries[i], {name: [19,37], hour: [16,18]})
+                images.entries[i] = timeFormat.format(images.entries[i], {name: [19,37], hour: [16,18]})
                 token = blobService.generateSharedAccessSignature('imagecontainer', images.entries[i].name, sharedAccessPolicy);
                 images.entries[i].downloadUrl = blobService.getUrl('imagecontainer', images.entries[i].name, token);
               }

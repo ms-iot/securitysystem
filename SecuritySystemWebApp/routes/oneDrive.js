@@ -27,7 +27,7 @@ router.post('/images', function(req, res) {
     var parsedBody = JSON.parse(body).value
     if(parsedBody) {
       for(var i = 0; i < parsedBody.length; i++){
-        parsedBody[i] = timeFormat.timeFormat(parsedBody[i], {name: [3,21], hour: [0,2]})
+        parsedBody[i] = timeFormat.format(parsedBody[i], {name: [3,21], hour: [0,2]})
         parsedBody[i].downloadUrl = parsedBody[i]['@content.downloadUrl'];
       }
       res.send({images: parsedBody})
