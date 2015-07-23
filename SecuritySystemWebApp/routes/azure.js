@@ -20,7 +20,6 @@ router.post('/images',
   ensureAuthenticated,
   function(req,res){
     var images = [],
-        days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
         startDate = new Date(),
         expiryDate = new Date(startDate),
         searchDate = req.body.date;
@@ -39,22 +38,9 @@ router.post('/images',
             console.log("result:,",result)
             images = result;
              for(var i = 0; i < images.entries.length; i++){
-                // using npm module bigInt, because the number of .NET ticks
-                // is a number with too many digits for vanilla JavaScript
-                // to perform accurate math on.
-                var ticks = images.entries[i].name.slice(19,37);
-                    ticksAtUnixEpoch = bigInt("621355968000000000"),
-                    ticksInt = bigInt(ticks),
-                    ticksSinceUnixEpoch = ticksInt.minus(ticksAtUnixEpoch),
-                    milliseconds = ticksSinceUnixEpoch.divide(10000),
-                    date = new Date(milliseconds.value),
-                    day = days[date.getDay()],
-                    localDate = date.toLocaleString(),
-                    token = blobService.generateSharedAccessSignature('imagecontainer', images.entries[i].name, sharedAccessPolicy);
-                images.entries[i].date = localDate;
-                images.entries[i].day = day;
-                images.entries[i].hour = images.entries[i].name.slice(16,18)
-                images.entries[i]['@content.downloadUrl'] = blobService.getUrl('imagecontainer', images.entries[i].name, token);
+                images.entries[i] = timeFormat(images.entries[i], {name: [19,37], hour: [16,18]})
+                token = blobService.generateSharedAccessSignature('imagecontainer', images.entries[i].name, sharedAccessPolicy);
+                images.entries[i].downloadUrl = blobService.getUrl('imagecontainer', images.entries[i].name, token);
               }
             res.send({images: images.entries, token: result.continuationToken});
           } else {

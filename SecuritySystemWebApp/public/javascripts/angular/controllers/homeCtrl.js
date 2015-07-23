@@ -27,7 +27,7 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSiden
   $scope.getImages();
 
   $scope.switchImage = function(image){
-      $scope.imageUrl = image ? image['@content.downloadUrl'] : null;
+      $scope.imageUrl = image ? image.downloadUrl : null;
       $scope.viewImage = image ? image : null;
   };
 
@@ -95,6 +95,12 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSiden
   }
   $scope.noPhotos = function() {
     if($scope.images && $scope.images.length === 0 && $scope.loading === false) return true
+  }
+  $scope.emptyImage = function() {
+    if($scope.images) return $scope.images.length === 0;
+  }
+  $scope.isLoading = function() {
+    return $scope.loading
   }
 
 }]);

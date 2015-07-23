@@ -110,6 +110,9 @@ background-color: #3F51B5;
 #securityBody {
 background-color: rgb(26,26,27);
 }
+#homeBody {
+background-color: rgb(48,0,164);
+}
 #imageBorder {
 background-color: rgb(36,36,37);
 }
@@ -129,6 +132,9 @@ md-slider {
 }
 md-icon {
   padding-top:3px;
+}
+#what {
+  background-color:white;
 }
 @media (min-width: 500px) and (max-width: 650px) {
   #buttonRow {

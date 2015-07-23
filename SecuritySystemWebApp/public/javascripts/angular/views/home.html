@@ -4,7 +4,7 @@
         <span>
         <h1 class="md-toolbar-tools">Photos
           <span flex></span>
-          <md-button ng-click="openTimeSelector()" ng-if="images.length > 0" class="md-mini md-fab md-primary">
+          <md-button ng-click="openTimeSelector()" ng-if="!emptyImage()" class="md-mini md-fab md-primary">
             <i class="fa fa-clock-o"></i>
           </md-button>
           <md-button ng-click="openCalendar($event)" class="md-mini md-fab md-primary">
@@ -24,7 +24,7 @@
               <p>{{::image.date}}</p>
             </div>
           </md-list-item>
-          <md-list-item ng-if="loading === true">
+          <md-list-item ng-if="isLoading()">
             Loading...
           </md-list-item>
           <md-list-item class="md-2-line" ng-if="noPhotos()">
@@ -36,10 +36,10 @@
         </md-list>
       </md-content>
   </md-sidenav>
-  <div flex-offset="20" flex="80" layout="column" layout-align="center center" ng-if="loading === true">
+  <div flex-offset="20" flex="80" layout="column" layout-align="center center" ng-if="isLoading()">
     <md-progress-circular class="md-primary" md-diameter="75" md-mode="indeterminate"></md-progress-circular>
   </div>
-  <div id="pictureView" layout-gt-sm="row" layout-xs="column" flex-offset-sm="20" flex-offset-gt-md="20" flex-gt-md="80" flex-md="100" layout-align-gt-md="space-around center" layout-align="space-around center" ng-if="loading === false">
+  <div id="pictureView" layout-gt-sm="row" layout-xs="column" flex-offset-sm="20" flex-offset-gt-md="20" flex-gt-md="80" flex-md="100" layout-align-gt-md="space-around center" layout-align="space-around center" ng-if="!isLoading()">
     <div layout="column" layout-align="center">
       <md-button hide-sm show-gt-sm ng-disabled="imagePosition().first" id="browseLeft" class="md-fab md-primary" ng-click="browsePicture(-1)">
         <i class="fa fa-chevron-left fa-2x"></i>
