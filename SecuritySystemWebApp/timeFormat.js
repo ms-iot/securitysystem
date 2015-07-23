@@ -2,7 +2,7 @@ var bigInt = require('big-integer');
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 module.exports = {
-  timeFormat: function(image, sliceObject) {
+  format: function(image, sliceObject) {
   // using npm module bigInt, because the number of .NET ticks
   // is a number with too many digits for vanilla JavaScript
   // to perform accurate math on.
