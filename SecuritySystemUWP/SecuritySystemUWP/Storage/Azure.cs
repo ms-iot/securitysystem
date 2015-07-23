@@ -28,7 +28,7 @@ namespace SecuritySystemUWP
         {
             storageAccount = Config.AzureAccountName;
             storageKey = Config.AzureAccessKey;
-            endpoint = "http://" + storageAccount + ".blob.core.windows.net/";
+            endpoint = string.Format(Config.AzureBlobUrl, storageAccount);
         }
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -53,12 +53,9 @@ namespace SecuritySystemUWP
 
                 foreach (StorageFile file in files)
                 {
-                    string imageName = camera + "/" + DateTime.Now.ToString("MM_dd_yyyy/HH") + "_" + DateTime.UtcNow.Ticks.ToString() + ".jpg";
-                    if (await uploadPicture(Config.FolderName, imageName, file))
-                    {
-                        Debug.WriteLine("Image uploaded");
-                        await file.DeleteAsync();
-                    }
+                    string imageName = string.Format("{0}/{1}_{2}.jpg", camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
+                    await uploadPictureToAzure(Config.FolderName, imageName, file);
+                    await file.DeleteAsync();
                 }
             }
             catch (Exception ex)
@@ -79,13 +76,10 @@ namespace SecuritySystemUWP
                 foreach (string picture in pictures)
                 {
                     long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(Config.StorageDuration).Ticks;
-                    string picName = (picture.Contains('/')) ? picture.Split('_')[3] : picture.Split('_')[1];
+                    string picName = picture.Split('_')[3];
                     if (picName.CompareTo(oldestTime.ToString()) < 0)
                     {
-                        if (await deletePicture(Config.FolderName, picture))
-                        {
-                            Debug.WriteLine("Image deleted");
-                        }
+                        await deletePicture(Config.FolderName, picture);
                     }
                 }
             }
@@ -99,87 +93,76 @@ namespace SecuritySystemUWP
         /*******************************************************************************************
         * PRIVATE METHODS
         ********************************************************************************************/
-        private async Task<bool> uploadPicture(string folderPath, string imageName, StorageFile imageFile)
+        private async Task uploadPictureToAzure(string folderPath, string imageName, StorageFile imageFile)
         {
-            bool returnStatus = false;
-            var memStream = new MemoryStream();
-            Stream testStream = await imageFile.OpenStreamForReadAsync();
-            await testStream.CopyToAsync(memStream);
-            memStream.Position = 0;
-
-            try
+            using (var memStream = new MemoryStream())
+            using (Stream testStream = await imageFile.OpenStreamForReadAsync())
             {
-                Dictionary<string, string> headers = new Dictionary<string, string>();
-                headers.Add("x-ms-blob-type", "BlockBlob");
+                await testStream.CopyToAsync(memStream);
+                memStream.Position = 0;
 
-                HttpRequestMessage request = CreateStreamRESTRequest("PUT", folderPath + "/" + imageName, memStream, headers);
-                HttpClient httpClient = new HttpClient();
-                HttpResponseMessage response = await httpClient.SendRequestAsync(request);
+                try
+                {
+                    Dictionary<string, string> headers = new Dictionary<string, string>();
+                    headers.Add("x-ms-blob-type", "BlockBlob");
 
-                if (response.StatusCode == HttpStatusCode.Created)
-                {
-                    returnStatus =  true;
+                    using (HttpRequestMessage request = CreateStreamRESTRequest("PUT", folderPath + "/" + imageName, memStream, headers))
+                    using (HttpClient httpClient = new HttpClient())
+                    using (HttpResponseMessage response = await httpClient.SendRequestAsync(request))
+                    {
+                        if (response.StatusCode == HttpStatusCode.Created)
+                        {
+                        }
+                        else
+                        {
+                            Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
+
+                        }
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
-                    returnStatus = false;
+                    Debug.WriteLine(ex.Message);
+                    throw;
                 }
-                memStream.Dispose();
-                testStream.Dispose();
-                request.Content.Dispose();
-                request.Dispose();
-                httpClient.Dispose();
-                response.Dispose();
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                returnStatus = false;
-                throw;
-            }
-            return returnStatus;
         }
         private async Task<List<string>> listPictures(string folderPath)
         {
-            List<string> blobs = new List<string>();
+            List<string> blobs = null;
 
             try
             {
-                HttpRequestMessage request = CreateRESTRequest("GET", folderPath + "?restype=container&comp=list&include=snapshots&include=metadata");
-                HttpClient httpClient = new HttpClient();
-                HttpResponseMessage response = await httpClient.SendRequestAsync(request);
-
-                if ((int)response.StatusCode == 200)
+                using (HttpRequestMessage request = CreateRESTRequest("GET", folderPath + "?restype=container&comp=list&include=snapshots&include=metadata"))
+                using (HttpClient httpClient = new HttpClient())
+                using (HttpResponseMessage response = await httpClient.SendRequestAsync(request))
                 {
-                    var inputStream = await response.Content.ReadAsInputStreamAsync();
-                    var memStream = new MemoryStream();
-                    Stream testStream = inputStream.AsStreamForRead();
-                    await testStream.CopyToAsync(memStream);
-
-                    memStream.Position = 0;
-                    using (StreamReader reader = new StreamReader(memStream))
+                    if ((int)response.StatusCode == 200)
                     {
-                        string result = reader.ReadToEnd();
-
-                        XElement x = XElement.Parse(result);
-                        foreach (XElement blob in x.Element("Blobs").Elements("Blob"))
+                        blobs = new List<string>();
+                        using (var inputStream = await response.Content.ReadAsInputStreamAsync())
+                        using (var memStream = new MemoryStream())
+                        using (Stream testStream = inputStream.AsStreamForRead())
                         {
-                            blobs.Add(blob.Element("Name").Value);
+                            await testStream.CopyToAsync(memStream);
+                            memStream.Position = 0;
+                            using (StreamReader reader = new StreamReader(memStream))
+                            {
+                                string result = reader.ReadToEnd();
+
+                                XElement x = XElement.Parse(result);
+                                foreach (XElement blob in x.Element("Blobs").Elements("Blob"))
+                                {
+                                    blobs.Add(blob.Element("Name").Value);
+                                }
+                            }
                         }
                     }
-                    inputStream.Dispose();
-                    memStream.Dispose();
-                    testStream.Dispose();
+                    else
+                    {
+                        Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
+                    }
                 }
-                else
-                {
-                    Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
-                    blobs = null;
-                }
-                request.Dispose();
-                httpClient.Dispose();
-                response.Dispose();
                 return blobs;
             }
             catch (Exception ex)
@@ -190,35 +173,25 @@ namespace SecuritySystemUWP
             }
         }
 
-        private async Task<bool> deletePicture(string folderPath, string imageName)
+        private async Task deletePicture(string folderPath, string imageName)
         {
-            bool returnStatus = false;
             try
             {
-                HttpRequestMessage request = CreateStreamRESTRequest("DELETE", folderPath + "/" + imageName);
-                HttpClient httpClient = new HttpClient();
-                HttpResponseMessage response = await httpClient.SendRequestAsync(request);
-                if (response.StatusCode == HttpStatusCode.Accepted)
+                using (HttpRequestMessage request = CreateStreamRESTRequest("DELETE", folderPath + "/" + imageName))
+                using (HttpClient httpClient = new HttpClient())
+                using (HttpResponseMessage response = await httpClient.SendRequestAsync(request))
                 {
-                    returnStatus = true;
+                    if (response.StatusCode != HttpStatusCode.Accepted)
+                    {
+                        Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
+                    }
                 }
-                else
-                {
-                    Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
-                    returnStatus = false;
-                }
-                request.Dispose();
-                httpClient.Dispose();
-                response.Dispose();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                returnStatus = false;
                 throw;
             }
-            return returnStatus;
-
         }
 
         private HttpRequestMessage CreateRESTRequest(string method, string resource, string requestBody = null, Dictionary<string, string> headers = null, string ifMatch = "", string md5 = "")
@@ -246,16 +219,13 @@ namespace SecuritySystemUWP
                 request.Headers.Add("Accept-Charset", "UTF-8");
 
                 byteArray = Encoding.UTF8.GetBytes(requestBody);
-                MemoryStream stream = new MemoryStream(byteArray);
-                Windows.Storage.Streams.IInputStream streamContent = stream.AsInputStream();
-                HttpStreamContent content = new HttpStreamContent(streamContent);
-                request.Content = content;
-
-                contentLength = byteArray.Length;
-
-                stream.Dispose();
-                streamContent.Dispose();
-                content.Dispose();
+                using (MemoryStream stream = new MemoryStream(byteArray))
+                using (Windows.Storage.Streams.IInputStream streamContent = stream.AsInputStream())
+                using (HttpStreamContent content = new HttpStreamContent(streamContent))
+                {
+                    request.Content = content;
+                    contentLength = byteArray.Length;
+                }
             }
 
             var authorizationHeader = AuthorizationHeader(method, now, request, contentLength, ifMatch, md5);

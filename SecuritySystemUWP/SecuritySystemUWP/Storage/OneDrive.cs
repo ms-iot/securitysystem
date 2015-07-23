@@ -58,12 +58,9 @@ namespace SecuritySystemUWP
 
                 foreach (StorageFile file in files)
                 {
-                    string imageName = camera + "/" + DateTime.Now.ToString("MM_dd_yyyy/HH") + "_" + DateTime.UtcNow.Ticks.ToString() + ".jpg";
-                    if (await uploadPicture(Config.FolderName, imageName, file))
-                    {
-                        Debug.WriteLine("Image uploaded");
-                        await file.DeleteAsync();
-                    }
+                    string imageName = string.Format("{0}/{1}_{2}.jpg", camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
+                    await uploadPictureToOnedrive(Config.FolderName, imageName, file);
+                    await file.DeleteAsync();
                 }
             }
             catch (Exception ex)
@@ -84,7 +81,7 @@ namespace SecuritySystemUWP
                 List<string> pictures = await listPictures(folder);
                 foreach (string picture in pictures)
                 {
-                    await deletePicture(folder, picture);
+                   await deletePicture(folder, picture);
                 }
             }
             catch (Exception ex)
@@ -95,7 +92,6 @@ namespace SecuritySystemUWP
         public static async Task authorize(string accessCode)
         {
             CreateHttpClient(ref httpClient);
-
             await getTokens(accessCode, "authorization_code");
             SetAuthorization("Bearer", accessToken);
 
@@ -105,7 +101,7 @@ namespace SecuritySystemUWP
         /*******************************************************************************************
         * PRIVATE METHODS
         ********************************************************************************************/
-        private async Task<bool> uploadPicture(string folderName, string imageName, StorageFile imageFile)
+        private async Task uploadPictureToOnedrive(string folderName, string imageName, StorageFile imageFile)
         {
             try
             {
@@ -118,60 +114,54 @@ namespace SecuritySystemUWP
                         imageFile,
                         Windows.Web.Http.HttpMethod.Put
                         );
-                    return true;
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Exception in uploading pictures to OneDrive: " + ex.Message);
             }
-            return false;
         }
 
         private async Task<List<string>> listPictures(string folderName)
         {
             String uriString = "https://api.onedrive.com/v1.0/drive/root:" + "/Pictures/" + folderName + ":/children";
-            List<string> files = new List<string>();
-
+            List<string> files = null;
             try
             {
                 if (isLoggedin)
                 {
                     Uri uri = new Uri(uriString);
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
-                    HttpResponseMessage response = await httpClient.SendRequestAsync(request);
-
-                    if (response.StatusCode == HttpStatusCode.Ok)
+                    using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri))
+                    using (HttpResponseMessage response = await httpClient.SendRequestAsync(request))
                     {
-                        var inputStream = await response.Content.ReadAsInputStreamAsync();
-                        var memStream = new MemoryStream();
-                        Stream testStream = inputStream.AsStreamForRead();
-                        await testStream.CopyToAsync(memStream);
-
-                        memStream.Position = 0;
-                        using (StreamReader reader = new StreamReader(memStream))
+                        if (response.StatusCode == HttpStatusCode.Ok)
                         {
-                            string result = reader.ReadToEnd();
-                            string[] parts = result.Split('"');
-                            foreach (string part in parts)
+                            files = new List<string>();
+                            using (var inputStream = await response.Content.ReadAsInputStreamAsync())
+                            using (var memStream = new MemoryStream())
+                            using (Stream testStream = inputStream.AsStreamForRead())
                             {
-                                if (part.Contains(".jpg"))
+                                await testStream.CopyToAsync(memStream);
+                                memStream.Position = 0;
+                                using (StreamReader reader = new StreamReader(memStream))
                                 {
-                                    files.Add(part);
+                                    string result = reader.ReadToEnd();
+                                    string[] parts = result.Split('"');
+                                    foreach (string part in parts)
+                                    {
+                                        if (part.Contains(".jpg"))
+                                        {
+                                            files.Add(part);
+                                        }
+                                    }
                                 }
                             }
                         }
-                        inputStream.Dispose();
-                        memStream.Dispose();
-                        testStream.Dispose();
+                        else
+                        {
+                            Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
+                        }
                     }
-                    else
-                    {
-                        Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
-                        files = null;
-                    }
-                    request.Dispose();
-                    response.Dispose();
                     return files;
                 }
             }
@@ -181,9 +171,8 @@ namespace SecuritySystemUWP
             }
             return null;
         }
-        private async Task<bool> deletePicture(string folderName, string imageName)
+        private async Task deletePicture(string folderName, string imageName)
         {
-            bool returnStatus = false;
             try
             {
                 if (isLoggedin)
@@ -191,41 +180,39 @@ namespace SecuritySystemUWP
                     String uriString = "https://api.onedrive.com/v1.0/drive/root:" + "/Pictures/" + folderName + "/" + imageName;
 
                     Uri uri = new Uri(uriString);
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri);
-                    HttpResponseMessage response = await httpClient.SendRequestAsync(request);
-                    if (response.StatusCode == HttpStatusCode.NoContent)
+                    using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri))
+                    using (HttpResponseMessage response = await httpClient.SendRequestAsync(request))
                     {
-                        returnStatus = true;
+                        if (response.StatusCode != HttpStatusCode.NoContent)
+                        {
+                            Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
+                        }
                     }
-                    request.Dispose();
-                    response.Dispose();
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
             }
-            return returnStatus;
         }
         private static async Task getTokens(string accessCodeOrRefreshToken, string grantType)
         {
             string uri = "https://login.live.com/oauth20_token.srf";
             string content = "client_id=" + clientId + "&redirect_uri=" + redirectUri + "&client_secret=" + clientSecret + "&code=" + accessCodeOrRefreshToken + "&grant_type=" + grantType;
-            HttpClient client = new HttpClient();
+            using (HttpClient client = new HttpClient())
+            using (HttpRequestMessage reqMessage = new HttpRequestMessage(HttpMethod.Post, new Uri(uri)))
+            {
+                reqMessage.Content = new HttpStringContent(content);
+                reqMessage.Content.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
+                using (HttpResponseMessage responseMessage = await client.SendRequestAsync(reqMessage))
+                {
+                    responseMessage.EnsureSuccessStatusCode();
 
-            HttpRequestMessage reqMessage = new HttpRequestMessage(HttpMethod.Post, new Uri(uri));
-            reqMessage.Content = new HttpStringContent(content);
-            reqMessage.Content.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
-            HttpResponseMessage responseMessage = await client.SendRequestAsync(reqMessage);
-
-            responseMessage.EnsureSuccessStatusCode();
-
-            string responseContentString = await responseMessage.Content.ReadAsStringAsync();
-            accessToken = getAccessToken(responseContentString);
-            refreshToken = getRefreshToken(responseContentString);
-            client.Dispose();
-            reqMessage.Dispose();
-            responseMessage.Dispose();
+                    string responseContentString = await responseMessage.Content.ReadAsStringAsync();
+                    accessToken = getAccessToken(responseContentString);
+                    refreshToken = getRefreshToken(responseContentString);
+                }
+            }
         }
 
         private static string getAccessToken(string responseContent)
@@ -309,20 +296,20 @@ namespace SecuritySystemUWP
             try
             {
                 Uri resourceAddress = new Uri(url);
-                HttpRequestMessage request = new HttpRequestMessage(httpMethod, resourceAddress);
-                request.Content = streamContent;
+                using (HttpRequestMessage request = new HttpRequestMessage(httpMethod, resourceAddress))
+                {
+                    request.Content = streamContent;
 
-                // Do an asynchronous POST.
-                HttpResponseMessage response = await httpClient.SendRequestAsync(request).AsTask(cts.Token);
-
-                await DebugTextResultAsync(response);
-                request.Content.Dispose();
-                request.Dispose();
-                response.Dispose();
+                    // Do an asynchronous POST.
+                    using (HttpResponseMessage response = await httpClient.SendRequestAsync(request).AsTask(cts.Token))
+                    {
+                        await DebugTextResultAsync(response);
+                    }
+                }
             }
             catch (TaskCanceledException ex)
             {
-                Debug.WriteLine("SendFileAsync() - Request canceled.");
+                Debug.WriteLine("SendFileAsync() - Request canceled: " + ex.Message);
             }
             catch (Exception ex)
             {
