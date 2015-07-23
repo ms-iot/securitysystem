@@ -8,14 +8,19 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 var authenticationStrategies = require('./authenticationStrategies.js')
 
+//set to 'true' if you want authentication AND are using Azure Blob storage.
 var authenticationOn = false
+
+// must be set to "oneDrive" or "azure"
+var storageService = "oneDrive"
 
 
 //.env file
 env('./.env')
 
 var auth = require("./routes/auth");
-var index = require("./routes/index");
+var storageServiceRoute = require("./routes/" + storageService)
+
 
 var app = express();
 
@@ -57,12 +62,7 @@ if(authenticationOn == true) {
   app.use('/auth', auth);
 }
 
-
-app.use('/', index);
-
-
-
-
+  app.use('/', storageServiceRoute)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
