@@ -8,8 +8,13 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <StackPanel>
-            <Image x:Name = "image" HorizontalAlignment = "Center" Margin = "10" Height = "100" Width = "100" />
-        </StackPanel>
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+
+        <TextBlock x:Name="titleTextBlock" TextWrapping="Wrap" Text="Security System" FontSize="72" FontWeight="Thin" HorizontalAlignment="Center"/>
+        <Button Name="Start" FontWeight="Light" Content="Start" FontSize="29.333" Click="Start_Click" Height="52" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </Page>

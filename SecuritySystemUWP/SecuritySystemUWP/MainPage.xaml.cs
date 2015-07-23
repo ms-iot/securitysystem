@@ -1,20 +1,9 @@
-﻿using Windows.UI.Xaml.Controls;
-using DeviceProviders;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System;
-using Windows.Web.Http;
-using Windows.Devices.Gpio;
-using System.IO;
-using Windows.UI.Xaml.Media.Imaging;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using System.Collections.Generic;
-using System.Linq;
-using Windows.UI.Xaml;
-using Windows.Storage.Search;
-using Windows.Storage;
+﻿using System;
 using System.Threading;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+
+
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace SecuritySystemUWP
@@ -24,16 +13,11 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        //TODO: Input account name and account key in variables below
-        private string accountName = "";
-        private string accountKey = "";
-        private string blobType = "BlockBlob";
-        private string sharedKeyAuthorizationScheme = "SharedKey";
-
         private DispatcherTimer uploadPicturesTimer;
         private DispatcherTimer deletePicturesTimer;
-        private static Mutex uploadPicturesMutexLock = new Mutex();
+        private IStorage storage;
 
+        private string[] cameras = new string[Config.NumberOfCameras];
         public MainPage()
         {
             this.InitializeComponent();
@@ -42,6 +26,8 @@ namespace SecuritySystemUWP
 
         private void Initialize()
         {
+            storage = StorageFactory.Get(Config.StorageProvider);
+
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
             uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
@@ -53,75 +39,27 @@ namespace SecuritySystemUWP
             deletePicturesTimer.Interval = TimeSpan.FromHours(1);
             deletePicturesTimer.Tick += deletePicturesTimer_Tick;
             deletePicturesTimer.Start();
+
+            for (int i = 0; i < Config.NumberOfCameras; i++)
+            {
+                cameras[i] = "Cam" + (i + 1);
+            }
+
         }
 
-
-        private async void uploadPicturesTimer_Tick(object sender, object e)
+        private void Start_Click(object sender, RoutedEventArgs e)
         {
-            uploadPicturesMutexLock.WaitOne();
-            BlobHelper BlobHelper = new BlobHelper(accountName, accountKey);
-            try
-            {
-                QueryOptions querySubfolders = new QueryOptions();
-                querySubfolders.FolderDepth = FolderDepth.Deep;
-               
-                StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
-                var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
-                var files = await result.GetFilesAsync();
-
-                foreach (StorageFile file in files)
-                {
-                    var memStream = new MemoryStream();
-                    Stream testStream = await file.OpenStreamForReadAsync();
-                    await testStream.CopyToAsync(memStream);
-                    memStream.Position = 0;
-
-                    string imageName = DateTime.UtcNow.Ticks.ToString() + ".jpg";
-                    Debug.WriteLine(imageName);
-                    if (await BlobHelper.PutBlob("imagecontainer", imageName, memStream))
-                    {
-                        Debug.WriteLine("true");
-                    }
-                    else
-                    {
-                        Debug.WriteLine("false");
-
-                    }
-                    await file.DeleteAsync();
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Exception in uploadPicturesTimer_Tick() " + ex.Message);
-            }
-            finally
-            {
-                uploadPicturesMutexLock.ReleaseMutex();
-            }
+            this.Frame.Navigate(storage.LoginType());
         }
 
-        private async void deletePicturesTimer_Tick(object sender, object e)
+        private void uploadPicturesTimer_Tick(object sender, object e)
         {
-            BlobHelper BlobHelper = new BlobHelper(accountName, accountKey);
+            storage.UploadPictures(cameras[0]);
+        }
 
-            List<string> blobList = await BlobHelper.ListBlobs("imagecontainer");
-            foreach (string blob in blobList)
-            {
-                long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(7).Ticks;
-                if (blob.CompareTo(oldestTime.ToString()) < 0)
-                {
-                    Debug.WriteLine("Delete blob ");
-                    if (await BlobHelper.DeleteBlob("imagecontainer", blob))
-                    {
-                        Debug.WriteLine("Delete successful");
-                    }
-                    else
-                    {
-                        Debug.WriteLine("Delete failed");
-                    }
-                }
-            }
+        private void deletePicturesTimer_Tick(object sender, object e)
+        {
+            storage.DeleteExpiredPictures(cameras[0]);
         }
     }
 }
