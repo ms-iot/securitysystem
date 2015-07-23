@@ -18,17 +18,11 @@ namespace SecuritySystemUWP
 {
     public class Azure : IStorage
     {
-        //TODO: Add your account name and acount key
-        private static string storageAccount = "";
-        private static string storageKey = "";
-
         private static string endpoint;
         private static Mutex uploadPicturesMutexLock = new Mutex();
         public Azure()
         {
-            storageAccount = Config.AzureAccountName;
-            storageKey = Config.AzureAccessKey;
-            endpoint = string.Format(Config.AzureBlobUrl, storageAccount);
+            endpoint = string.Format(Config.AzureBlobUrl, Config.AzureAccountName);
         }
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -53,7 +47,7 @@ namespace SecuritySystemUWP
 
                 foreach (StorageFile file in files)
                 {
-                    string imageName = string.Format("{0}/{1}_{2}.jpg", camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
+                    string imageName = string.Format(Config.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
                     await uploadPictureToAzure(Config.FolderName, imageName, file);
                     await file.DeleteAsync();
                 }
@@ -95,7 +89,7 @@ namespace SecuritySystemUWP
         ********************************************************************************************/
         private async Task uploadPictureToAzure(string folderPath, string imageName, StorageFile imageFile)
         {
-            using (var memStream = new MemoryStream())
+            using (MemoryStream memStream = new MemoryStream())
             using (Stream testStream = await imageFile.OpenStreamForReadAsync())
             {
                 await testStream.CopyToAsync(memStream);
@@ -110,13 +104,9 @@ namespace SecuritySystemUWP
                     using (HttpClient httpClient = new HttpClient())
                     using (HttpResponseMessage response = await httpClient.SendRequestAsync(request))
                     {
-                        if (response.StatusCode == HttpStatusCode.Created)
-                        {
-                        }
-                        else
-                        {
+                        if (response.StatusCode != HttpStatusCode.Created)
+                        { 
                             Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
-
                         }
                     }
                 }
@@ -137,11 +127,11 @@ namespace SecuritySystemUWP
                 using (HttpClient httpClient = new HttpClient())
                 using (HttpResponseMessage response = await httpClient.SendRequestAsync(request))
                 {
-                    if ((int)response.StatusCode == 200)
+                    if (response.StatusCode == HttpStatusCode.Ok)
                     {
                         blobs = new List<string>();
-                        using (var inputStream = await response.Content.ReadAsInputStreamAsync())
-                        using (var memStream = new MemoryStream())
+                        using (Windows.Storage.Streams.IInputStream inputStream = await response.Content.ReadAsInputStreamAsync())
+                        using (MemoryStream memStream = new MemoryStream())
                         using (Stream testStream = inputStream.AsStreamForRead())
                         {
                             await testStream.CopyToAsync(memStream);
@@ -278,17 +268,17 @@ namespace SecuritySystemUWP
                     (method == "GET" || method == "HEAD") ? String.Empty : contentLength.ToString(),
                     ifMatch,
                     GetCanonicalizedHeaders(request),
-                    GetCanonicalizedResource(request.RequestUri, storageAccount),
+                    GetCanonicalizedResource(request.RequestUri, Config.AzureAccountName),
                     md5
                     );
 
-            var key = CryptographicBuffer.DecodeFromBase64String(storageKey);
+            var key = CryptographicBuffer.DecodeFromBase64String(Config.AzureAccessKey);
             var msg = CryptographicBuffer.ConvertStringToBinary(MessageSignature, BinaryStringEncoding.Utf8);
 
             MacAlgorithmProvider objMacProv = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);
             CryptographicHash hash = objMacProv.CreateHash(key);
             hash.Append(msg);
-            var authorizationHeader = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("SharedKey", storageAccount + ":" + CryptographicBuffer.EncodeToBase64String(hash.GetValueAndReset()));
+            var authorizationHeader = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("SharedKey", Config.AzureAccountName + ":" + CryptographicBuffer.EncodeToBase64String(hash.GetValueAndReset()));
             return authorizationHeader;
         }
         public string GetCanonicalizedHeaders(HttpRequestMessage request)

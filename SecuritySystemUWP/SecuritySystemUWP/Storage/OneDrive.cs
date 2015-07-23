@@ -15,25 +15,15 @@ namespace SecuritySystemUWP
 {
     public class OneDrive : IStorage
     {
-        public static string clientId { get; private set; } = "";
-        private static string clientSecret = "";
-
         //Obtained during onedrive login
         private static String accessToken = "";
         private static String refreshToken = "";
-
-        internal const string scope = "wl.offline_access onedrive.readwrite";
-        internal const string redirectUri = "https://login.live.com/oauth20_desktop.srf";
 
         private static HttpClient httpClient;
         private static CancellationTokenSource cts;
         private static bool isLoggedin = false;
         private static Mutex uploadPicturesMutexLock = new Mutex();
-        public OneDrive()
-        {
-            clientId = Config.OneDriveClientId;
-            clientSecret = Config.OneDriveClientSecret;
-        }
+
         /*******************************************************************************************
         * PUBLIC METHODS
         *******************************************************************************************/
@@ -58,7 +48,7 @@ namespace SecuritySystemUWP
 
                 foreach (StorageFile file in files)
                 {
-                    string imageName = string.Format("{0}/{1}_{2}.jpg", camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
+                    string imageName = string.Format(Config.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
                     await uploadPictureToOnedrive(Config.FolderName, imageName, file);
                     await file.DeleteAsync();
                 }
@@ -77,7 +67,7 @@ namespace SecuritySystemUWP
         {
             try
             {
-                string folder = Config.FolderName + "/" + camera + "/" + DateTime.Now.Subtract(TimeSpan.FromDays(Config.StorageDuration)).ToString("MM_dd_yyyy");
+                string folder = string.Format("{0}/{1}/{2}", Config.FolderName, camera, DateTime.Now.Subtract(TimeSpan.FromDays(Config.StorageDuration)).ToString("MM_dd_yyyy"));
                 List<string> pictures = await listPictures(folder);
                 foreach (string picture in pictures)
                 {
@@ -107,10 +97,10 @@ namespace SecuritySystemUWP
             {
                 if (isLoggedin)
                 {
-                    String url = "https://api.onedrive.com/v1.0/drive/root:" + "/Pictures/" + folderName + "/" + imageName + ":/content";
+                    String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", Config.OneDriveRootUrl, folderName, imageName);
 
                     await SendFileAsync(
-                        url,  // example: "https://api.onedrive.com/v1.0/drive/root:/Documents/test.jpg:/content"
+                        uriString, 
                         imageFile,
                         Windows.Web.Http.HttpMethod.Put
                         );
@@ -124,7 +114,7 @@ namespace SecuritySystemUWP
 
         private async Task<List<string>> listPictures(string folderName)
         {
-            String uriString = "https://api.onedrive.com/v1.0/drive/root:" + "/Pictures/" + folderName + ":/children";
+            String uriString = string.Format("{0}/Pictures/{1}:/children", Config.OneDriveRootUrl, folderName);
             List<string> files = null;
             try
             {
@@ -177,7 +167,7 @@ namespace SecuritySystemUWP
             {
                 if (isLoggedin)
                 {
-                    String uriString = "https://api.onedrive.com/v1.0/drive/root:" + "/Pictures/" + folderName + "/" + imageName;
+                    String uriString = string.Format("{0}/Pictures/{1}/{2}",Config.OneDriveRootUrl, folderName, imageName);
 
                     Uri uri = new Uri(uriString);
                     using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri))
@@ -197,8 +187,8 @@ namespace SecuritySystemUWP
         }
         private static async Task getTokens(string accessCodeOrRefreshToken, string grantType)
         {
-            string uri = "https://login.live.com/oauth20_token.srf";
-            string content = "client_id=" + clientId + "&redirect_uri=" + redirectUri + "&client_secret=" + clientSecret + "&code=" + accessCodeOrRefreshToken + "&grant_type=" + grantType;
+            string uri = Config.OneDriveTokenUrl;
+            string content = string.Format(Config.OneDriveTokenContent, Config.OneDriveClientId, Config.OneDriveRedirectUrl, Config.OneDriveClientSecret, accessCodeOrRefreshToken, grantType);
             using (HttpClient client = new HttpClient())
             using (HttpRequestMessage reqMessage = new HttpRequestMessage(HttpMethod.Post, new Uri(uri)))
             {
@@ -248,7 +238,7 @@ namespace SecuritySystemUWP
 
         private static async Task logout()
         {
-            string uri = "https://login.live.com/oauth20_logout.srf?client_id=" + clientId + "&redirect_uri=" + redirectUri;
+            string uri = string.Format(Config.OneDriveLogoutUrl, Config.OneDriveClientId, Config.OneDriveRedirectUrl);
             await httpClient.GetAsync(new Uri(uri));
             accessToken = "";
             refreshToken = "";
