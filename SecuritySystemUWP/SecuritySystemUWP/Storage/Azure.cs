@@ -260,7 +260,7 @@ namespace SecuritySystemUWP
             return request;
         }
 
-
+        // Returns the Authorization Header for the REST Request based on HMACSHA256 cryptography
         private Windows.Web.Http.Headers.HttpCredentialsHeaderValue AuthorizationHeader(string method, DateTime now, HttpRequestMessage request, long contentLength, string ifMatch = "", string md5 = "")
         {
             string MessageSignature = String.Format("{0}\n\n\n{1}\n{5}\n\n\n\n{2}\n\n\n\n{3}{4}",
@@ -281,6 +281,8 @@ namespace SecuritySystemUWP
             var authorizationHeader = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("SharedKey", Config.AzureAccountName + ":" + CryptographicBuffer.EncodeToBase64String(hash.GetValueAndReset()));
             return authorizationHeader;
         }
+
+        // Returns the standardized headers as a singular string for the request message
         public string GetCanonicalizedHeaders(HttpRequestMessage request)
         {
             List<string> headerNameList = new List<string>();
@@ -309,6 +311,8 @@ namespace SecuritySystemUWP
             }
             return sb.ToString();
         }
+
+        // Returns a list of header values for the HTTP Request from the Collection
         public List<string> GetHeaderValues(Windows.Web.Http.Headers.HttpRequestHeaderCollection headers, string headerName)
         {
             List<string> list = new List<string>();
@@ -322,6 +326,7 @@ namespace SecuritySystemUWP
             return list;
         }
 
+        // Returns the standardized resource of the url and accountname as a singular string
         public string GetCanonicalizedResource(Uri address, string accountName)
         {
             StringBuilder str = new StringBuilder();
