@@ -3,11 +3,10 @@ var router = express.Router();
 var env = require('node-env-file');
 env('./.env')
 var fs = require('fs');
+var timeFormat = require('../timeFormat.js');
 var azure = require('azure-storage');
 var bigInt = require('big-integer');
 var blobService = azure.createBlobService();
-
-
 
 router.get('/',
   ensureAuthenticated,
@@ -34,11 +33,9 @@ router.post('/images',
       };
         blobService.listBlobsSegmentedWithPrefix('imagecontainer', "Cam1/" + searchDate, null, function(error, result, response){
           if(!error){
-            console.log(searchDate)
-            console.log("result:,",result)
             images = result;
              for(var i = 0; i < images.entries.length; i++){
-                images.entries[i] = timeFormat(images.entries[i], {name: [19,37], hour: [16,18]})
+                images.entries[i] = timeFormat.timeFormat(images.entries[i], {name: [19,37], hour: [16,18]})
                 token = blobService.generateSharedAccessSignature('imagecontainer', images.entries[i].name, sharedAccessPolicy);
                 images.entries[i].downloadUrl = blobService.getUrl('imagecontainer', images.entries[i].name, token);
               }
