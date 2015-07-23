@@ -1,0 +1,11 @@
+<md-dialog>
+  <md-dialog-content>
+    <div id="calendar">
+      <div date-picker="date" min-view="date"></div>
+    </div>
+    <span layout="row" layout-align="center center">
+    <md-button flex="50" class="md-raised" ng-click="closeDialog()"> Close </md-button>
+    <md-button flex="50" class="md-raised md-primary" ng-click="closeDialog(date, 'date')">  Select</md-button>
+    </span>
+  </md-dialog-content>
+</md-dialog>

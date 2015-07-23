@@ -1,53 +1,42 @@
-securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorScroll', function($scope, $http, $location, $anchorScroll){
+securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSidenav', '$rootScope', '$mdDialog', function($scope, $http, $location, $mdSidenav, $rootScope, $mdDialog){
 
 
   var staticImagesArray = [];
-  var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  $scope.dayList = ["M", "T", "W", "Th", "F", "Sa", "S"]
   $scope.loading = true;
   $scope.imageUrl;
 
-  $scope.getImages = function(){
+  $scope.getImages = function(date){
     $scope.loading = true;
-    $http.get('/images')
-      .success(function(blobData){
-        for(var i = 0; i < blobData.entries.length; i++){
-          //DateTime formatting.
-          var date = new Date(blobData.entries[i].milliseconds).toLocaleString();
-          blobData.entries[i].date = date;
-          var day = new Date(blobData.entries[i].milliseconds).getDay();
-          blobData.entries[i].day = days[day - 1]
-        }
-    staticImagesArray = blobData.entries;
-    $scope.images = staticImagesArray;
-    $scope.viewImage = $scope.images[$scope.images.length - 1];
-    $scope.switchImage($scope.viewImage)
-    $scope.loading = false;
+    var todaysDate = null,
+        today = date ? date : new Date(),
+        month = (today.getMonth() + 1).toString(),
+        day = (today.getDate()).toString(),
+        year = (today.getFullYear()).toString();
+    if(day.length === 1) day = "0" + day;
+    if(month.length === 1) month = "0" + month;
+    todaysDate = month + "_" + day + "_" + year;
+    $http.post('/images', {url: $location.absUrl(), date: todaysDate})
+      .success(function(response){
+        staticImagesArray = response.images.reverse();
+        $scope.images = staticImagesArray;
+        $scope.viewImage = $scope.images[0];
+        $scope.switchImage($scope.viewImage);
+        $scope.loading = false;
     });
   };
-
   $scope.getImages();
 
-
-  $scope.switchImage = function(image, redirect){
-      $http.get('/image/'+image.name)
-        .success(function(url){
-          $scope.imageUrl = url
-          $scope.viewImage = image;
-          if(redirect === true){
-            $location.path('/')
-          }
-        })
+  $scope.switchImage = function(image){
+      $scope.imageUrl = image ? image.downloadUrl : null;
+      $scope.viewImage = image ? image : null;
   };
 
    $scope.imagePosition = function(){
     var first = true, last = true;
-
     if($scope.images && $scope.images.length !== 0){
       first = $scope.images.indexOf($scope.viewImage) == 0;
       last = $scope.images.indexOf($scope.viewImage) == $scope.images.length - 1;
     }
-
     return {first: first, last: last}
   };
 
@@ -57,8 +46,61 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$anchorS
     $scope.switchImage($scope.viewImage);
   };
 
-  $scope.scrollSpy = function(index){
-    $anchorScroll(days[index])
+  $rootScope.toggleSidenav = function(id) {
+      $mdSidenav(id).toggle();
+   }
+
+  $scope.openCalendar = function(event) {
+    $mdDialog.show({
+      templateUrl: 'javascripts/angular/views/calendar.html',
+      scope: $scope,
+      preserveScope: true,
+      targetEvent: event,
+      clickOutsideToClose: true,
+      escapeToClose: true
+    })
+    .then(function(date) {
+      if(date) $scope.getImages(date)
+    })
+  }
+
+  $scope.openTimeSelector = function(event) {
+    $mdDialog.show({
+      templateUrl:'javascripts/angular/views/timePicker.html',
+      scope: $scope,
+      preserveScope: true,
+      targetEvent: event,
+      clickOutsideToClose: true,
+      escapeToClose: true
+    })
+    .then(function(time) {
+      if(time) {
+        var timeString = time.toString(),
+            endPosition = timeString.search(':'),
+            hour = timeString.slice(endPosition - 2, endPosition);
+        $scope.images = [];
+        for(var i = 0; i < staticImagesArray.length; i++){
+          if(staticImagesArray[i].hour === hour){
+            $scope.images.push(staticImagesArray[i]);
+          }
+        }
+      }
+    })
+
+  }
+  $scope.closeDialog = function(data, dialog) {
+    if(data && dialog === "date") $mdDialog.hide(data);
+    if(data && dialog === "time") $mdDialog.hide(data);
+    $mdDialog.hide()
+  }
+  $scope.noPhotos = function() {
+    if($scope.images && $scope.images.length === 0 && $scope.loading === false) return true
+  }
+  $scope.emptyImage = function() {
+    if($scope.images) return $scope.images.length === 0;
+  }
+  $scope.isLoading = function() {
+    return $scope.loading
   }
 
 }]);
