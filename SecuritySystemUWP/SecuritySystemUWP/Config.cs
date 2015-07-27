@@ -24,6 +24,8 @@ namespace SecuritySystemUWP
         //This value is the number of days for which your pictures will be stored
         public static int StorageDuration = 7;
 
+        //Microsoft Employees: enter your alias here
+        public static string alias = "";
 
         //Do not change these values
         public static string AzureBlobUrl = "http://{0}.blob.core.windows.net/";

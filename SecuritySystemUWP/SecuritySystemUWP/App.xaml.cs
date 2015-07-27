@@ -36,6 +36,8 @@ namespace SecuritySystemUWP
         public App()
         {
             TelemetryClient = new Microsoft.ApplicationInsights.TelemetryClient();
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", Config.alias } };
+            App.TelemetryClient.TrackTrace("Start Info", properties);
 
             this.InitializeComponent();
             this.Suspending += OnSuspending;
