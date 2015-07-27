@@ -313,7 +313,7 @@ namespace SecuritySystemUWP
                 streamContent.Dispose();
                 Debug.WriteLine("SendFileAsync() - final.");
             }
-            App.TelemetryClient.TrackEvent("OneDrive picture upload success");
+            App.TelemetryClient.TrackEvent("OneDrive picture upload success", properties);
         }
 
         internal static async Task DebugTextResultAsync(HttpResponseMessage response)

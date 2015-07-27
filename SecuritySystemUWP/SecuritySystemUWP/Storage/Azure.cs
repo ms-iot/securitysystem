@@ -89,6 +89,10 @@ namespace SecuritySystemUWP
         ********************************************************************************************/
         private async Task uploadPictureToAzure(string folderPath, string imageName, StorageFile imageFile)
         {
+            Windows.Storage.FileProperties.BasicProperties fileProperties = await imageFile.GetBasicPropertiesAsync();
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "File Size", fileProperties.Size.ToString() } };
+            App.TelemetryClient.TrackEvent("Azure picture upload attempt", properties);
+
             using (MemoryStream memStream = new MemoryStream())
             using (Stream testStream = await imageFile.OpenStreamForReadAsync())
             {
@@ -116,6 +120,7 @@ namespace SecuritySystemUWP
                     throw;
                 }
             }
+            App.TelemetryClient.TrackEvent("Azure picture upload success", properties);
         }
         private async Task<List<string>> listPictures(string folderPath)
         {
