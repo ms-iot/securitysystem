@@ -34,7 +34,7 @@ namespace SecuritySystemUWP
         public static string OneDriveScope = "wl.offline_access onedrive.readwrite";
         public static string OneDriveRootUrl = "https://api.onedrive.com/v1.0/drive/root:";
         public static string OneDriveTokenUrl = "https://login.live.com/oauth20_token.srf";
-        public static string OneDriveTokenContent = "client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&grant_type={4}";
+        public static string OneDriveTokenContent = "client_id={0}&redirect_uri={1}&client_secret={2}&{3}={4}&grant_type={5}";
 
         public static int NumberOfCameras = 1;
         public static string FolderName = "imagecontainer";

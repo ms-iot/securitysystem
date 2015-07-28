@@ -10,6 +10,7 @@ using Windows.Web.Http.Filters;
 using Windows.Web.Http.Headers;
 using Windows.Storage;
 using Windows.Storage.Search;
+using Windows.UI.Xaml;
 
 namespace SecuritySystemUWP
 {
@@ -23,11 +24,18 @@ namespace SecuritySystemUWP
         private static CancellationTokenSource cts;
         private static bool isLoggedin = false;
         private static Mutex uploadPicturesMutexLock = new Mutex();
+        private DispatcherTimer refreshTimer;
 
         /*******************************************************************************************
         * PUBLIC METHODS
         *******************************************************************************************/
-
+        public OneDrive()
+        {
+            refreshTimer = new DispatcherTimer();
+            refreshTimer.Interval = TimeSpan.FromMinutes(25);
+            refreshTimer.Tick += refreshTimer_Tick;
+            refreshTimer.Start();
+        }
         public Type LoginType()
         {
             return typeof(OnedriveLoginPage);
@@ -82,7 +90,7 @@ namespace SecuritySystemUWP
         public static async Task authorize(string accessCode)
         {
             CreateHttpClient(ref httpClient);
-            await getTokens(accessCode, "authorization_code");
+            await getTokens(accessCode, "code", "authorization_code");
             SetAuthorization("Bearer", accessToken);
 
             cts = new CancellationTokenSource();
@@ -185,10 +193,10 @@ namespace SecuritySystemUWP
                 Debug.WriteLine(ex.Message);
             }
         }
-        private static async Task getTokens(string accessCodeOrRefreshToken, string grantType)
+        private static async Task getTokens(string accessCodeOrRefreshToken, string requestType, string grantType)
         {
             string uri = Config.OneDriveTokenUrl;
-            string content = string.Format(Config.OneDriveTokenContent, Config.OneDriveClientId, Config.OneDriveRedirectUrl, Config.OneDriveClientSecret, accessCodeOrRefreshToken, grantType);
+            string content = string.Format(Config.OneDriveTokenContent, Config.OneDriveClientId, Config.OneDriveRedirectUrl, Config.OneDriveClientSecret, requestType, accessCodeOrRefreshToken, grantType);
             using (HttpClient client = new HttpClient())
             using (HttpRequestMessage reqMessage = new HttpRequestMessage(HttpMethod.Post, new Uri(uri)))
             {
@@ -233,7 +241,7 @@ namespace SecuritySystemUWP
                 return;
             }
 
-            await getTokens(refreshToken, "refresh_token");
+            await getTokens(refreshToken, "refresh_token", "refresh_token");
         }
 
         private static async Task logout()
@@ -342,6 +350,12 @@ namespace SecuritySystemUWP
                 output.Append(header.Key + ": " + header.Value + "\r\n");
             }
         }
+
+        private async void refreshTimer_Tick(object sender, object e)
+        {
+            await reauthorize();
+        }
+
     }
 }
 
