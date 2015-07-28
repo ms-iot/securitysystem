@@ -3,6 +3,7 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSiden
 
   var staticImagesArray = [];
   $scope.loading = true;
+  $scope.searchDate;
   $scope.imageUrl;
 
   $scope.getImages = function(date){
@@ -60,7 +61,10 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSiden
       escapeToClose: true
     })
     .then(function(date) {
-      if(date) $scope.getImages(date)
+      if(date) {
+        $scope.searchDate = date;
+        $scope.getImages(date);
+      }
     })
   }
 
@@ -97,7 +101,7 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSiden
     if($scope.images && $scope.images.length === 0 && $scope.loading === false) return true
   }
   $scope.emptyImage = function() {
-    if($scope.images) return $scope.images.length === 0;
+    if($scope.images) return staticImagesArray.length === 0 && $scope.images.length === 0;
   }
   $scope.isLoading = function() {
     return $scope.loading

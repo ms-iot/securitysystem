@@ -10,7 +10,7 @@
           <md-button ng-click="openCalendar($event)" class="md-mini md-fab md-primary">
             <i class="fa fa-calendar"></i>
           </md-button>
-          <md-button ng-click="getImages(start)" class="md-mini md-fab md-primary">
+          <md-button ng-click="getImages(searchDate)" class="md-mini md-fab md-primary">
             <i class="fa fa-refresh"></i>
           </md-button>
         </h1>
@@ -39,9 +39,9 @@
   <div flex-offset="20" flex="80" layout="column" layout-align="center center" ng-if="isLoading()">
     <md-progress-circular class="md-primary" md-diameter="75" md-mode="indeterminate"></md-progress-circular>
   </div>
-  <div id="pictureView" layout-gt-sm="row" layout-xs="column" flex-offset-sm="20" flex-offset-gt-md="20" flex-gt-md="80" flex-md="100" layout-align-gt-md="space-around center" layout-align="space-around center" ng-if="!isLoading()">
+  <div id="pictureView" layout-gt-md="row" layout-xs="column" flex-offset-md="5" flex-offset-lg="10" flex-offset-gt-lg="20" flex-gt-md="80" flex-md="100" layout-align-gt-lg="space-around center" layout-align="center center" ng-if="!isLoading()">
     <div layout="column" layout-align="center">
-      <md-button hide-sm show-gt-sm ng-disabled="imagePosition().first" id="browseLeft" class="md-fab md-primary" ng-click="browsePicture(-1)">
+      <md-button hide show-gt-md ng-disabled="imagePosition().first" id="browseLeft" class="md-fab md-primary" ng-click="browsePicture(-1)">
         <i class="fa fa-chevron-left fa-2x"></i>
       </md-button>
     </div>
@@ -53,7 +53,7 @@
       </md-content>
     </md-card>
     <div id="buttonRow" layout-gt-md="column" layout-md="row" layout-align-md="space-around center">
-       <md-button hide-gt-sm ng-disabled="imagePosition().first" id="browseLeft" class="md-fab md-primary" ng-click="browsePicture(-1)">
+       <md-button hide-gt-md ng-disabled="imagePosition().first" id="browseLeft" class="md-fab md-primary" ng-click="browsePicture(-1)">
         <i class="fa fa-chevron-left fa-2x"></i>
       </md-button>
       <md-button ng-disabled="imagePosition().last" id="browseRight" class="md-fab md-primary" ng-click="browsePicture(1)">
