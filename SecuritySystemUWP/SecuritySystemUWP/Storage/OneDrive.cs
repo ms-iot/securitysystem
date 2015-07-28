@@ -264,6 +264,9 @@ namespace SecuritySystemUWP
 
         private static async Task SendFileAsync(String url, StorageFile sFile, HttpMethod httpMethod)
         {
+            Windows.Storage.FileProperties.BasicProperties fileProperties = await sFile.GetBasicPropertiesAsync();
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "File Size", fileProperties.Size.ToString() } };
+            App.TelemetryClient.TrackEvent("OneDrive picture upload attempt", properties);
             HttpStreamContent streamContent = null;
             try
             {
@@ -310,6 +313,7 @@ namespace SecuritySystemUWP
                 streamContent.Dispose();
                 Debug.WriteLine("SendFileAsync() - final.");
             }
+            App.TelemetryClient.TrackEvent("OneDrive picture upload success", properties);
         }
 
         internal static async Task DebugTextResultAsync(HttpResponseMessage response)
