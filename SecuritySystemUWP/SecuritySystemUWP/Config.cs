@@ -28,7 +28,7 @@ namespace SecuritySystemUWP
         public static string alias = "";
 
         //Do not change these values
-        public static string AzureBlobUrl = "http://{0}.blob.core.windows.net/";
+        public static string AzureConnectionSettings = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}";
 
         public static string OneDriveRedirectUrl = "https://login.live.com/oauth20_desktop.srf";
         public static string OneDriveLoginUrl = "https://login.live.com/oauth20_authorize.srf?client_id={0}&scope={1}&response_type=code&redirect_uri={2}";
