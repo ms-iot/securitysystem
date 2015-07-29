@@ -4,19 +4,19 @@
   <title>Security System</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.10.0/angular-material.min.css">
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="stylesheets/datePicker.css">
+  <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
+  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="bower_components/angular-datepicker/dist/index.min.css">
   <link rel="stylesheet" href="stylesheets/style.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.1/angular-route.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.10.0/angular-material.min.js"></script>
+  <script src="bower_components/angular/angular.min.js"></script>
+  <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+  <script src="bower_components/angular-aria/angular-aria.min.js"></script>
+  <script src="bower_components/angular-datepicker/dist/index.min.js"></script>
+  <script src="bower_components/angular-material/angular-material.min.js"></script>
+  <script src="bower_components/angular-route/angular-route.min.js"></script>
+  <script src="javascripts/angular/controllers/homeCtrl.js"></script>
   <script src="javascripts/angular/app.js"></script>
   <script src="javascripts/angular/controllers/homeCtrl.js"></script>
-  <script src="javascripts/datePicker.js"></script>
   <script type="text/javascript">
     var appInsights=window.appInsights||function(config){
         function s(config){t[config]=function(){var i=arguments;t.queue.push(function(){t[config].apply(t,i)})}}var t={config:config},r=document,f=window,e="script",o=r.createElement(e),i,u;for(o.src=config.url||"//az416426.vo.msecnd.net/scripts/a/ai.0.js",r.getElementsByTagName(e)[0].parentNode.appendChild(o),t.cookie=r.cookie,t.queue=[],i=["Event","Exception","Metric","PageView","Trace"];i.length;)s("track"+i.pop());return config.disableExceptionTracking||(i="onerror",s("_"+i),u=f[i],f[i]=function(config,r,f,e,o){var s=u&&u(config,r,f,e,o);return s!==!0&&t["_"+i](config,r,f,e,o),s}),t

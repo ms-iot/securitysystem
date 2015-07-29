@@ -18,7 +18,6 @@ securitySystem.controller('homeCtrl', ['$scope', '$http', '$location', '$mdSiden
     todaysDate = month + "_" + day + "_" + year;
     $http.post('/images', {url: $location.absUrl(), date: todaysDate})
       .success(function(response){
-        console.log(response)
         staticImagesArray = response.images.reverse();
         $scope.images = staticImagesArray;
         $scope.viewImage = $scope.images[0];

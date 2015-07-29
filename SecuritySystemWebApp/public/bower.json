@@ -1,0 +1,25 @@
+{
+  "name": "SecuritySystemWebApp",
+  "version": "0.0.0",
+  "homepage": "https://github.com/daveraskin/securitysystem",
+  "authors": [
+    "daveraskin <draskal2@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-datepicker": "~1.0.12",
+    "angular-material": "~0.10.0",
+    "angular-animate": "~1.4.3",
+    "angular-aria": "~1.4.3",
+    "font-awesome": "~4.4.0",
+    "angular": "~1.4.3",
+    "angular-route": "~1.4.3"
+  }
+}
