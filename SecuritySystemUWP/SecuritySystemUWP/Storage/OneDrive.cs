@@ -51,6 +51,7 @@ namespace SecuritySystemUWP
                 querySubfolders.FolderDepth = FolderDepth.Deep;
 
                 StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
+                cacheFolder = await cacheFolder.GetFolderAsync("securitysystem-cameradrop");
                 var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
                 var files = await result.GetFilesAsync();
 
