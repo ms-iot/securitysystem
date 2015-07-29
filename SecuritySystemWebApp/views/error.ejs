@@ -1,12 +1,14 @@
 <% include partials/header.ejs %>
-<div class="container">
-  <div class="col-sm-4 col-sm-offset-4 text-center cardBlock">
-    <h1> Whoops... </h1>
-    <h3> There's been an error: </h3>
-    <h4>
-      <%= message %>
-      <%= error.status%>
-    </h4>
-  </div>
+<div layout="row" layout-align="center center">
+  <md-card>
+    <md-card-content>
+      <h1> Whoops... </h1>
+      <h3> There's been an error: </h3>
+      <h4>
+        <%= message %>
+        <%= error.status%>
+      </h4>
+    </md-card-content>
+  </md-card>
 </div>
 <% include partials/footer.ejs %>
