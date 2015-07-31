@@ -14,11 +14,11 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private DispatcherTimer uploadPicturesTimer;
-        private DispatcherTimer deletePicturesTimer;
+        private static DispatcherTimer uploadPicturesTimer;
+        private static DispatcherTimer deletePicturesTimer;
         private IStorage storage;
 
-        private bool started = false;
+        private static bool started = false;
 
         private string[] cameras = new string[Config.NumberOfCameras];
         public MainPage()
