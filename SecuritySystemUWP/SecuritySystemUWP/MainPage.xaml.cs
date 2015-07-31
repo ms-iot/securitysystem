@@ -17,6 +17,8 @@ namespace SecuritySystemUWP
         private DispatcherTimer deletePicturesTimer;
         private IStorage storage;
 
+        private bool started = false;
+
         private string[] cameras = new string[Config.NumberOfCameras];
         public MainPage()
         {
@@ -32,13 +34,11 @@ namespace SecuritySystemUWP
             uploadPicturesTimer = new DispatcherTimer();
             uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
             uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
-            uploadPicturesTimer.Start();
 
             //Timer controlling deletion of old pictures
             deletePicturesTimer = new DispatcherTimer();
             deletePicturesTimer.Interval = TimeSpan.FromHours(1);
             deletePicturesTimer.Tick += deletePicturesTimer_Tick;
-            deletePicturesTimer.Start();
 
             for (int i = 0; i < Config.NumberOfCameras; i++)
             {
@@ -47,9 +47,21 @@ namespace SecuritySystemUWP
 
         }
 
-        private void Start_Click(object sender, RoutedEventArgs e)
+        private void RunningToggle_Click(object sender, RoutedEventArgs e)
         {
-            this.Frame.Navigate(storage.LoginType());
+            if (!started)
+            {
+                uploadPicturesTimer.Start();
+                deletePicturesTimer.Start();
+                RunningToggle.Content = "Stop";
+                this.Frame.Navigate(storage.LoginType());
+            }
+            else
+            {
+                uploadPicturesTimer.Stop();
+                deletePicturesTimer.Stop();
+                RunningToggle.Content = "Start";
+            }
         }
 
         private void uploadPicturesTimer_Tick(object sender, object e)
