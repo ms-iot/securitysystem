@@ -2,6 +2,7 @@
 using System.Threading;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -53,14 +54,27 @@ namespace SecuritySystemUWP
             {
                 uploadPicturesTimer.Start();
                 deletePicturesTimer.Start();
-                RunningToggle.Content = "Stop";
+                started = true;
                 this.Frame.Navigate(storage.LoginType());
             }
             else
             {
                 uploadPicturesTimer.Stop();
                 deletePicturesTimer.Stop();
+                started = false;
+                this.Frame.Navigate(typeof(MainPage));
+            }
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            if(!started)
+            {
                 RunningToggle.Content = "Start";
+            }
+            else
+            {
+                RunningToggle.Content = "Stop";
             }
         }
 
