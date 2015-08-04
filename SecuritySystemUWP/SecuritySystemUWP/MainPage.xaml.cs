@@ -68,14 +68,7 @@ namespace SecuritySystemUWP
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if(!started)
-            {
-                RunningToggle.Content = "Start";
-            }
-            else
-            {
-                RunningToggle.Content = "Stop";
-            }
+            RunningToggle.Content = started ? "Stop" : "Start";
         }
 
         private void uploadPicturesTimer_Tick(object sender, object e)
