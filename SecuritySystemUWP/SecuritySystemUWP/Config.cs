@@ -8,10 +8,10 @@ namespace SecuritySystemUWP
 {
     public static class Config
     {
-        //TODO: Add your storgae configuration information here
+        public static string CameraType = "usb";
 
         //This will be "Azure" or "OneDrive" based on the storage you are using for this project
-        public static string StorageProvider = "";
+        public static string StorageProvider = "local";
 
         //If you are using Azure, update these values with your Azure Account Name and your Primary Access Key
         public static string AzureAccountName = ""; 
@@ -41,5 +41,7 @@ namespace SecuritySystemUWP
         public static int NumberOfCameras = 1;
         public static string FolderName = "imagecontainer";
         public static string ImageNameFormat = "{0}/{1}_{2}.jpg";
+
+        public static int GpioMotionPin = 4;
     }
 }
