@@ -15,6 +15,6 @@
         </Grid.ChildrenTransitions>
 
         <TextBlock x:Name="titleTextBlock" TextWrapping="Wrap" Text="Security System" FontSize="72" FontWeight="Thin" HorizontalAlignment="Center"/>
-        <Button Name="Start" FontWeight="Light" Content="Start" FontSize="29.333" Click="Start_Click" Height="52" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <Button Name="RunningToggle" FontWeight="Light" Content="Start" FontSize="29.333" Click="RunningToggle_Click" Height="52" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </Page>

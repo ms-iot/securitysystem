@@ -2,6 +2,7 @@
 using System.Threading;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -13,9 +14,11 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private DispatcherTimer uploadPicturesTimer;
-        private DispatcherTimer deletePicturesTimer;
+        private static DispatcherTimer uploadPicturesTimer;
+        private static DispatcherTimer deletePicturesTimer;
         private IStorage storage;
+
+        private static bool started = false;
 
         private string[] cameras = new string[Config.NumberOfCameras];
         public MainPage()
@@ -32,13 +35,11 @@ namespace SecuritySystemUWP
             uploadPicturesTimer = new DispatcherTimer();
             uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
             uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
-            uploadPicturesTimer.Start();
 
             //Timer controlling deletion of old pictures
             deletePicturesTimer = new DispatcherTimer();
             deletePicturesTimer.Interval = TimeSpan.FromHours(1);
             deletePicturesTimer.Tick += deletePicturesTimer_Tick;
-            deletePicturesTimer.Start();
 
             for (int i = 0; i < Config.NumberOfCameras; i++)
             {
@@ -47,9 +48,27 @@ namespace SecuritySystemUWP
 
         }
 
-        private void Start_Click(object sender, RoutedEventArgs e)
+        private void RunningToggle_Click(object sender, RoutedEventArgs e)
         {
-            this.Frame.Navigate(storage.LoginType());
+            if (!started)
+            {
+                uploadPicturesTimer.Start();
+                deletePicturesTimer.Start();
+                started = true;
+                this.Frame.Navigate(storage.LoginType());
+            }
+            else
+            {
+                uploadPicturesTimer.Stop();
+                deletePicturesTimer.Stop();
+                started = false;
+                this.Frame.Navigate(typeof(MainPage));
+            }
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            RunningToggle.Content = started ? "Stop" : "Start";
         }
 
         private void uploadPicturesTimer_Tick(object sender, object e)
