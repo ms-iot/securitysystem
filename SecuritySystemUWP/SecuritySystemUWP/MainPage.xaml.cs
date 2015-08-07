@@ -4,8 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.Media.Capture;
-using Windows.Devices.Enumeration;
+using Windows.UI.Xaml.Navigation;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -17,28 +16,25 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private IStorage storage;
-        private ICamera camera;
-        private DispatcherTimer uploadPicturesTimer;
-        private DispatcherTimer deletePicturesTimer;
-        private static bool isInitialized = false;
+        private static IStorage storage;
+        private static ICamera camera;
         private string[] cameras = { "Cam1" };
+        private static DispatcherTimer uploadPicturesTimer;
+        private static DispatcherTimer deletePicturesTimer;
+
+        private static bool started = false;
+
         public MainPage()
         {
             this.InitializeComponent();
-            if (!isInitialized)
-            {
-                Initialize();
-                isInitialized = true;
-            }
         }
 
-        private void Initialize()
+        private async Task Initialize()
         {
             camera = CameraFactory.Get(Config.CameraType);
             storage = StorageFactory.Get(Config.StorageProvider);
 
-            camera.Initialize();
+            await camera.Initialize();
 
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
@@ -53,9 +49,32 @@ namespace SecuritySystemUWP
             deletePicturesTimer.Start();
         }
 
-        private void Start_Click(object sender, RoutedEventArgs e)
+        private void Dispose()
         {
-            this.Frame.Navigate(storage.LoginType());
+            camera.Dispose();
+            uploadPicturesTimer.Stop();
+            deletePicturesTimer.Stop();
+        }
+
+        private async void RunningToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (!started)
+            {
+                await Initialize();
+                started = true;
+                this.Frame.Navigate(storage.StorageStartPage());
+            }
+            else
+            {
+                Dispose();
+                started = false;
+                this.Frame.Navigate(typeof(MainPage));
+            }
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            RunningToggle.Content = started ? "Stop" : "Start";
         }
 
         private void uploadPicturesTimer_Tick(object sender, object e)

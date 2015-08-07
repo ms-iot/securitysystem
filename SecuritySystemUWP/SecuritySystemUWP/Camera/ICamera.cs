@@ -9,6 +9,7 @@ namespace SecuritySystemUWP
 {
     public interface ICamera
     {
-        void Initialize();
+        Task Initialize();
+        void Dispose();
     }
 }

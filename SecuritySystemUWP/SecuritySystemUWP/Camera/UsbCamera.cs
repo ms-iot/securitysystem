@@ -23,7 +23,7 @@ namespace SecuritySystemUWP
         /*******************************************************************************************
         * PUBLIC METHODS
         *******************************************************************************************/
-        public async void Initialize()
+        public async Task Initialize()
         {
             //Initialize Camera
             if (mediaCapture == null)
@@ -65,6 +65,13 @@ namespace SecuritySystemUWP
             takePhotoTimer.Interval = TimeSpan.FromSeconds(1);
             takePhotoTimer.Tick += takePhotoTimer_Tick;
             takePhotoTimer.Start();
+        }
+
+        public void Dispose()
+        {
+            mediaCapture.Dispose();
+            takePhotoTimer.Stop();
+            pirSensor.Dispose();
         }
 
         /*******************************************************************************************

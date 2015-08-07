@@ -12,13 +12,16 @@ namespace SecuritySystemUWP
         public bool isMotionDetected;
         private GpioPin motionSensorPin;
         private GpioPinValue pinValue;
-
         public void Initialize()
         {
             var gpioController = GpioController.GetDefault();
             motionSensorPin = gpioController.OpenPin(Config.GpioMotionPin);
             motionSensorPin.SetDriveMode(GpioPinDriveMode.Input);
             motionSensorPin.ValueChanged += motionDetected;
+        }
+        public void Dispose()
+        {
+            motionSensorPin.Dispose();
         }
 
         private void motionDetected(GpioPin s, GpioPinValueChangedEventArgs e)
