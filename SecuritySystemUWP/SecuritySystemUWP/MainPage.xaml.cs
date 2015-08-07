@@ -22,7 +22,7 @@ namespace SecuritySystemUWP
         private DispatcherTimer uploadPicturesTimer;
         private DispatcherTimer deletePicturesTimer;
         private static bool isInitialized = false;
-        private string[] cameras = new string[Config.NumberOfCameras];
+        private string[] cameras = { "Cam1" };
         public MainPage()
         {
             this.InitializeComponent();
@@ -51,14 +51,7 @@ namespace SecuritySystemUWP
             deletePicturesTimer.Interval = TimeSpan.FromHours(1);
             deletePicturesTimer.Tick += deletePicturesTimer_Tick;
             deletePicturesTimer.Start();
-
-            for (int i = 0; i < Config.NumberOfCameras; i++)
-            {
-                cameras[i] = "Cam" + (i + 1);
-            }
         }
-
-
 
         private void Start_Click(object sender, RoutedEventArgs e)
         {

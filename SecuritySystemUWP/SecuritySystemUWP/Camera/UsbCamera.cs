@@ -14,13 +14,11 @@ using Windows.UI.Xaml;
 
 namespace SecuritySystemUWP
 {
-    public class Usb : ICamera
+    public class UsbCamera : ICamera
     {
         private MediaCapture mediaCapture;
-        private GpioPin motionSensorPin;
         private DispatcherTimer takePhotoTimer;
-        private GpioPinValue pinValue;
-        private bool isMotionDetected;
+        private MotionSensor pirSensor;
         private static Mutex pictureMutexLock = new Mutex();
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -50,7 +48,7 @@ namespace SecuritySystemUWP
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    Debug.WriteLine("The app was denied access to the camera");
+                    Debug.WriteLine("The app was denied access to the camera. Ensure webcam capability is added in the manifest.");
                 }
                 catch (Exception ex)
                 {
@@ -59,10 +57,8 @@ namespace SecuritySystemUWP
             }
 
             //Initialize PIR Sensor
-            var gpioController = GpioController.GetDefault();
-            motionSensorPin = gpioController.OpenPin(Config.GpioMotionPin);
-            motionSensorPin.SetDriveMode(GpioPinDriveMode.Input);
-            motionSensorPin.ValueChanged += motionDetected;
+            pirSensor = new MotionSensor();
+            pirSensor.Initialize();
 
             //Timer controlling camera pictures with motion
             takePhotoTimer = new DispatcherTimer();
@@ -88,7 +84,7 @@ namespace SecuritySystemUWP
 
         private async void takePhotoTimer_Tick(object sender, object e)
         {
-            if (isMotionDetected)
+            if (pirSensor.isMotionDetected)
             {
                 await takePhotoAsync();
             }
@@ -108,13 +104,6 @@ namespace SecuritySystemUWP
                 Debug.WriteLine(string.Format("Exception when taking a photo: {0}", ex.ToString()));
                 await image.DeleteAsync();
             }
-        }
-
-        private async void motionDetected(GpioPin s, GpioPinValueChangedEventArgs e)
-        {
-            pinValue = motionSensorPin.Read();
-            isMotionDetected = (e.Edge == GpioPinEdge.RisingEdge);
-            await takePhotoAsync();
         }
     }
 }
