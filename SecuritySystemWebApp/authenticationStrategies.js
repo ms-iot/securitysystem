@@ -8,7 +8,7 @@ env('./.env')
 // passport.use(new GitHubStrategy({
 //     clientID: process.env.GITHUB_CLIENT_ID,
 //     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-//     callbackURL: ""
+//     callbackURL: "http://{yoursite}.azurewebsites.net/auth/github/callback"
 //   },
 //   function(accessToken, refreshToken, profile, done) {
 //     // console.log(profile.id);
@@ -27,7 +27,7 @@ env('./.env')
 // passport.use(new FacebookStrategy({
 //     clientID: process.env.FACEBOOK_APP_ID,
 //     clientSecret: process.env.FACEBOOK_APP_SECRET,
-//     callbackURL: "",
+//     callbackURL: "http://{yoursite}.azurewebsites.net/auth/facebook/callback",
 //     enableProof: false
 //   },
 //   function(accessToken, refreshToken, profile, done) {
