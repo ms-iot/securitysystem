@@ -9,7 +9,7 @@ namespace SecuritySystemUWP
 {
     public interface IStorage
     {
-        Type LoginType();
+        Type StorageStartPage();
         void UploadPictures(string camera);
         void DeleteExpiredPictures(string camera);
     }

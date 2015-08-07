@@ -11,7 +11,7 @@ namespace SecuritySystemUWP
         * PUBLIC METHODS
         *******************************************************************************************/
 
-        public Type LoginType()
+        public Type StorageStartPage()
         {
             return typeof(MainPage);
         }
