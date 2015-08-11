@@ -13,7 +13,7 @@ namespace SecuritySystemUWP
 
         public Type StorageStartPage()
         {
-            return typeof(MainPage);
+            return typeof(LocalPictureViewer);
         }
         public void UploadPictures(string camera)
         {
