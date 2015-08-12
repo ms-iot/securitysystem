@@ -32,7 +32,7 @@ namespace SecuritySystemUWP
         /// <summary>
         /// Configuration settings for app
         /// </summary>
-        public static AppSettings Settings;
+        public static AppSettings XmlSettings;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -53,9 +53,9 @@ namespace SecuritySystemUWP
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            Settings = await AppSettings.RestoreAsync("Settings.xml");
+            XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
 
-            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.Settings.MicrosoftAlias } };
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.XmlSettings.MicrosoftAlias } };
             App.TelemetryClient.TrackTrace("Start Info", properties);
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)

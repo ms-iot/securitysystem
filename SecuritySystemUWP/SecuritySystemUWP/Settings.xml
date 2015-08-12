@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <AppSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <NumberOfCameras>1</NumberOfCameras>
-  <CameraType>dlink</CameraType>
+  <CameraType>usb</CameraType>
 
-  <StorageProvider>OneDrive</StorageProvider>
-  <AzureAccountName>SecuritySystemPictures</AzureAccountName>
-  <AzureAccessKey>tU9viS+ag/72hRO+GxRVfGt7f8Syzq6c7MSOZAw6Lol1HmBl927r8J/oaPT+Y/v+d8g+YcVdF1VO2vD9u1mtqg==</AzureAccessKey>
+  <StorageProvider>local</StorageProvider>
+  <AzureAccountName></AzureAccountName>
+  <AzureAccessKey></AzureAccessKey>
 
-  <OneDriveClientId>000000004015EE9E</OneDriveClientId>
-  <OneDriveClientSecret>b4Hn9onTcXLPmtSafXqc1GJRwhvOzwGK </OneDriveClientSecret>
+  <OneDriveClientId></OneDriveClientId>
+  <OneDriveClientSecret></OneDriveClientSecret>
 
   <StorageDuration>7</StorageDuration>
   <FolderName>imagecontainer</FolderName>

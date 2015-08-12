@@ -58,8 +58,8 @@ namespace SecuritySystemUWP
 
                 foreach (StorageFile file in files)
                 {
-                    string imageName = string.Format(Config.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
-                    await uploadPictureToOnedrive(App.Settings.FolderName, imageName, file);
+                    string imageName = string.Format(AppSettings.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
+                    await uploadPictureToOnedrive(App.XmlSettings.FolderName, imageName, file);
                     await file.DeleteAsync();
                 }
             }
@@ -77,7 +77,7 @@ namespace SecuritySystemUWP
         {
             try
             {
-                string folder = string.Format("{0}/{1}/{2}", App.Settings.FolderName, camera, DateTime.Now.Subtract(TimeSpan.FromDays(App.Settings.StorageDuration)).ToString("MM_dd_yyyy"));
+                string folder = string.Format("{0}/{1}/{2}", App.XmlSettings.FolderName, camera, DateTime.Now.Subtract(TimeSpan.FromDays(App.XmlSettings.StorageDuration)).ToString("MM_dd_yyyy"));
                 List<string> pictures = await listPictures(folder);
                 foreach (string picture in pictures)
                 {
@@ -107,7 +107,7 @@ namespace SecuritySystemUWP
             {
                 if (isLoggedin)
                 {
-                    String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", Config.OneDriveRootUrl, folderName, imageName);
+                    String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
 
                     await SendFileAsync(
                         uriString, 
@@ -124,7 +124,7 @@ namespace SecuritySystemUWP
 
         private async Task<List<string>> listPictures(string folderName)
         {
-            String uriString = string.Format("{0}/Pictures/{1}:/children", Config.OneDriveRootUrl, folderName);
+            String uriString = string.Format("{0}/Pictures/{1}:/children", AppSettings.OneDriveRootUrl, folderName);
             List<string> files = null;
             try
             {
@@ -177,7 +177,7 @@ namespace SecuritySystemUWP
             {
                 if (isLoggedin)
                 {
-                    String uriString = string.Format("{0}/Pictures/{1}/{2}",Config.OneDriveRootUrl, folderName, imageName);
+                    String uriString = string.Format("{0}/Pictures/{1}/{2}",AppSettings.OneDriveRootUrl, folderName, imageName);
 
                     Uri uri = new Uri(uriString);
                     using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri))
@@ -198,8 +198,8 @@ namespace SecuritySystemUWP
         private static async Task getTokens(string accessCodeOrRefreshToken, string requestType, string grantType)
         {
             
-            string uri = Config.OneDriveTokenUrl;
-            string content = string.Format(Config.OneDriveTokenContent, App.Settings.OneDriveClientId, Config.OneDriveRedirectUrl, App.Settings.OneDriveClientSecret, requestType, accessCodeOrRefreshToken, grantType);
+            string uri = AppSettings.OneDriveTokenUrl;
+            string content = string.Format(AppSettings.OneDriveTokenContent, App.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl, App.XmlSettings.OneDriveClientSecret, requestType, accessCodeOrRefreshToken, grantType);
             using (HttpClient client = new HttpClient())
             using (HttpRequestMessage reqMessage = new HttpRequestMessage(HttpMethod.Post, new Uri(uri)))
             {
@@ -249,7 +249,7 @@ namespace SecuritySystemUWP
 
         private static async Task logout()
         {
-            string uri = string.Format(Config.OneDriveLogoutUrl, App.Settings.OneDriveClientId, Config.OneDriveRedirectUrl);
+            string uri = string.Format(AppSettings.OneDriveLogoutUrl, App.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl);
             await httpClient.GetAsync(new Uri(uri));
             accessToken = "";
             refreshToken = "";

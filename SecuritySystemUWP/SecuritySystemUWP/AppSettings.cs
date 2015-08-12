@@ -20,6 +20,17 @@ namespace SecuritySystemUWP
         public int StorageDuration = 7;
         public string FolderName = "imagecontainer";
 
+        //The following values are not changed, and not read in from the xml file
+        public const string AzureConnectionSettings = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}";
+        public const string OneDriveRedirectUrl = "https://login.live.com/oauth20_desktop.srf";
+        public const string OneDriveLoginUrl = "https://login.live.com/oauth20_authorize.srf?client_id={0}&scope={1}&response_type=code&redirect_uri={2}";
+        public const string OneDriveLogoutUrl = "https://login.live.com/oauth20_logout.srf?client_id={0}&redirect_uri={1}";
+        public const string OneDriveScope = "wl.offline_access onedrive.readwrite";
+        public const string OneDriveRootUrl = "https://api.onedrive.com/v1.0/drive/root:";
+        public const string OneDriveTokenUrl = "https://login.live.com/oauth20_token.srf";
+        public const string OneDriveTokenContent = "client_id={0}&redirect_uri={1}&client_secret={2}&{3}={4}&grant_type={5}";
+        public const string ImageNameFormat = "{0}/{1}_{2}.jpg";
+
         public static async Task SaveAsync(AppSettings settings, string filename)
         {
             StorageFile sessionFile = await KnownFolders.DocumentsLibrary.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);

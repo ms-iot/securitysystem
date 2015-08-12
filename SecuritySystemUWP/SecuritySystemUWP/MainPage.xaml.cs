@@ -19,7 +19,7 @@ namespace SecuritySystemUWP
 
         private static bool started = false;
 
-        private string[] cameras = new string[App.Settings.NumberOfCameras];
+        private string[] cameras = new string[App.XmlSettings.NumberOfCameras];
 
         public MainPage()
         {
@@ -30,7 +30,7 @@ namespace SecuritySystemUWP
 
         private void Initialize()
         {
-            storage = StorageFactory.Get(App.Settings.StorageProvider);
+            storage = StorageFactory.Get(App.XmlSettings.StorageProvider);
 
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
@@ -44,7 +44,7 @@ namespace SecuritySystemUWP
             deletePicturesTimer.Tick += deletePicturesTimer_Tick;
             deletePicturesTimer.Start();
 
-            for (int i = 0; i < App.Settings.NumberOfCameras; i++)
+            for (int i = 0; i < App.XmlSettings.NumberOfCameras; i++)
             {
                 cameras[i] = "Cam" + (i + 1);
             }
@@ -71,8 +71,8 @@ namespace SecuritySystemUWP
 
         private async void Start_Click(object sender, RoutedEventArgs e)
         {
-            //RunningToggle.Content = started ? "Stop" : "Start";  (Is this still being used?)
-            App.Settings = await AppSettings.RestoreAsync("Settings.xml");
+            RunningToggle.Content = started ? "Stop" : "Start";  
+            App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
             this.Frame.Navigate(storage.LoginType());
         }
 
