@@ -16,6 +16,9 @@ namespace SecuritySystemUWP
         private DispatcherTimer uploadPicturesTimer;
         private DispatcherTimer deletePicturesTimer;
         private IStorage storage;
+
+        private static bool started = false;
+
         private string[] cameras = new string[App.Settings.NumberOfCameras];
 
         public MainPage()
@@ -48,8 +51,27 @@ namespace SecuritySystemUWP
 
         }
 
+        private void RunningToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (!started)
+            {
+                uploadPicturesTimer.Start();
+                deletePicturesTimer.Start();
+                started = true;
+                this.Frame.Navigate(storage.LoginType());
+            }
+            else
+            {
+                uploadPicturesTimer.Stop();
+                deletePicturesTimer.Stop();
+                started = false;
+                this.Frame.Navigate(typeof(MainPage));
+            }
+        }
+
         private async void Start_Click(object sender, RoutedEventArgs e)
         {
+            //RunningToggle.Content = started ? "Stop" : "Start";  (Is this still being used?)
             App.Settings = await AppSettings.RestoreAsync("Settings.xml");
             this.Frame.Navigate(storage.LoginType());
         }

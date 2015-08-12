@@ -10,25 +10,6 @@ namespace SecuritySystemUWP
 {
     public static class Config
     {
-        //TODO: Add your storage configuration information here
-
-        //This will be "Azure" or "OneDrive" based on the storage you are using for this project
-        //public static string StorageProvider = "Azure";
-
-        //If you are using Azure, update these values with your Azure Account Name and your Primary Access Key
-        //public static string AzureAccountName = "securitysystempictures"; 
-        //public static string AzureAccessKey = "tU9viS+ag/72hRO+GxRVfGt7f8Syzq6c7MSOZAw6Lol1HmBl927r8J/oaPT+Y/v+d8g+YcVdF1VO2vD9u1mtqg==";
-
-        //If you are using OneDrive, update these values with your Client ID and your Client Secret
-        //public static string OneDriveClientId = "";
-        //public static string OneDriveClientSecret = "";
-
-        //This value is the number of days for which your pictures will be stored
-        //public static int StorageDuration = 7;
-
-        //Microsoft Employees: enter your alias here
-        //public static string alias = "v-makust";
-
         //Do not change these values
         public static string AzureConnectionSettings = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}";
 
@@ -40,8 +21,6 @@ namespace SecuritySystemUWP
         public static string OneDriveTokenUrl = "https://login.live.com/oauth20_token.srf";
         public static string OneDriveTokenContent = "client_id={0}&redirect_uri={1}&client_secret={2}&{3}={4}&grant_type={5}";
 
-        //public static int NumberOfCameras = 1;
-        //public static string FolderName = "imagecontainer";
         public static string ImageNameFormat = "{0}/{1}_{2}.jpg";
     }
 }
