@@ -45,7 +45,7 @@ namespace SecuritySystemUWP
 
         private void getAccessCode()
         {
-            string uri = string.Format(Config.OneDriveLoginUrl, Config.OneDriveClientId, Config.OneDriveScope, Config.OneDriveRedirectUrl);
+            string uri = string.Format(Config.OneDriveLoginUrl, App.Settings.OneDriveClientId, Config.OneDriveScope, Config.OneDriveRedirectUrl);
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, new Uri(uri));
             browser.NavigateWithHttpRequestMessage(request);
         }

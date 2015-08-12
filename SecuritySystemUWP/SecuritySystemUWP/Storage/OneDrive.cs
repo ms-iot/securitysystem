@@ -25,6 +25,7 @@ namespace SecuritySystemUWP
         private static bool isLoggedin = false;
         private static Mutex uploadPicturesMutexLock = new Mutex();
         private DispatcherTimer refreshTimer;
+                
 
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -58,7 +59,7 @@ namespace SecuritySystemUWP
                 foreach (StorageFile file in files)
                 {
                     string imageName = string.Format(Config.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
-                    await uploadPictureToOnedrive(Config.FolderName, imageName, file);
+                    await uploadPictureToOnedrive(App.Settings.FolderName, imageName, file);
                     await file.DeleteAsync();
                 }
             }
@@ -76,7 +77,7 @@ namespace SecuritySystemUWP
         {
             try
             {
-                string folder = string.Format("{0}/{1}/{2}", Config.FolderName, camera, DateTime.Now.Subtract(TimeSpan.FromDays(Config.StorageDuration)).ToString("MM_dd_yyyy"));
+                string folder = string.Format("{0}/{1}/{2}", App.Settings.FolderName, camera, DateTime.Now.Subtract(TimeSpan.FromDays(App.Settings.StorageDuration)).ToString("MM_dd_yyyy"));
                 List<string> pictures = await listPictures(folder);
                 foreach (string picture in pictures)
                 {
@@ -196,8 +197,9 @@ namespace SecuritySystemUWP
         }
         private static async Task getTokens(string accessCodeOrRefreshToken, string requestType, string grantType)
         {
+            
             string uri = Config.OneDriveTokenUrl;
-            string content = string.Format(Config.OneDriveTokenContent, Config.OneDriveClientId, Config.OneDriveRedirectUrl, Config.OneDriveClientSecret, requestType, accessCodeOrRefreshToken, grantType);
+            string content = string.Format(Config.OneDriveTokenContent, App.Settings.OneDriveClientId, Config.OneDriveRedirectUrl, App.Settings.OneDriveClientSecret, requestType, accessCodeOrRefreshToken, grantType);
             using (HttpClient client = new HttpClient())
             using (HttpRequestMessage reqMessage = new HttpRequestMessage(HttpMethod.Post, new Uri(uri)))
             {
@@ -247,7 +249,7 @@ namespace SecuritySystemUWP
 
         private static async Task logout()
         {
-            string uri = string.Format(Config.OneDriveLogoutUrl, Config.OneDriveClientId, Config.OneDriveRedirectUrl);
+            string uri = string.Format(Config.OneDriveLogoutUrl, App.Settings.OneDriveClientId, Config.OneDriveRedirectUrl);
             await httpClient.GetAsync(new Uri(uri));
             accessToken = "";
             refreshToken = "";
