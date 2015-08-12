@@ -9,7 +9,7 @@ using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
 using Windows.Storage;
 using Windows.UI.Xaml;
-
+using Windows.UI.Core;
 
 
 namespace SecuritySystemUWP
@@ -17,8 +17,10 @@ namespace SecuritySystemUWP
     public class UsbCamera : ICamera
     {
         private MediaCapture mediaCapture;
-        private DispatcherTimer takePhotoTimer;
+        private static DispatcherTimer takePhotoTimer;
         private MotionSensor pirSensor;
+        private CoreDispatcher dispatcher;
+        private bool isTimerStarted;
         private static Mutex pictureMutexLock = new Mutex();
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -55,16 +57,42 @@ namespace SecuritySystemUWP
                     Debug.WriteLine(string.Format("Exception when initializing MediaCapture with {0}: {1}", cameraDevice.Id, ex.ToString()));
                 }
             }
-
-            //Initialize PIR Sensor
-            pirSensor = new MotionSensor();
-            pirSensor.Initialize();
-
             //Timer controlling camera pictures with motion
+            isTimerStarted = false;
             takePhotoTimer = new DispatcherTimer();
             takePhotoTimer.Interval = TimeSpan.FromSeconds(1);
             takePhotoTimer.Tick += TakePhotoTimer_Tick;
-            takePhotoTimer.Start();
+            dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+
+            //Initialize PIR Sensor
+            pirSensor = new MotionSensor();
+            pirSensor.OnChanged += PirSensor_OnChanged;
+        }
+
+        private async void PirSensor_OnChanged(object sender, GpioPinValueChangedEventArgs e)
+        {
+            if (e.Edge == GpioPinEdge.RisingEdge)
+            {
+                if (!isTimerStarted)
+                {
+                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        takePhotoTimer.Start();
+                    }).AsTask();
+                    isTimerStarted = true;
+                }
+            }
+            else
+            {
+                if (isTimerStarted)
+                {
+                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        takePhotoTimer.Stop();
+                    }).AsTask();
+                    isTimerStarted = false;
+                }
+            }
         }
 
         public void Dispose()
@@ -96,10 +124,7 @@ namespace SecuritySystemUWP
 
         private async void TakePhotoTimer_Tick(object sender, object e)
         {
-            if (pirSensor.isMotionDetected)
-            {
-                await TakePhotoAsync();
-            }
+            await TakePhotoAsync();
         }
         private async Task TakePhotoAsync()
         {
