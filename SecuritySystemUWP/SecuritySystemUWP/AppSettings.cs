@@ -10,15 +10,15 @@ namespace SecuritySystemUWP
     public class AppSettings
     {
         public string MicrosoftAlias;
-        public int NumberOfCameras;
-        public string CameraType;
-        public string StorageProvider;
-        public string AzureAccountName;
-        public string AzureAccessKey;
-        public string OneDriveClientId;
-        public string OneDriveClientSecret;
-        public int StorageDuration;
-        public string FolderName;
+        public int NumberOfCameras = 1;
+        public string CameraType = "dlink";
+        public string StorageProvider = "OneDrive";
+        public string AzureAccountName = "SecuritySystemPictures";
+        public string AzureAccessKey = "****";
+        public string OneDriveClientId = "****";
+        public string OneDriveClientSecret = "****";
+        public int StorageDuration = 7;
+        public string FolderName = "imagecontainer";
 
         public static async Task SaveAsync(AppSettings settings, string filename)
         {

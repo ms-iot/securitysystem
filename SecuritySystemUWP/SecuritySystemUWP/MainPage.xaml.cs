@@ -48,8 +48,9 @@ namespace SecuritySystemUWP
 
         }
 
-        private void Start_Click(object sender, RoutedEventArgs e)
+        private async void Start_Click(object sender, RoutedEventArgs e)
         {
+            App.Settings = await AppSettings.RestoreAsync("Settings.xml");
             this.Frame.Navigate(storage.LoginType());
         }
 
