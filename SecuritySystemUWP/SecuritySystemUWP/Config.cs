@@ -8,9 +8,10 @@ namespace SecuritySystemUWP
 {
     public static class Config
     {
+        //This will be "usb" or "ip" based on the camera you are using for this project
         public static string CameraType = "usb";
 
-        //This will be "Azure" or "OneDrive" based on the storage you are using for this project
+        //This will be "local", "azure" or "onedrive" based on the storage you are using for this project
         public static string StorageProvider = "local";
 
         //If you are using Azure, update these values with your Azure Account Name and your Primary Access Key

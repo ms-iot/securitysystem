@@ -21,6 +21,8 @@ namespace SecuritySystemUWP
         private string[] cameras = { "Cam1" };
         private static DispatcherTimer uploadPicturesTimer;
         private static DispatcherTimer deletePicturesTimer;
+        private const int uploadInterval = 10; //Value in seconds
+        private const int deleteInterval = 1; //Value in hours
 
         private static bool started = false;
 
@@ -38,22 +40,22 @@ namespace SecuritySystemUWP
 
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
-            uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
+            uploadPicturesTimer.Interval = TimeSpan.FromSeconds(uploadInterval);
             uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
             uploadPicturesTimer.Start();
 
             //Timer controlling deletion of old pictures
             deletePicturesTimer = new DispatcherTimer();
-            deletePicturesTimer.Interval = TimeSpan.FromHours(1);
+            deletePicturesTimer.Interval = TimeSpan.FromHours(deleteInterval);
             deletePicturesTimer.Tick += deletePicturesTimer_Tick;
             deletePicturesTimer.Start();
         }
 
         private void Dispose()
         {
-            camera.Dispose();
             uploadPicturesTimer.Stop();
             deletePicturesTimer.Stop();
+            camera.Dispose();
         }
 
         private async void RunningToggle_Click(object sender, RoutedEventArgs e)
