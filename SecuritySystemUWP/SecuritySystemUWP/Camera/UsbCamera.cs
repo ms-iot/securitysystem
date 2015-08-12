@@ -71,27 +71,20 @@ namespace SecuritySystemUWP
 
         private async void PirSensor_OnChanged(object sender, GpioPinValueChangedEventArgs e)
         {
-            if (e.Edge == GpioPinEdge.RisingEdge)
+            if ((e.Edge == GpioPinEdge.RisingEdge) != isTimerStarted)
             {
-                if (!isTimerStarted)
-                {
-                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                isTimerStarted = !isTimerStarted;
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        takePhotoTimer.Start();
-                    }).AsTask();
-                    isTimerStarted = true;
-                }
-            }
-            else
-            {
-                if (isTimerStarted)
-                {
-                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                    {
-                        takePhotoTimer.Stop();
-                    }).AsTask();
-                    isTimerStarted = false;
-                }
+                        if (isTimerStarted)
+                        {
+                            takePhotoTimer.Start();
+                        }
+                        else
+                        {
+                            takePhotoTimer.Stop();
+                        }
+                    }).AsTask();                                  
             }
         }
 
