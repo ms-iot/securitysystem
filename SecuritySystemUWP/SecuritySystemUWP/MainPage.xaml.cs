@@ -2,7 +2,6 @@
 using System.Threading;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -14,34 +13,38 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private static DispatcherTimer uploadPicturesTimer;
-        private static DispatcherTimer deletePicturesTimer;
+        private DispatcherTimer uploadPicturesTimer;
+        private DispatcherTimer deletePicturesTimer;
         private IStorage storage;
 
         private static bool started = false;
 
-        private string[] cameras = new string[Config.NumberOfCameras];
+        private string[] cameras = new string[App.XmlSettings.NumberOfCameras];
+
         public MainPage()
         {
             this.InitializeComponent();
             Initialize();
+             
         }
 
         private void Initialize()
         {
-            storage = StorageFactory.Get(Config.StorageProvider);
+            storage = StorageFactory.Get(App.XmlSettings.StorageProvider);
 
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
             uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
             uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
+            uploadPicturesTimer.Start();
 
             //Timer controlling deletion of old pictures
             deletePicturesTimer = new DispatcherTimer();
             deletePicturesTimer.Interval = TimeSpan.FromHours(1);
             deletePicturesTimer.Tick += deletePicturesTimer_Tick;
+            deletePicturesTimer.Start();
 
-            for (int i = 0; i < Config.NumberOfCameras; i++)
+            for (int i = 0; i < App.XmlSettings.NumberOfCameras; i++)
             {
                 cameras[i] = "Cam" + (i + 1);
             }
@@ -66,9 +69,11 @@ namespace SecuritySystemUWP
             }
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        private async void Start_Click(object sender, RoutedEventArgs e)
         {
-            RunningToggle.Content = started ? "Stop" : "Start";
+            RunningToggle.Content = started ? "Stop" : "Start";  
+            App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
+            this.Frame.Navigate(storage.LoginType());
         }
 
         private void uploadPicturesTimer_Tick(object sender, object e)
