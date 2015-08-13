@@ -120,6 +120,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="settings.xml" />
     <None Include="project.json">
       <SubType>Designer</SubType>
     </None>

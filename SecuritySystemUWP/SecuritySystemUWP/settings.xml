@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AppSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <NumberOfCameras>1</NumberOfCameras>
+  <CameraType>usb</CameraType>
+
+  <StorageProvider>local</StorageProvider>
+  <AzureAccountName></AzureAccountName>
+  <AzureAccessKey></AzureAccessKey>
+
+  <OneDriveClientId></OneDriveClientId>
+  <OneDriveClientSecret></OneDriveClientSecret>
+
+  <StorageDuration>7</StorageDuration>
+  <FolderName>imagecontainer</FolderName>
+</AppSettings>
