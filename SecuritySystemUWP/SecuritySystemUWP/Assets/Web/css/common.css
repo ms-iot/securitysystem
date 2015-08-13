@@ -1,0 +1,560 @@
+body {
+    font-family: 'Segoe UI';
+    margin:0px;
+}
+
+#commonContent {
+    color:#018bcb;
+}
+
+#content {
+    position:fixed;
+    top:48px;
+    width: calc(100% - 230px);
+    height: calc(100% - 80px);
+    left: 48px;
+    padding-top:16px;
+    padding-left:32px;
+    overflow:auto;
+    z-index:5;
+}
+
+#content.fullscreen {
+    position:fixed;
+    top:48px;
+    left:0px;
+    width: 100%;
+    height: calc(100% - 48px);
+    overflow:auto;
+    z-index:5;
+}
+
+#webbHeaderLogo {
+    position:fixed;
+    z-index:5;
+    width:192px;
+    height:48px;
+    top:0px;
+    left:0px;
+    background: #050505;
+}
+
+#webbHeaderLogo img {
+    display:block;
+    height:22px;
+    margin: 12px auto;
+}
+
+#webbNavigationBar {
+    position:fixed;
+    z-index:5;
+    width:192px;
+    top:48px;
+    left:0px;
+    background: #050505;
+    height:calc(100% - 48px);
+    overflow-y:auto;
+}
+
+#webbNavigationBar p {
+    color:white;
+    text-transform: uppercase;
+    text-align:center;
+    font-size:small;
+    margin-top:8px;
+    margin-bottom:4px;
+}
+
+#webbNavigationBar ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 0;
+}
+
+#webbNavigationBar a:hover {
+    background: #222222;
+    color:#38c0fd;
+}
+
+#webbNavigationBar a.highlight:hover {
+    background:linear-gradient(90deg, #32bdfe, #65daf4);
+    color:white;
+}
+
+#webbNavigationBar a {
+    text-decoration: none;
+    color:#018bcb;
+    text-transform: none;
+    display:block;
+    text-align: center;
+}
+
+#webbNavigationBar .highlight {
+    color:black;
+    background : linear-gradient(90deg, #32bdfe, #65daf4);
+}
+
+#webbTitleBar {
+    position:fixed;
+    z-index:5;
+    left:0px;
+    top:0px;
+    right:0px;
+    height:48px;
+    background: #d5d5d5;
+    z-index: -1;
+}
+
+#webbTitleBar p {
+    font-size: x-large;
+    margin-top:4px;
+    margin-bottom:4px;
+    position:absolute;
+    left:228px;
+}
+
+#webbIconsBar {
+    position:fixed;
+    top:0px;
+    right:0px;
+    z-index:6;
+}
+
+#webbIconsBar button {
+    border-left: solid 1px white;
+    height:48px;
+    color:#018bcb;
+    padding: 0px 6px;
+    vertical-align: top;
+    width:82px;
+    margin:0px 0px 4px 0px;
+}
+
+#webbIconsBar button span {
+    font-size:x-small;
+    text-transform:uppercase;
+}
+
+#webbIconsBar button:hover {
+    background: #eeeeee;
+}
+
+#webbIconsBar button img {
+    height:20px;
+    width:20px;
+}
+
+/* Override strange default slickgrid height formatting. */
+div .slick-headerrow .slick-headerrow-columns {
+    height: 0;
+}
+
+#HostSection,
+#ServicesSection,
+#DeviceSection,
+#FirmwareSection {
+    display:none;
+}
+
+#CalibrationSubSection {
+    position:relative;
+}
+
+.indentSection,
+.statusPage #CalibrationActions,
+.statusPage p {
+    margin-left: 20px;
+}
+
+.statusPage table {
+    margin-left: 20px;
+}
+
+.statusPage table,
+.statusPage th,
+.statusPage td {
+    border-collapse: collapse;
+}
+
+#CalibrationStatus {
+    display: inline;
+}
+
+.tableCell {
+    font-size:medium;
+    border:1px solid white;
+    background: #f9f9f9;
+    padding-left:8px;
+}
+
+.tableHeader {
+    font-size:smaller;
+    color:#B0E6FF;
+    background-color:#018BCB;
+    text-transform: uppercase;
+    padding-left:8px;
+}
+
+.rowSelected {
+    background-color:#38c0fd;
+}
+
+#StatusDetails {
+    font-size: 80%;
+}
+
+#StatusSummary {
+    width: 600px;
+    align-content: center;
+    height: 150px;
+}
+
+#doPairGroup {
+    display:none;
+}
+
+#setCredsGroup .credentialsInput {
+    display:inline-block;
+    width:120px;
+}
+
+#RigToAppSpace {
+    border-spacing: 0;
+}
+
+#RigToAppSpace td,
+#RigToAppSpace th {
+    padding: 16px;
+}
+
+#recordingStatusCaption {
+    margin-left:64px;
+}
+
+#recordingProgress {
+    margin:24px;
+}
+
+#recordProgressSpinner {
+    height:48px;
+    width:48px;
+}
+
+.sensorPreviewContainer {
+    float: left;
+    text-align: center;
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid black;
+}
+
+.sensorPreview {
+    width: 200px;
+    height: 200px;
+    margin: 20px;
+}
+
+#mrcHistoryStrip {
+    width: 840px;
+}
+
+#mrcHistoryStrip img {
+    width:128px;
+    height:auto;
+    margin-top:10px;
+    margin-right:20px;
+}
+
+#processesGrid {
+    width:1150px;
+}
+
+#spectrumEventsGrid {
+    height:400px;
+    border:none;
+    width:600px;
+}
+
+#handLatencyChartCanvas,
+#gestureLatencyChartCanvas {
+    height:400px;
+    width:600px;
+}
+
+.sectionHeader {
+    font-size:large;
+    font-weight: bold;
+}
+
+.logError,
+.warning {
+    color:red;
+}
+
+.logWarning {
+    color:yellow;
+}
+
+.logInfo {
+    color:lightgreen;
+}
+
+.symbol {
+    font-family:"Segoe UI Symbol";
+}
+
+.symbol_webdings {
+    font-family:"Webdings";
+}
+
+#FirmwareGrid,
+#DeviceGrid,
+#ServicesGrid {
+    margin-left:20px;
+    width:608px;
+}
+
+.spinner {
+    width:32px;
+    height:32px;
+}
+
+.inputField, .wideInputField {
+    padding:0px 4px;
+    margin:5px;
+    height:28px;
+    vertical-align: middle;
+}
+
+.wideInputField{
+    width:512px;
+}
+
+#etwEventsGrid {
+    height:1000px;
+    width:1500px;
+}
+
+.textButton {
+    background:rgba(0, 0, 0, 0.00);
+    border:rgba(0, 0, 0, 0.00);
+    color:white;
+    margin:5px;
+}
+
+.blackTextButton {
+    background:rgba(0, 0, 0, 0.00);
+    border:rgba(0, 0, 0, 0.00);
+    color:black;
+    margin:5px;
+}
+
+#framerate,
+#renderedModels,
+#drawCalls, 
+#primitivesAfterTessellation,
+#hullShaderInvocationCount {
+    color:rgb(180, 31, 53);
+}
+
+#renderedLights,
+#verticesPassedToDrawCalls,
+#primitivesPassedToDrawCalls,
+#domainShaderInvocationCount,
+#pixelShaderInvocationCount {
+    color:rgb(166, 194, 0);
+}
+
+#verticesInPipeline,
+#primitivesBeforeTessellation,
+#geometryShaderInvocationCount {
+    color:rgb(31, 105, 175);
+}
+
+#primitivesRendered,
+#vertexShaderInvocationCount
+{
+    color:rgb(254, 148, 4);
+}
+
+.commonButton {
+    width:128px;
+    height:32px;
+    background: linear-gradient(0deg, #D5D5D5, #F9F9F9);
+    border: 1px solid rgb(168, 168, 168);
+    margin:5px;
+    vertical-align: middle;
+}
+
+.autoWidth {
+    width:auto;
+}
+
+.treeViewBorder {
+    border-left:1px dashed;
+}
+
+/* Section below is used in Latencies.htm */
+#latencies_chart {
+    display:inline-block;
+}
+
+.chartLegend {
+    display:inline-block;
+    vertical-align: top;
+    font-size:smaller;
+}
+
+#legend_inner_bottom {
+    line-height: 10%;
+}
+
+.blue_is_displayed {
+    background-color: #0000FF
+}
+
+.green_is_displayed {
+    background-color: #00FF00
+}
+
+.red_is_displayed {
+    background-color: #FF0000
+}
+
+#hw_frame_transmit {
+    background-color: #FFFE34
+}
+
+#wait_for_vsync {
+    background-color: #0247FE
+}
+
+#composition_latency {
+    background-color: #FB9902
+}
+
+#gpu_work_latency {
+    background-color: #8601B0
+}
+
+#cpu_work_latency {
+    background-color: #FFFE34
+}
+
+#lsr_errors {
+    clear: left;
+    font-size:large;
+}
+
+.deviceDescription {
+    background:lightgrey;
+    border: solid 1px black;
+    margin-left: 40px;
+    padding-left:10px;
+    width:400px;
+}
+
+.footer {
+    position: fixed;
+    bottom:0;
+    background-color: #303030;
+    color:white;
+    width:calc(100% - 40px);
+    padding:10px;
+    z-index: 100;
+}
+
+.footerCollapsed {
+    position: fixed;
+    bottom:0;
+    background-color: #303030;
+    color:white;
+    width:120px;
+    padding:10px;
+    z-index: 100;
+}
+
+.floatRight {
+    float:right;
+}
+
+.floatLeft {
+    float:left;
+}
+
+#logMessagesList{
+    list-style:none;
+    font-family: Segoe UI Symbol;
+    width:100%;
+    background-color: transparent;
+    border:none;
+    border-top: solid 1px white;
+}
+
+#availableWifiNetworks {
+    width:695px;
+}
+
+#MapGrid {
+    position: absolute;
+    margin:0;
+}
+
+#LocalMapGrid .loaded {
+    background-color: #ddd;
+}
+
+#LocalMapGrid .active,
+#RemoteMapGrid .active {
+    background-color: #dff;
+}
+
+.MapManager .commonButton {
+    width: auto;
+}
+
+.MapManager #CopyMap {
+    height: auto;
+}
+
+.MapManager label {
+    margin-right: 3px;
+}
+
+.MapManager h3 {
+    margin: 1em 0 0.5em;
+    font-weight: 500;
+}
+
+.videoPlayer {
+    width: 800px;
+    background-color: black;
+}
+
+.fullWindowCanvas {
+    position: fixed;
+    z-index:10;
+    top:0;
+    bottom: 0;
+    left:0;
+    right:0;
+    height:100%;
+    width:100%;
+}
+
+.inline-block-align {
+    display:inline-block;
+    vertical-align: top;
+}
+
+.navigationLink {
+    color:#018bcb;
+}
+
+.3DViewSettingSection {
+    margin-right:32px;
+}
+
+.marginTop {
+    margin-top:5px;
+}
