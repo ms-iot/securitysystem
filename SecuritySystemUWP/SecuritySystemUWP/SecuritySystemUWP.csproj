@@ -96,6 +96,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Camera\ICamera.cs" />
+    <Compile Include="Camera\IpCamera.cs" />
     <Compile Include="Camera\UsbCamera.cs" />
     <Compile Include="Camera\CameraFactory.cs" />
     <Compile Include="MotionSensor.cs" />
