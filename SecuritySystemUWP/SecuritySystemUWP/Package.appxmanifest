@@ -39,11 +39,21 @@
         BackgroundColor="#464646">
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="full">
+            <uap:SupportedFileTypes>
+              <uap:FileType>.xml</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
 
   <Capabilities>
     <Capability Name="internetClient" />
     <uap:Capability Name="picturesLibrary"/>
+    <uap:Capability Name="documentsLibrary"/>
   </Capabilities>
 </Package>

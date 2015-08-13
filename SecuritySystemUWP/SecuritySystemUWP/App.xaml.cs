@@ -28,16 +28,19 @@ namespace SecuritySystemUWP
         /// Allows tracking page views, exceptions and other telemetry through the Microsoft Application Insights service.
         /// </summary>
         public static Microsoft.ApplicationInsights.TelemetryClient TelemetryClient;
+        
+        /// <summary>
+        /// Configuration settings for app
+        /// </summary>
+        public static AppSettings XmlSettings;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
         public App()
-        {
+        { 
             TelemetryClient = new Microsoft.ApplicationInsights.TelemetryClient();
-            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", Config.alias } };
-            App.TelemetryClient.TrackTrace("Start Info", properties);
 
             this.InitializeComponent();
             this.Suspending += OnSuspending;
@@ -48,9 +51,12 @@ namespace SecuritySystemUWP
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
 
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.XmlSettings.MicrosoftAlias } };
+            App.TelemetryClient.TrackTrace("Start Info", properties);
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
