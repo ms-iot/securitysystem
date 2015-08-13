@@ -16,10 +16,16 @@ namespace SecuritySystemUWP
     {
         public static ICamera Get(string type)
         {
+            if(object.ReferenceEquals(type, null))
+            {
+                throw new NotSupportedException("Set CameraType in Settings.");
+            }
+
             switch (type.ToLower())
             {
                 case "usb": return new UsbCamera();
-                default: throw new ArgumentNullException("Set CameraType in Config");
+                case "ip": return new IpCamera();
+                default: throw new ArgumentNullException("Camera Type not supported. Set Camera Type in Settings.");
             }
         }
     }
