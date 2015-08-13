@@ -24,7 +24,7 @@ namespace SecuritySystemUWP
             switch (type.ToLower())
             {
                 case "usb": return new UsbCamera();
-                case "ip": return new UsbCamera();
+                case "ip": return new IpCamera();
                 default: throw new ArgumentNullException("Camera Type not supported. Set Camera Type in Settings.");
             }
         }
