@@ -14,7 +14,7 @@ namespace SecuritySystemUWP
         public MotionSensor()
         {
             var gpioController = GpioController.GetDefault();
-            motionSensorPin = gpioController.OpenPin(Config.GpioMotionPin);
+            motionSensorPin = gpioController.OpenPin(App.XmlSettings.GpioMotionPin);
             motionSensorPin.SetDriveMode(GpioPinDriveMode.Input);
             motionSensorPin.ValueChanged += MotionSensorPin_ValueChanged;
         }

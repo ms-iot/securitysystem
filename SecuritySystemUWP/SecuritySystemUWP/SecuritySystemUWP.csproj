@@ -99,7 +99,6 @@
     <Compile Include="Camera\UsbCamera.cs" />
     <Compile Include="Camera\CameraFactory.cs" />
     <Compile Include="MotionSensor.cs" />
-    <Compile Include="Config.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -110,6 +109,7 @@
     <Compile Include="Storage\OneDrive.cs" />
     <Compile Include="Storage\OnedriveLoginPage.xaml.cs" />
     <Compile Include="Storage\StorageFactory.cs" />
+    <Compile Include="AppSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

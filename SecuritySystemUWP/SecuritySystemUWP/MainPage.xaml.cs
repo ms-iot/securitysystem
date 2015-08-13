@@ -33,8 +33,9 @@ namespace SecuritySystemUWP
 
         private async Task Initialize()
         {
-            camera = CameraFactory.Get(Config.CameraType);
-            storage = StorageFactory.Get(Config.StorageProvider);
+
+            camera = CameraFactory.Get(App.XmlSettings.CameraType);
+            storage = StorageFactory.Get(App.XmlSettings.StorageProvider);        
 
             await camera.Initialize();
 
@@ -64,6 +65,7 @@ namespace SecuritySystemUWP
             {
                 await Initialize();
                 started = true;
+                App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
                 this.Frame.Navigate(storage.StorageStartPage());
             }
             else
@@ -76,7 +78,7 @@ namespace SecuritySystemUWP
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            RunningToggle.Content = started ? "Stop" : "Start";
+            RunningToggle.Content = started ? "Stop" : "Start";  
         }
 
         private void uploadPicturesTimer_Tick(object sender, object e)
