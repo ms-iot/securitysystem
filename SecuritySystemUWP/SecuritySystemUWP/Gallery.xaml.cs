@@ -222,7 +222,7 @@ namespace SecuritySystemUWP
             totalPictures = await query.GetItemCountAsync();
 
             // Calculate total pages for gallery
-            totalPages = (int)Math.Ceiling((float)totalPictures / gallerySize) - 1;
+            totalPages = (int)Math.Ceiling((float)totalPictures / gallerySize);
             if (totalPages <= 0) totalPages = 1;
 
             // Set current page to 0
@@ -268,7 +268,7 @@ namespace SecuritySystemUWP
             int index = 0;
             if (totalPictures > gallerySize)
             {
-                index = (int)(totalPictures - ((page + 1) * gallerySize) - 1);
+                index = (int)(page * gallerySize);
             }
 
             // Get the files in current folder and subfolders

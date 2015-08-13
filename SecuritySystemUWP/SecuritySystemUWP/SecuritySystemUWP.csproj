@@ -110,7 +110,6 @@
     <Compile Include="Storage\Azure.cs" />
     <Compile Include="Storage\IStorage.cs" />
     <Compile Include="Storage\OneDrive.cs" />
-    <Compile Include="Storage\LocalPictureViewer.xaml.cs" />
     <Compile Include="Storage\OnedriveLoginPage.xaml.cs" />
     <Compile Include="Storage\StorageFactory.cs" />
     <Compile Include="AppSettings.cs" />
@@ -147,10 +146,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Storage\LocalPictureViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
