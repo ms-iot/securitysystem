@@ -105,6 +105,7 @@
     <Compile Include="Storage\OnedriveLoginPage.xaml.cs" />
     <Compile Include="Storage\StorageFactory.cs" />
     <Compile Include="AppSettings.cs" />
+    <Compile Include="WebServer\WebHelper.cs" />
     <Compile Include="WebServer\WebServer.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -125,9 +126,15 @@
     <None Include="Service References\Application Insights\ConnectedService.json" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\Web\css\common.css" />
-    <Content Include="Assets\Web\default.htm" />
-    <Content Include="Assets\Web\img\Logo.png" />
+    <Content Include="Assets\Web\css\common.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Web\default.htm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Web\img\Logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\Logo.scale-100.png" />
     <Content Include="Assets\SmallLogo.scale-100.png" />

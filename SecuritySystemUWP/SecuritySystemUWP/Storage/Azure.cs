@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Linq;
-using System.Text;
-using Windows.Web.Http;
 using Windows.Storage;
-using Windows.Security.Cryptography.Core;
-using Windows.Security.Cryptography;
 using Windows.Storage.Search;
-using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 
 

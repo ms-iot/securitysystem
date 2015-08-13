@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,21 +33,23 @@ namespace SecuritySystemUWP
 
     public sealed class HttpServer : IDisposable
     {
-        string offHtmlString = "<html><head><title>Blinky App</title></head><body><form action=\"blinky.html\" method=\"GET\"><input type=\"radio\" name=\"state\" value=\"on\" onclick=\"this.form.submit()\"> On<br><input type=\"radio\" name=\"state\" value=\"off\" checked onclick=\"this.form.submit()\"> Off</form></body></html>";
-        string onHtmlString = "<html><head><title>Blinky App</title></head><body><form action=\"blinky.html\" method=\"GET\"><input type=\"radio\" name=\"state\" value=\"on\" checked onclick=\"this.form.submit()\"> On<br><input type=\"radio\" name=\"state\" value=\"off\" onclick=\"this.form.submit()\"> Off</form></body></html>";
         private const uint BufferSize = 8192;
         private int port = 8000;
         private readonly StreamSocketListener listener;
+        private WebHelper helper;
 
         public HttpServer(int serverPort)
         {
+            helper = new WebHelper();
             listener = new StreamSocketListener();
             port = serverPort;
             listener.ConnectionReceived += (s, e) => ProcessRequestAsync(e.Socket);
         }
 
-        public void StartServer()
+        public async void StartServer()
         {
+            await helper.InitializeAsync();
+
 #pragma warning disable CS4014
             listener.BindServiceNameAsync(port.ToString());
 #pragma warning restore CS4014
@@ -78,55 +83,98 @@ namespace SecuritySystemUWP
                 string[] requestParts = requestMethod.Split(' ');
 
                 if (requestParts[0] == "GET")
-                    await WriteResponseAsync(requestParts[1], output);
+                    await WriteResponseAsync(requestParts[1], output, socket.Information);
                 else
                     throw new InvalidDataException("HTTP method not supported: "
                                                    + requestParts[0]);
             }
         }
 
-        private async Task WriteResponseAsync(string request, IOutputStream os)
+        private async Task WriteResponseAsync(string request, IOutputStream os, StreamSocketInformation socketInfo)
         {
-            if(request.Equals("/"))
+            try
             {
-                request = @"\default.htm";
-            }
-
-            using (Stream resp = os.AsStreamForWrite())
-            {
-                bool exists = true;
-                try
+                if (request.Equals("/"))
                 {
-                    // Look in the Data subdirectory of the app package
-                    var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
-                    string filePath = @"Assets\Web" + request.Replace('/', '\\');
-                    using (Stream fs = await folder.OpenStreamForReadAsync(filePath))
+                    string html = helper.GenerateSettingsConfigPage(socketInfo);
+                    await WebHelper.WriteToStream(html, os);
+                }
+                else if (request.Contains("?") && !request.Contains("htm"))
+                {
+                    Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
+                    var decoder = new WwwFormUrlDecoder(uri.Query);
+                    foreach (WwwFormUrlDecoderEntry entry in decoder)
                     {
-                        string header = String.Format("HTTP/1.1 200 OK\r\n" +
-                                        "Content-Length: {0}\r\n" +
-                                        "Connection: close\r\n\r\n",
-                                        fs.Length);
-                        byte[] headerArray = Encoding.UTF8.GetBytes(header);
-                        await resp.WriteAsync(headerArray, 0, headerArray.Length);
-                        await fs.CopyToAsync(resp);
+                        var field = typeof(AppSettings).GetField(entry.Name);
+                        if (field.FieldType == typeof(int))
+                        {
+                            field.SetValue(App.XmlSettings, Convert.ToInt32(entry.Value));
+                        }
+                        else
+                        {
+                            field.SetValue(App.XmlSettings, entry.Value);
+                        }
+                    }
+
+                    await AppSettings.SaveAsync(App.XmlSettings, "Settings.xml");
+
+                    string html = helper.GenerateSettingsConfigPage(socketInfo);
+                    await WebHelper.WriteToStream(html, os);
+                }
+                else if(request.Contains("OneDrive.htm"))
+                {
+                    if(request.Contains("?"))
+                    {
+                        Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
+                        await helper.ParseOneDriveUri(uri);
+                    }
+
+                    string html = helper.GenerateOneDrivePage();
+                    await WebHelper.WriteToStream(html, os);
+                }
+                else
+                {
+                    using (Stream resp = os.AsStreamForWrite())
+                    {
+                        bool exists = true;
+                        try
+                        {
+                            var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+                            string filePath = @"Assets\Web" + request.Replace('/', '\\');
+                            using (Stream fs = await folder.OpenStreamForReadAsync(filePath))
+                            {
+                                string header = String.Format("HTTP/1.1 200 OK\r\n" +
+                                                "Content-Length: {0}\r\n" +
+                                                "Connection: close\r\n\r\n",
+                                                fs.Length);
+                                byte[] headerArray = Encoding.UTF8.GetBytes(header);
+                                await resp.WriteAsync(headerArray, 0, headerArray.Length);
+                                await fs.CopyToAsync(resp);
+                            }
+                        }
+                        catch (FileNotFoundException)
+                        {
+                            exists = false;
+                        }
+
+                        if (!exists)
+                        {
+                            byte[] headerArray = Encoding.UTF8.GetBytes(
+                                                  "HTTP/1.1 404 Not Found\r\n" +
+                                                  "Content-Length:0\r\n" +
+                                                  "Connection: close\r\n\r\n");
+                            await resp.WriteAsync(headerArray, 0, headerArray.Length);
+                        }
+
+                        await resp.FlushAsync();
                     }
                 }
-                catch (FileNotFoundException)
-                {
-                    exists = false;
-                }
-
-                if (!exists)
-                {
-                    byte[] headerArray = Encoding.UTF8.GetBytes(
-                                          "HTTP/1.1 404 Not Found\r\n" +
-                                          "Content-Length:0\r\n" +
-                                          "Connection: close\r\n\r\n");
-                    await resp.WriteAsync(headerArray, 0, headerArray.Length);
-                }
-
-                await resp.FlushAsync();
+            }catch(Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
             }
         }
+
     }
 }

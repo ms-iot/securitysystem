@@ -12,7 +12,7 @@ body {
     top:48px;
     width: calc(100% - 230px);
     height: calc(100% - 80px);
-    left: 48px;
+    left: 198px;
     padding-top:16px;
     padding-left:32px;
     overflow:auto;
@@ -29,7 +29,7 @@ body {
     z-index:5;
 }
 
-#webbHeaderLogo {
+#ssHeaderLogo {
     position:fixed;
     z-index:5;
     width:192px;
@@ -39,13 +39,13 @@ body {
     background: #050505;
 }
 
-#webbHeaderLogo img {
+#ssHeaderLogo img {
     display:block;
     height:22px;
     margin: 12px auto;
 }
 
-#webbNavigationBar {
+#ssNavigationBar {
     position:fixed;
     z-index:5;
     width:192px;
@@ -56,7 +56,7 @@ body {
     overflow-y:auto;
 }
 
-#webbNavigationBar p {
+#ssNavigationBar p {
     color:white;
     text-transform: uppercase;
     text-align:center;
@@ -65,23 +65,23 @@ body {
     margin-bottom:4px;
 }
 
-#webbNavigationBar ul {
+#ssNavigationBar ul {
     list-style-type: none;
     padding: 0;
     margin-top: 0;
 }
 
-#webbNavigationBar a:hover {
+#ssNavigationBar a:hover {
     background: #222222;
     color:#38c0fd;
 }
 
-#webbNavigationBar a.highlight:hover {
+#ssNavigationBar a.highlight:hover {
     background:linear-gradient(90deg, #32bdfe, #65daf4);
     color:white;
 }
 
-#webbNavigationBar a {
+#ssNavigationBar a {
     text-decoration: none;
     color:#018bcb;
     text-transform: none;
@@ -89,12 +89,12 @@ body {
     text-align: center;
 }
 
-#webbNavigationBar .highlight {
+#ssNavigationBar .highlight {
     color:black;
     background : linear-gradient(90deg, #32bdfe, #65daf4);
 }
 
-#webbTitleBar {
+#ssTitleBar {
     position:fixed;
     z-index:5;
     left:0px;
@@ -105,7 +105,7 @@ body {
     z-index: -1;
 }
 
-#webbTitleBar p {
+#ssTitleBar p {
     font-size: x-large;
     margin-top:4px;
     margin-bottom:4px;
@@ -113,14 +113,14 @@ body {
     left:228px;
 }
 
-#webbIconsBar {
+#ssIconsBar {
     position:fixed;
     top:0px;
     right:0px;
     z-index:6;
 }
 
-#webbIconsBar button {
+#ssIconsBar button {
     border-left: solid 1px white;
     height:48px;
     color:#018bcb;
@@ -130,16 +130,16 @@ body {
     margin:0px 0px 4px 0px;
 }
 
-#webbIconsBar button span {
+#ssIconsBar button span {
     font-size:x-small;
     text-transform:uppercase;
 }
 
-#webbIconsBar button:hover {
+#ssIconsBar button:hover {
     background: #eeeeee;
 }
 
-#webbIconsBar button img {
+#ssIconsBar button img {
     height:20px;
     width:20px;
 }
@@ -557,4 +557,8 @@ div .slick-headerrow .slick-headerrow-columns {
 
 .marginTop {
     margin-top:5px;
+}
+
+.subText {
+    font-size:smaller;
 }

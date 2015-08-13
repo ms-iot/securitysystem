@@ -22,7 +22,7 @@ namespace SecuritySystemUWP
 
         private static HttpClient httpClient;
         private static CancellationTokenSource cts;
-        private static bool isLoggedin = false;
+        private static bool isLoggedIn = false;
         private static Mutex uploadPicturesMutexLock = new Mutex();
         private DispatcherTimer refreshTimer;
                 
@@ -52,7 +52,7 @@ namespace SecuritySystemUWP
                 querySubfolders.FolderDepth = FolderDepth.Deep;
 
                 StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
-                cacheFolder = await cacheFolder.GetFolderAsync("securitysystem-cameradrop");
+                cacheFolder = await cacheFolder.GetFolderAsync(App.XmlSettings.FolderName);
                 var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
                 var files = await result.GetFilesAsync();
 
@@ -89,6 +89,7 @@ namespace SecuritySystemUWP
                 Debug.WriteLine("Exception in deleteExpiredPictures() " + ex.Message);
             }
         }
+
         public static async Task authorize(string accessCode)
         {
             CreateHttpClient(ref httpClient);
@@ -96,7 +97,12 @@ namespace SecuritySystemUWP
             SetAuthorization("Bearer", accessToken);
 
             cts = new CancellationTokenSource();
-            isLoggedin = true;
+            isLoggedIn = true;
+        }
+
+        public static bool IsLoggedIn()
+        {
+            return isLoggedIn;
         }
         /*******************************************************************************************
         * PRIVATE METHODS
@@ -105,7 +111,7 @@ namespace SecuritySystemUWP
         {
             try
             {
-                if (isLoggedin)
+                if (isLoggedIn)
                 {
                     String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
 
@@ -128,7 +134,7 @@ namespace SecuritySystemUWP
             List<string> files = null;
             try
             {
-                if (isLoggedin)
+                if (isLoggedIn)
                 {
                     Uri uri = new Uri(uriString);
                     using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri))
@@ -175,7 +181,7 @@ namespace SecuritySystemUWP
         {
             try
             {
-                if (isLoggedin)
+                if (isLoggedIn)
                 {
                     String uriString = string.Format("{0}/Pictures/{1}/{2}",AppSettings.OneDriveRootUrl, folderName, imageName);
 
@@ -239,7 +245,7 @@ namespace SecuritySystemUWP
         private static async Task reauthorize()
         {
 
-            if (!isLoggedin)
+            if (!isLoggedIn)
             {
                 return;
             }
@@ -253,7 +259,7 @@ namespace SecuritySystemUWP
             await httpClient.GetAsync(new Uri(uri));
             accessToken = "";
             refreshToken = "";
-            isLoggedin = false;
+            isLoggedIn = false;
             httpClient.Dispose();
         }
 

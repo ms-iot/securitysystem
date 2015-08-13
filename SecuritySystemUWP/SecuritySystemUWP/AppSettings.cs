@@ -9,15 +9,34 @@ namespace SecuritySystemUWP
 {
     public class AppSettings
     {
+        [Description("The Microsoft alias of the user")]
         public string MicrosoftAlias;
+
+        [Description("Number of cameras - I don't really know what this is for")]
         public int NumberOfCameras = 1;
+
+        [Description("Type of camera you're using (e.g. dlink, webcam)")]
         public string CameraType = "dlink";
+
+        [Description("This is the storage provider that you will use to store your photos")]
         public string StorageProvider = "OneDrive";
+
+        [Description("Azure Account Name")]
         public string AzureAccountName = "SecuritySystemPictures";
+
+        [Description("Azure Access Key")]
         public string AzureAccessKey = "****";
-        public string OneDriveClientId = "****";
-        public string OneDriveClientSecret = "****";
+
+        [Description("OneDrive Client ID")]
+        public string OneDriveClientId = "000000004014CD78";
+
+        [Description("OneDrive Secret")]
+        public string OneDriveClientSecret = "9AjwMwmv0CeTYvJa21w1s-ra9wyizfUz";
+
+        [Description("Number of days to store your pictures before they are deleted")]
         public int StorageDuration = 7;
+
+        [Description("Name of the folder that contains the images in the Pictures Library")]
         public string FolderName = "imagecontainer";
 
         //The following values are not changed, and not read in from the xml file
@@ -54,7 +73,7 @@ namespace SecuritySystemUWP
                     return new AppSettings();
                 }
                 IInputStream sessionInputStream = await sessionFile.OpenReadAsync();
-                var serializer = new XmlSerializer(typeof(AppSettings), new Type[] { typeof(AppSettings) });
+                var serializer = XmlSerializer.FromTypes(new[] { typeof(AppSettings) })[0];
                 AppSettings temp = (AppSettings)serializer.Deserialize(sessionInputStream.AsStreamForRead());
                 sessionInputStream.Dispose();
 
@@ -66,5 +85,24 @@ namespace SecuritySystemUWP
                 return new AppSettings();
             }
         }
+    }
+
+    [AttributeUsage(AttributeTargets.All)]
+    public class DescriptionAttribute : Attribute
+    {
+        public DescriptionAttribute(string description)
+        {
+            this.description = description;
+        }
+
+        public string Description
+        {
+            get
+            {
+                return description;
+            }
+        }
+
+        private string description;
     }
 }

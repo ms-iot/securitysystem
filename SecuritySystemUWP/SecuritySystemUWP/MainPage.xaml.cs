@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -19,13 +21,23 @@ namespace SecuritySystemUWP
 
         private static bool started = false;
 
-        private string[] cameras = new string[App.XmlSettings.NumberOfCameras];
+        private string[] cameras;
 
         public MainPage()
         {
-            this.InitializeComponent();
+            this.InitializeComponent();             
+        }
+
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
+            WebServer.Start(8000);
+
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.XmlSettings.MicrosoftAlias } };
+            App.TelemetryClient.TrackTrace("Start Info", properties);
+            cameras = new string[App.XmlSettings.NumberOfCameras]; 
+
             Initialize();
-             
         }
 
         private void Initialize()
