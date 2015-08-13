@@ -144,9 +144,10 @@ namespace SecuritySystemUWP
                             using (Stream fs = await folder.OpenStreamForReadAsync(filePath))
                             {
                                 string header = String.Format("HTTP/1.1 200 OK\r\n" +
-                                                "Content-Length: {0}\r\n" +
+                                                "Content-Length: {0}\r\n{1}" +
                                                 "Connection: close\r\n\r\n",
-                                                fs.Length);
+                                                fs.Length,
+                                                ((request.Contains("css")) ? "Content-Type: text/css\r\n" : ""));
                                 byte[] headerArray = Encoding.UTF8.GetBytes(header);
                                 await resp.WriteAsync(headerArray, 0, headerArray.Length);
                                 await fs.CopyToAsync(resp);
