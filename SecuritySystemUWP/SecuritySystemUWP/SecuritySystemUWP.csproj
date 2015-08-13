@@ -95,10 +95,15 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Camera\ICamera.cs" />
+    <Compile Include="Camera\UsbCamera.cs" />
+    <Compile Include="Camera\CameraFactory.cs" />
+    <Compile Include="MotionSensor.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Storage\LocalStorage.cs" />
     <Compile Include="Storage\Azure.cs" />
     <Compile Include="Storage\IStorage.cs" />
     <Compile Include="Storage\OneDrive.cs" />
@@ -112,10 +117,7 @@
     </AppxManifest>
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Settings.xml">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="project.json">
       <SubType>Designer</SubType>

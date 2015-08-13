@@ -11,14 +11,15 @@ namespace SecuritySystemUWP
     {
         public string MicrosoftAlias;
         public int NumberOfCameras = 1;
-        public string CameraType = "dlink";
-        public string StorageProvider = "OneDrive";
+        public string CameraType = "usb";
+        public string StorageProvider = "local";
         public string AzureAccountName = "SecuritySystemPictures";
         public string AzureAccessKey = "****";
         public string OneDriveClientId = "****";
         public string OneDriveClientSecret = "****";
         public int StorageDuration = 7;
         public string FolderName = "imagecontainer";
+        public int GpioMotionPin = 4;
 
         //The following values are not changed, and not read in from the xml file
         public const string AzureConnectionSettings = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}";

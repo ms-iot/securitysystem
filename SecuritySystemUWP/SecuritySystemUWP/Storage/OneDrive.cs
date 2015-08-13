@@ -37,7 +37,7 @@ namespace SecuritySystemUWP
             refreshTimer.Tick += refreshTimer_Tick;
             refreshTimer.Start();
         }
-        public Type LoginType()
+        public Type StorageStartPage()
         {
             return typeof(OnedriveLoginPage);
         }

@@ -7,10 +7,9 @@ using Windows.Storage;
 
 namespace SecuritySystemUWP
 {
-    public interface IStorage
+    public interface ICamera
     {
-        Type StorageStartPage();
-        void UploadPictures(string camera);
-        void DeleteExpiredPictures(string camera);
+        Task Initialize();
+        void Dispose();
     }
 }

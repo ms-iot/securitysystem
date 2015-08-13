@@ -12,16 +12,14 @@ using Windows.UI.Xaml.Controls;
 
 namespace SecuritySystemUWP
 {
-    public static class StorageFactory
+    public static class CameraFactory
     {
-        public static IStorage Get(string type)
+        public static ICamera Get(string type)
         {
             switch (type.ToLower())
             {
-                case "azure": return new Azure();
-                case "onedrive": return new OneDrive();
-                case "local": return new LocalStorage();
-                default: throw new ArgumentNullException("Set StorageProvider in config");
+                case "usb": return new UsbCamera();
+                default: throw new ArgumentNullException("Set CameraType in Config");
             }
         }
     }

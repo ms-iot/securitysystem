@@ -1,7 +1,10 @@
 ﻿using System;
-using System.Threading;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -13,67 +16,69 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private DispatcherTimer uploadPicturesTimer;
-        private DispatcherTimer deletePicturesTimer;
-        private IStorage storage;
+        private static IStorage storage;
+        private static ICamera camera;
+        private string[] cameras = { "Cam1" };
+        private static DispatcherTimer uploadPicturesTimer;
+        private static DispatcherTimer deletePicturesTimer;
+        private const int uploadInterval = 10; //Value in seconds
+        private const int deleteInterval = 1; //Value in hours
 
         private static bool started = false;
-
-        private string[] cameras = new string[App.XmlSettings.NumberOfCameras];
 
         public MainPage()
         {
             this.InitializeComponent();
-            Initialize();
-             
         }
 
-        private void Initialize()
+        private async Task Initialize()
         {
-            storage = StorageFactory.Get(App.XmlSettings.StorageProvider);
+
+            camera = CameraFactory.Get(App.XmlSettings.CameraType);
+            storage = StorageFactory.Get(App.XmlSettings.StorageProvider);        
+
+            await camera.Initialize();
 
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
-            uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
+            uploadPicturesTimer.Interval = TimeSpan.FromSeconds(uploadInterval);
             uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
             uploadPicturesTimer.Start();
 
             //Timer controlling deletion of old pictures
             deletePicturesTimer = new DispatcherTimer();
-            deletePicturesTimer.Interval = TimeSpan.FromHours(1);
+            deletePicturesTimer.Interval = TimeSpan.FromHours(deleteInterval);
             deletePicturesTimer.Tick += deletePicturesTimer_Tick;
             deletePicturesTimer.Start();
-
-            for (int i = 0; i < App.XmlSettings.NumberOfCameras; i++)
-            {
-                cameras[i] = "Cam" + (i + 1);
-            }
-
         }
 
-        private void RunningToggle_Click(object sender, RoutedEventArgs e)
+        private void Dispose()
+        {
+            uploadPicturesTimer.Stop();
+            deletePicturesTimer.Stop();
+            camera.Dispose();
+        }
+
+        private async void RunningToggle_Click(object sender, RoutedEventArgs e)
         {
             if (!started)
             {
-                uploadPicturesTimer.Start();
-                deletePicturesTimer.Start();
+                await Initialize();
                 started = true;
-                this.Frame.Navigate(storage.LoginType());
+                App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
+                this.Frame.Navigate(storage.StorageStartPage());
             }
             else
             {
-                uploadPicturesTimer.Stop();
-                deletePicturesTimer.Stop();
+                Dispose();
                 started = false;
                 this.Frame.Navigate(typeof(MainPage));
             }
         }
 
-        private async void Start_Click(object sender, RoutedEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             RunningToggle.Content = started ? "Stop" : "Start";  
-            App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
-            this.Frame.Navigate(storage.LoginType());
         }
 
         private void uploadPicturesTimer_Tick(object sender, object e)
