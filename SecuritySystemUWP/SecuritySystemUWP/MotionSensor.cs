@@ -9,25 +9,25 @@ namespace SecuritySystemUWP
 {
     public class MotionSensor
     {
-        public bool isMotionDetected;
-        private GpioPin motionSensorPin;
-        private GpioPinValue pinValue;
-        public void Initialize()
+        public GpioPin motionSensorPin;
+        public event EventHandler<GpioPinValueChangedEventArgs> OnChanged;
+        public MotionSensor()
         {
             var gpioController = GpioController.GetDefault();
-            motionSensorPin = gpioController.OpenPin(Config.GpioMotionPin);
+            motionSensorPin = gpioController.OpenPin(App.XmlSettings.GpioMotionPin);
             motionSensorPin.SetDriveMode(GpioPinDriveMode.Input);
-            motionSensorPin.ValueChanged += motionDetected;
+            motionSensorPin.ValueChanged += MotionSensorPin_ValueChanged;
         }
         public void Dispose()
         {
             motionSensorPin.Dispose();
         }
-
-        private void motionDetected(GpioPin s, GpioPinValueChangedEventArgs e)
+        private void MotionSensorPin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
         {
-            pinValue = motionSensorPin.Read();
-            isMotionDetected = (e.Edge == GpioPinEdge.RisingEdge);
+            if (OnChanged != null)
+            {
+                OnChanged(this, args);
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
 using Windows.Storage;
 using Windows.UI.Xaml;
-
+using Windows.UI.Core;
 
 
 namespace SecuritySystemUWP
@@ -17,8 +17,10 @@ namespace SecuritySystemUWP
     public class UsbCamera : ICamera
     {
         private MediaCapture mediaCapture;
-        private DispatcherTimer takePhotoTimer;
+        private static DispatcherTimer takePhotoTimer;
         private MotionSensor pirSensor;
+        private CoreDispatcher dispatcher;
+        private bool isTimerStarted;
         private static Mutex pictureMutexLock = new Mutex();
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -29,7 +31,7 @@ namespace SecuritySystemUWP
             if (mediaCapture == null)
             {
                 // Attempt to get the back camera if one is available, but use any camera device if not
-                var cameraDevice = await findCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel.Back);
+                var cameraDevice = await FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel.Back);
 
                 if (cameraDevice == null)
                 {
@@ -55,16 +57,35 @@ namespace SecuritySystemUWP
                     Debug.WriteLine(string.Format("Exception when initializing MediaCapture with {0}: {1}", cameraDevice.Id, ex.ToString()));
                 }
             }
+            //Timer controlling camera pictures with motion
+            isTimerStarted = false;
+            takePhotoTimer = new DispatcherTimer();
+            takePhotoTimer.Interval = TimeSpan.FromSeconds(1);
+            takePhotoTimer.Tick += TakePhotoTimer_Tick;
+            dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
 
             //Initialize PIR Sensor
             pirSensor = new MotionSensor();
-            pirSensor.Initialize();
+            pirSensor.OnChanged += PirSensor_OnChanged;
+        }
 
-            //Timer controlling camera pictures with motion
-            takePhotoTimer = new DispatcherTimer();
-            takePhotoTimer.Interval = TimeSpan.FromSeconds(1);
-            takePhotoTimer.Tick += takePhotoTimer_Tick;
-            takePhotoTimer.Start();
+        private async void PirSensor_OnChanged(object sender, GpioPinValueChangedEventArgs e)
+        {
+            if ((e.Edge == GpioPinEdge.RisingEdge) != isTimerStarted)
+            {
+                isTimerStarted = !isTimerStarted;
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        if (isTimerStarted)
+                        {
+                            takePhotoTimer.Start();
+                        }
+                        else
+                        {
+                            takePhotoTimer.Stop();
+                        }
+                    }).AsTask();                                  
+            }
         }
 
         public void Dispose()
@@ -77,7 +98,7 @@ namespace SecuritySystemUWP
         /*******************************************************************************************
         * PRIVATE METHODS
         ********************************************************************************************/
-        private static async Task<DeviceInformation> findCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel desiredPanel)
+        private static async Task<DeviceInformation> FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel desiredPanel)
         {
             // Get available devices for capturing pictures
             var allVideoDevices = await DeviceInformation.FindAllAsync(DeviceClass.VideoCapture);
@@ -86,17 +107,19 @@ namespace SecuritySystemUWP
             DeviceInformation desiredDevice = allVideoDevices.FirstOrDefault(x => x.EnclosureLocation != null && x.EnclosureLocation.Panel == desiredPanel);
 
             // If there is no device mounted on the desired panel, return the first device found
-            return desiredDevice ?? allVideoDevices.FirstOrDefault();
+            if(desiredDevice == null)
+            {
+                Debug.WriteLine("No device was found on the desired panel. First device found was returned.");
+                return allVideoDevices.FirstOrDefault();
+            }
+            return desiredDevice;
         }
 
-        private async void takePhotoTimer_Tick(object sender, object e)
+        private async void TakePhotoTimer_Tick(object sender, object e)
         {
-            if (pirSensor.isMotionDetected)
-            {
-                await takePhotoAsync();
-            }
+            await TakePhotoAsync();
         }
-        private async Task takePhotoAsync()
+        private async Task TakePhotoAsync()
         {
             string imageName = DateTime.UtcNow.Ticks.ToString() + ".jpg";
             var cacheFolder = KnownFolders.PicturesLibrary;

@@ -26,12 +26,13 @@ namespace SecuritySystemUWP
         private CloudStorageAccount storageAccount;
         private CloudBlobClient blobClient;
         private CloudBlobContainer blobContainer;
+        
         public Azure()
         {
-            string connectionSettings = string.Format(Config.AzureConnectionSettings, Config.AzureAccountName, Config.AzureAccessKey);
+            string connectionSettings = string.Format(AppSettings.AzureConnectionSettings, App.XmlSettings.AzureAccountName, App.XmlSettings.AzureAccessKey);
             storageAccount = CloudStorageAccount.Parse(connectionSettings);
             blobClient = storageAccount.CreateCloudBlobClient();
-            blobContainer = blobClient.GetContainerReference(Config.FolderName);
+            blobContainer = blobClient.GetContainerReference(App.XmlSettings.FolderName);
         }
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -58,7 +59,7 @@ namespace SecuritySystemUWP
 
                 foreach (StorageFile file in files)
                 {
-                    string imageName = string.Format(Config.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
+                    string imageName = string.Format(AppSettings.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
                     if (file.IsAvailable)
                     {
                         await uploadPictureToAzure(imageName, file);                        
@@ -80,14 +81,14 @@ namespace SecuritySystemUWP
         {
             try
             {
-                List<string> pictures = await listPictures(Config.FolderName);
+                List<string> pictures = await listPictures(App.XmlSettings.FolderName);
                 foreach (string picture in pictures)
                 {
-                    long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(Config.StorageDuration).Ticks;
+                    long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(App.XmlSettings.StorageDuration).Ticks;
                     string picName = picture.Split('_')[3];
                     if (picName.CompareTo(oldestTime.ToString()) < 0)
                     {
-                        int index = picture.LastIndexOf(Config.FolderName + "/") + Config.FolderName.Length + 1;
+                        int index = picture.LastIndexOf(App.XmlSettings.FolderName + "/") + App.XmlSettings.FolderName.Length + 1;
                         await deletePicture(picture.Substring(index));
                     }
                 }

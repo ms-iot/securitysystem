@@ -21,6 +21,8 @@ namespace SecuritySystemUWP
         private string[] cameras = { "Cam1" };
         private static DispatcherTimer uploadPicturesTimer;
         private static DispatcherTimer deletePicturesTimer;
+        private const int uploadInterval = 10; //Value in seconds
+        private const int deleteInterval = 1; //Value in hours
 
         private static bool started = false;
 
@@ -31,29 +33,30 @@ namespace SecuritySystemUWP
 
         private async Task Initialize()
         {
-            camera = CameraFactory.Get(Config.CameraType);
-            storage = StorageFactory.Get(Config.StorageProvider);
+
+            camera = CameraFactory.Get(App.XmlSettings.CameraType);
+            storage = StorageFactory.Get(App.XmlSettings.StorageProvider);        
 
             await camera.Initialize();
 
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
-            uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
+            uploadPicturesTimer.Interval = TimeSpan.FromSeconds(uploadInterval);
             uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
             uploadPicturesTimer.Start();
 
             //Timer controlling deletion of old pictures
             deletePicturesTimer = new DispatcherTimer();
-            deletePicturesTimer.Interval = TimeSpan.FromHours(1);
+            deletePicturesTimer.Interval = TimeSpan.FromHours(deleteInterval);
             deletePicturesTimer.Tick += deletePicturesTimer_Tick;
             deletePicturesTimer.Start();
         }
 
         private void Dispose()
         {
-            camera.Dispose();
             uploadPicturesTimer.Stop();
             deletePicturesTimer.Stop();
+            camera.Dispose();
         }
 
         private async void RunningToggle_Click(object sender, RoutedEventArgs e)
@@ -62,6 +65,7 @@ namespace SecuritySystemUWP
             {
                 await Initialize();
                 started = true;
+                App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
                 this.Frame.Navigate(storage.StorageStartPage());
             }
             else
@@ -74,7 +78,7 @@ namespace SecuritySystemUWP
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            RunningToggle.Content = started ? "Stop" : "Start";
+            RunningToggle.Content = started ? "Stop" : "Start";  
         }
 
         private void uploadPicturesTimer_Tick(object sender, object e)

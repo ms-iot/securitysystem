@@ -102,7 +102,6 @@
       <DependentUpon>Gallery.xaml</DependentUpon>
     </Compile>
     <Compile Include="MotionSensor.cs" />
-    <Compile Include="Config.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -114,6 +113,7 @@
     <Compile Include="Storage\LocalPictureViewer.xaml.cs" />
     <Compile Include="Storage\OnedriveLoginPage.xaml.cs" />
     <Compile Include="Storage\StorageFactory.cs" />
+    <Compile Include="AppSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
