@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -25,22 +26,38 @@ namespace SecuritySystemUWP
             htmlTemplate = await FileIO.ReadTextAsync(file);
         }
 
-        private string createHtmlFormFromSettings(StreamSocketInformation socketInfo)
+        public string CreateHtmlFormFromSettings(StreamSocketInformation socketInfo)
         {
             string html = "<form>";
 
             html += "<table>";
             foreach (FieldInfo info in typeof(AppSettings).GetFields())
             {
-                if (!info.IsStatic)
+                // Don't allow constant/static fields or fields with no descriptions to be edited
+                if (!info.IsStatic && info.GetCustomAttributes(typeof(DescriptionAttribute)).Count() > 0)
                 {
                     html += "<tr>";
                     html += "<td>";
                     html += "<b>" + info.Name + "</b>    ";
                     html += "</td><td>";
-                    if (info.FieldType.Name.Equals("String") || info.FieldType.Name.Contains("Int32"))
+                    if (info.FieldType == typeof(string))
                     {
                         html += "<input type='text' name='" + info.Name + "' value='" + info.GetValue(App.XmlSettings) + "' size='50'>";
+                    }
+                    else if (info.FieldType == typeof(int))
+                    {
+                        html += "<input type='number' name='" + info.Name + "' value='" + info.GetValue(App.XmlSettings) + "' size='50'>";
+                    }
+                    else if (info.FieldType == typeof(CameraType) || info.FieldType == typeof(StorageProvider))
+                    {
+                        html += "<select name='" + info.Name + "'>";
+                        foreach(string type in Enum.GetNames(info.FieldType))
+                        {
+                            html += "<option value='" + type + "' " +
+                                (info.GetValue(App.XmlSettings).Equals(Enum.Parse(info.FieldType, type)) ? "selected='selected'" : "")
+                                + ">" + type + "</option>";
+                        }
+                        html += "</select>";
                     }
 
                     html += "</td></tr>";
@@ -75,11 +92,6 @@ namespace SecuritySystemUWP
             return html;
         }
 
-        public string GenerateSettingsConfigPage(StreamSocketInformation socketInfo)
-        {
-            return GeneratePage("Security System Config", "Security System Config", createHtmlFormFromSettings(socketInfo));
-        }
-
         public string GenerateOneDrivePage()
         {
             string html = "";
@@ -89,23 +101,30 @@ namespace SecuritySystemUWP
             html += "<ol>";
             html += "<li>Click on this link:  <a href='" + uri + "' target='_blank'>OneDrive Login</a><br>"+
                 "A new window will open.  Log into OneDrive.<br><br></li>";
-            html += "<li>After you're done, you should arrive at a blank page.<br>"
-                + "Copy the URL (it should look like this: https://login.live.com/oauth20_desktop.srf?code=M6b0ce71e-8961-1395-2435-f78db54f82ae&lc=1033), paste it into this box, and click Submit.<br>" +
-                " <form><input type='text' name='codeUrl' size='50'><input type='submit' value='Submit'></form></li>";
+            html += "<li>After you're done, you should arrive at a blank page.<br>" + 
+                "Copy the URL, paste it into this box, and click Submit.<br>" +
+                "The URL will look something like this: https://login.live.com/oauth20_desktop.srf?code=M6b0ce71e-8961-1395-2435-f78db54f82ae&lc=1033 <br>" +
+                " <form><input type='text' name='codeUrl' size='50'>  <input type='submit' value='Submit'></form></li>";
             html += "</ol>";
 
             return GeneratePage("OneDrive Config", "OneDrive Config", html);
         }
         
-        public string GeneratePage(string title, string titleBar, string content)
+        public string GeneratePage(string title, string titleBar, string content, string message)
         {
             string html = htmlTemplate;
             html = html.Replace("#content#", content);
             html = html.Replace("#title#", title);
             html = html.Replace("#titleBar#", titleBar);
             html = html.Replace("#navBar#", createNavBar());
+            html = html.Replace("#message#", message);
 
             return html;
+        }
+
+        public string GeneratePage(string title, string titleBar, string content)
+        {
+            return GeneratePage(title, titleBar, content, "");
         }
 
         public async Task ParseOneDriveUri(Uri uri)
@@ -124,7 +143,7 @@ namespace SecuritySystemUWP
                         {
                             if (subEntry.Name.Equals("code"))
                             {
-                                await OneDrive.authorize(subEntry.Value);
+                                await OneDrive.Authorize(subEntry.Value);
                                 break;
                             }
                         }
@@ -134,6 +153,37 @@ namespace SecuritySystemUWP
             }
             catch (Exception)
             { }
+        }
+
+        public void ParseUriIntoSettings(Uri uri)
+        {
+            var decoder = new WwwFormUrlDecoder(uri.Query);
+
+            // Take the parameters from the URL and put it into Settings
+            foreach (WwwFormUrlDecoderEntry entry in decoder)
+            {
+                try
+                {
+                    var field = typeof(AppSettings).GetField(entry.Name);
+                    if (field.FieldType == typeof(int))
+                    {
+                        field.SetValue(App.XmlSettings, Convert.ToInt32(entry.Value));
+                    }
+                    else if(field.FieldType == typeof(CameraType) ||
+                        field.FieldType == typeof(StorageProvider))
+                    {
+                        field.SetValue(App.XmlSettings, Enum.Parse(field.FieldType, entry.Value));
+                    }
+                    else
+                    {
+                        field.SetValue(App.XmlSettings, entry.Value);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
+            }
         }
 
         public static async Task WriteToStream(string data, IOutputStream os)

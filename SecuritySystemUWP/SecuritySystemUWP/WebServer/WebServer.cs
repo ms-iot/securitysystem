@@ -96,37 +96,34 @@ namespace SecuritySystemUWP
             {
                 if (request.Equals("/"))
                 {
-                    string html = helper.GenerateSettingsConfigPage(socketInfo);
+                    // Generate the default config page
+                    string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(socketInfo));
                     await WebHelper.WriteToStream(html, os);
                 }
                 else if (request.Contains("?") && !request.Contains("htm"))
                 {
                     Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
-                    var decoder = new WwwFormUrlDecoder(uri.Query);
-                    foreach (WwwFormUrlDecoderEntry entry in decoder)
-                    {
-                        var field = typeof(AppSettings).GetField(entry.Name);
-                        if (field.FieldType == typeof(int))
-                        {
-                            field.SetValue(App.XmlSettings, Convert.ToInt32(entry.Value));
-                        }
-                        else
-                        {
-                            field.SetValue(App.XmlSettings, entry.Value);
-                        }
-                    }
 
+                    // Take the parameters from the URL and put it into Settings
+                    helper.ParseUriIntoSettings(uri);
                     await AppSettings.SaveAsync(App.XmlSettings, "Settings.xml");
 
-                    string html = helper.GenerateSettingsConfigPage(socketInfo);
+                    string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(socketInfo), "<span style='color:Green'>Configuration saved!</span><br><br>");
                     await WebHelper.WriteToStream(html, os);
                 }
                 else if(request.Contains("OneDrive.htm"))
                 {
+                    // Take in the parameters and try to login to OneDrive
                     if(request.Contains("?"))
                     {
                         Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
                         await helper.ParseOneDriveUri(uri);
+
+                        if(OneDrive.IsLoggedIn())
+                        {
+                            // Save tokens to settings file
+                            await AppSettings.SaveAsync(App.XmlSettings, "Settings.xml");
+                        }
                     }
 
                     string html = helper.GenerateOneDrivePage();
@@ -177,5 +174,9 @@ namespace SecuritySystemUWP
             }
         }
 
+        private string GeneratePage(string v1, string v2, object p)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

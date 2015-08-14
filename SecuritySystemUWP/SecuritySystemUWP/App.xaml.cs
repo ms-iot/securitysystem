@@ -33,6 +33,11 @@ namespace SecuritySystemUWP
         /// Configuration settings for app
         /// </summary>
         public static AppSettings XmlSettings;
+        
+        /// <summary>
+        /// Storage interface
+        /// </summary>
+        public static IStorage Storage;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code

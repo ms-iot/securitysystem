@@ -17,7 +17,6 @@ namespace SecuritySystemUWP
     {
         private DispatcherTimer uploadPicturesTimer;
         private DispatcherTimer deletePicturesTimer;
-        private IStorage storage;
 
         private static bool started = false;
 
@@ -42,7 +41,17 @@ namespace SecuritySystemUWP
 
         private void Initialize()
         {
-            storage = StorageFactory.Get(App.XmlSettings.StorageProvider);
+            App.Storage = StorageFactory.Get(App.XmlSettings.StorageProvider);
+
+            // Try to login using existing Access Token in settings file
+            if(App.Storage.GetType() == typeof(OneDrive))
+            {
+                var oneDriveStorage = ((OneDrive)App.Storage);
+                if(!OneDrive.IsLoggedIn())
+                {
+                    OneDrive.AuthorizeWithAccessToken(App.XmlSettings.OneDriveAccessToken);
+                }
+            }
 
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
@@ -70,7 +79,7 @@ namespace SecuritySystemUWP
                 uploadPicturesTimer.Start();
                 deletePicturesTimer.Start();
                 started = true;
-                this.Frame.Navigate(storage.LoginType());
+                this.Frame.Navigate(App.Storage.LoginType());
             }
             else
             {
@@ -85,17 +94,17 @@ namespace SecuritySystemUWP
         {
             RunningToggle.Content = started ? "Stop" : "Start";  
             App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
-            this.Frame.Navigate(storage.LoginType());
+            this.Frame.Navigate(App.Storage.LoginType());
         }
 
         private void uploadPicturesTimer_Tick(object sender, object e)
         {
-            storage.UploadPictures(cameras[0]);
+            App.Storage.UploadPictures(cameras[0]);
         }
 
         private void deletePicturesTimer_Tick(object sender, object e)
         {
-            storage.DeleteExpiredPictures(cameras[0]);
+            App.Storage.DeleteExpiredPictures(cameras[0]);
         }
     }
 }

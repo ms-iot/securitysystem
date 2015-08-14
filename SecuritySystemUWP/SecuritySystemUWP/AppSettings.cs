@@ -7,8 +7,24 @@ using Windows.Storage.Streams;
 
 namespace SecuritySystemUWP
 {
+    public enum StorageProvider
+    {
+        OneDrive,
+        Azure,
+        Local,
+        RemovableMedia
+    }
+
+    public enum CameraType
+    {
+        DLink,
+        WebCam
+    }
+
     public class AppSettings
     {
+        // Any fields without descriptions will not appear in the web interface
+
         [Description("The Microsoft alias of the user")]
         public string MicrosoftAlias;
 
@@ -16,21 +32,21 @@ namespace SecuritySystemUWP
         public int NumberOfCameras = 1;
 
         [Description("Type of camera you're using (e.g. dlink, webcam)")]
-        public string CameraType = "dlink";
+        public CameraType CameraType = CameraType.DLink;
 
         [Description("This is the storage provider that you will use to store your photos")]
-        public string StorageProvider = "OneDrive";
+        public StorageProvider StorageProvider = StorageProvider.OneDrive;
 
-        [Description("Azure Account Name")]
+        [Description("Azure Account Name - Only required if you selected Azure as the Storage Provider")]
         public string AzureAccountName = "SecuritySystemPictures";
 
-        [Description("Azure Access Key")]
+        [Description("Azure Access Key - Only required if you selected Azure as the Storage Provider")]
         public string AzureAccessKey = "****";
 
-        [Description("OneDrive Client ID")]
+        [Description("OneDrive Client ID - Only required if you selected OneDrive as the Storage Provider")]
         public string OneDriveClientId = "000000004014CD78";
 
-        [Description("OneDrive Secret")]
+        [Description("OneDrive Secret - Only required if you selected OneDrive as the Storage Provider")]
         public string OneDriveClientSecret = "9AjwMwmv0CeTYvJa21w1s-ra9wyizfUz";
 
         [Description("Number of days to store your pictures before they are deleted")]
@@ -38,6 +54,10 @@ namespace SecuritySystemUWP
 
         [Description("Name of the folder that contains the images in the Pictures Library")]
         public string FolderName = "imagecontainer";
+
+        // Obtained from OneDrive Login
+        public string OneDriveAccessToken;
+        public string OneDriveRefreshToken;
 
         //The following values are not changed, and not read in from the xml file
         public const string AzureConnectionSettings = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}";

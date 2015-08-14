@@ -16,10 +16,6 @@ namespace SecuritySystemUWP
 {
     public class OneDrive : IStorage
     {
-        //Obtained during onedrive login
-        private static String accessToken = "";
-        private static String refreshToken = "";
-
         private static HttpClient httpClient;
         private static CancellationTokenSource cts;
         private static bool isLoggedIn = false;
@@ -44,32 +40,35 @@ namespace SecuritySystemUWP
 
         public async void UploadPictures(string camera)
         {
-            uploadPicturesMutexLock.WaitOne();
-
-            try
+            if (isLoggedIn)
             {
-                QueryOptions querySubfolders = new QueryOptions();
-                querySubfolders.FolderDepth = FolderDepth.Deep;
+                uploadPicturesMutexLock.WaitOne();
 
-                StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
-                cacheFolder = await cacheFolder.GetFolderAsync(App.XmlSettings.FolderName);
-                var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
-                var files = await result.GetFilesAsync();
-
-                foreach (StorageFile file in files)
+                try
                 {
-                    string imageName = string.Format(AppSettings.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
-                    await uploadPictureToOnedrive(App.XmlSettings.FolderName, imageName, file);
-                    await file.DeleteAsync();
+                    QueryOptions querySubfolders = new QueryOptions();
+                    querySubfolders.FolderDepth = FolderDepth.Deep;
+
+                    StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
+                    cacheFolder = await cacheFolder.GetFolderAsync(App.XmlSettings.FolderName);
+                    var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
+                    var files = await result.GetFilesAsync();
+
+                    foreach (StorageFile file in files)
+                    {
+                        string imageName = string.Format(AppSettings.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
+                        await uploadPictureToOnedrive(App.XmlSettings.FolderName, imageName, file);
+                        await file.DeleteAsync();
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Exception in uploadPictures() " + ex.Message);
-            }
-            finally
-            {
-                uploadPicturesMutexLock.ReleaseMutex();
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Exception in uploadPictures() " + ex.Message);
+                }
+                finally
+                {
+                    uploadPicturesMutexLock.ReleaseMutex();
+                }
             }
         }
 
@@ -90,12 +89,16 @@ namespace SecuritySystemUWP
             }
         }
 
-        public static async Task authorize(string accessCode)
+        public static async Task Authorize(string accessCode)
         {
             CreateHttpClient(ref httpClient);
             await getTokens(accessCode, "code", "authorization_code");
-            SetAuthorization("Bearer", accessToken);
+            AuthorizeWithAccessToken(App.XmlSettings.OneDriveAccessToken);
+        }
 
+        public static void AuthorizeWithAccessToken(string accessToken)
+        {
+            SetAuthorization("Bearer", accessToken);
             cts = new CancellationTokenSource();
             isLoggedIn = true;
         }
@@ -216,8 +219,8 @@ namespace SecuritySystemUWP
                     responseMessage.EnsureSuccessStatusCode();
 
                     string responseContentString = await responseMessage.Content.ReadAsStringAsync();
-                    accessToken = getAccessToken(responseContentString);
-                    refreshToken = getRefreshToken(responseContentString);
+                    App.XmlSettings.OneDriveAccessToken = getAccessToken(responseContentString);
+                    App.XmlSettings.OneDriveRefreshToken = getRefreshToken(responseContentString);
                 }
             }
         }
@@ -250,15 +253,15 @@ namespace SecuritySystemUWP
                 return;
             }
 
-            await getTokens(refreshToken, "refresh_token", "refresh_token");
+            await getTokens(App.XmlSettings.OneDriveRefreshToken, "refresh_token", "refresh_token");
         }
 
         private static async Task logout()
         {
             string uri = string.Format(AppSettings.OneDriveLogoutUrl, App.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl);
             await httpClient.GetAsync(new Uri(uri));
-            accessToken = "";
-            refreshToken = "";
+            App.XmlSettings.OneDriveAccessToken = "";
+            App.XmlSettings.OneDriveRefreshToken = "";
             isLoggedIn = false;
             httpClient.Dispose();
         }

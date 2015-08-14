@@ -39,7 +39,7 @@ namespace SecuritySystemUWP
             string response = args.Uri.AbsoluteUri;
             int index = response.IndexOf("code=") + 5;
             string accessCode = response.Substring(index);
-            await OneDrive.authorize(accessCode);
+            await OneDrive.Authorize(accessCode);
             this.Frame.Navigate(typeof(MainPage));
         }
 
