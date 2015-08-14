@@ -180,12 +180,6 @@ namespace SecuritySystemUWP
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            // Handle parameter
-            if (e.Parameter != null)
-            {
-
-            }
-
             imageFolder = KnownFolders.PicturesLibrary;
             imageFolder = await imageFolder.GetFolderAsync("securitysystem-cameradrop");
 
@@ -205,11 +199,6 @@ namespace SecuritySystemUWP
             listView.Items.Clear();
             loadingText.Visibility = Visibility.Visible;
 
-            // Delay so UI can update
-            await Task.Delay(10);
-
-            //listView.IsEnabled = false;
-
             imageFolder = folder;
 
             // Create query to get number of pictures in current folder and subfolders
@@ -220,9 +209,8 @@ namespace SecuritySystemUWP
             totalPictures = await query.GetItemCountAsync();
 
             // Calculate total pages for gallery
-            totalPages = (int)Math.Ceiling((float)totalPictures / gallerySize);
-            if (totalPages <= 0) totalPages = 1;
-
+            totalPages = Math.Max(1, (int)Math.Ceiling((float)totalPictures / gallerySize));
+            
             // Set current page to 0
             currentPage = 0;
 
@@ -291,9 +279,6 @@ namespace SecuritySystemUWP
 
             loadingText.Visibility = Visibility.Visible;
             stackPanel.Children.Clear();
-
-            // Delay so that UI can update with loading text.
-            await Task.Delay(1);
 
             try
             {
@@ -423,28 +408,14 @@ namespace SecuritySystemUWP
         // Go to previous page in gallery
         private void previousPageButton_Click(object sender, RoutedEventArgs e)
         {
-            if (currentPage == 0)
-            {
-                // Go to last page if we're on the first page and previous button is clicked
-                currentPage = (uint)(totalPages - 1);
-            }
-            else
-            {
-                --currentPage;
-            }
-
+            currentPage = (currentPage + (uint)totalPages - 1) % (uint)totalPages;
             generateGallery(currentPage);
         }
 
         // Go to next page in gallery
         private void nextPageButton_Click(object sender, RoutedEventArgs e)
         {
-            ++currentPage;
-            if (currentPage == totalPages)
-            {
-                currentPage = 0;
-            }
-
+            currentPage = (currentPage + (uint)totalPages + 1) % (uint)totalPages;
             generateGallery(currentPage);
         }
 
