@@ -6,7 +6,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" RequestedTheme="Dark">
-
+    <Page.Resources>
+        <Style TargetType="AppBarButton">
+            <Setter Property="Grid.Row" Value="0" />
+            <Setter Property="Grid.Column" Value="1" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Margin" Value="0,-4,0,0" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Height" Value="Auto" />
+            <Setter Property="Width" Value="120" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            <Setter Property="IsCompact" Value="False" />
+        </Style>
+    </Page.Resources>
     <Page.TopAppBar>
         <AppBar x:Name="appBar">
             <Grid>
@@ -15,29 +27,29 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <StackPanel x:Name="fullScreenBarPanel" Orientation="Horizontal">
-                    <AppBarButton x:Name="appBarBackButton" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Label="Back to Gallery" Margin="0,-4,0,0" VerticalAlignment="Top" RequestedTheme="Dark" Height="Auto" Width="120" RenderTransformOrigin="0.5,0.5" IsCompact="False" Click="appBarBackButton_Click" >
+                    <AppBarButton x:Name="appBarBackButton" Label="Back to Gallery" Click="appBarBackButton_Click" >
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE071;" FontFamily="Segoe UI Symbol"/>
                         </AppBarButton.Icon>
                     </AppBarButton>
                 </StackPanel>
                 <StackPanel x:Name="galleryBarPanel" Orientation="Horizontal">
-                    <AppBarButton x:Name="homeButton" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Label="Go Home" Margin="0,-4,0,0" VerticalAlignment="Top" RequestedTheme="Dark" Height="Auto" Width="120" RenderTransformOrigin="0.5,0.5" IsCompact="False" Click="homeButton_Click">
+                    <AppBarButton x:Name="homeButton" Label="Go Home" Click="homeButton_Click">
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE10F;" FontFamily="Segoe UI Symbol"/>
                         </AppBarButton.Icon>
                     </AppBarButton>
-                    <AppBarButton x:Name="previousPageButton" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Label="Previous Page" Margin="0,-4,0,0" VerticalAlignment="Top" RequestedTheme="Dark" Height="Auto" Width="120" RenderTransformOrigin="0.5,0.5" IsCompact="False" Click="previousPageButton_Click" >
+                    <AppBarButton x:Name="previousPageButton" Label="Previous Page" Click="previousPageButton_Click" >
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE0BA;" FontFamily="Segoe UI Symbol" FontSize="15"/>
                         </AppBarButton.Icon>
                     </AppBarButton>
-                    <AppBarButton x:Name="nextPageButton" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Label="Next Page" Margin="0,-4,0,0" VerticalAlignment="Top" RequestedTheme="Dark" Height="Auto" Width="120" RenderTransformOrigin="0.5,0.5" IsCompact="False" Click="nextPageButton_Click" >
+                    <AppBarButton x:Name="nextPageButton" Label="Next Page" Click="nextPageButton_Click" >
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE0AC;" FontFamily="Segoe UI Symbol" FontSize="15"/>
                         </AppBarButton.Icon>
                     </AppBarButton>
-                    <AppBarButton x:Name="refreshButton" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Label="Refresh" Margin="0,-4,0,0" VerticalAlignment="Top" RequestedTheme="Dark" Height="Auto" Width="120" RenderTransformOrigin="0.5,0.5" IsCompact="False" Click="refreshButton_Click" >
+                    <AppBarButton x:Name="refreshButton" Label="Refresh" Click="refreshButton_Click" >
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE117;" FontFamily="Segoe UI Symbol" FontSize="15"/>
                         </AppBarButton.Icon>
