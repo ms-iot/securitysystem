@@ -39,7 +39,7 @@ namespace SecuritySystemUWP
             Initialize();
         }
 
-        private void Initialize()
+        private async void Initialize()
         {
             App.Storage = StorageFactory.Get(App.XmlSettings.StorageProvider);
 
@@ -49,7 +49,7 @@ namespace SecuritySystemUWP
                 var oneDriveStorage = ((OneDrive)App.Storage);
                 if(!OneDrive.IsLoggedIn())
                 {
-                    OneDrive.AuthorizeWithAccessToken(App.XmlSettings.OneDriveAccessToken);
+                    await OneDrive.AuthorizeWithRefreshToken(App.XmlSettings.OneDriveRefreshToken);
                 }
             }
 

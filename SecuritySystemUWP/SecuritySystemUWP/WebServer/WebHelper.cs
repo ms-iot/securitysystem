@@ -97,7 +97,7 @@ namespace SecuritySystemUWP
             string html = "";
             html += "OneDrive Status:  " + (OneDrive.IsLoggedIn() ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br><br>";
             string uri = string.Format(AppSettings.OneDriveLoginUrl, App.XmlSettings.OneDriveClientId, AppSettings.OneDriveScope, AppSettings.OneDriveRedirectUrl);
-            html += "<p class='sectionHeader'>To log into OneDrive:</p>";
+            html += "<p class='sectionHeader'>Log into OneDrive:</p>";
             html += "<ol>";
             html += "<li>Click on this link:  <a href='" + uri + "' target='_blank'>OneDrive Login</a><br>"+
                 "A new window will open.  Log into OneDrive.<br><br></li>";
@@ -105,7 +105,13 @@ namespace SecuritySystemUWP
                 "Copy the URL, paste it into this box, and click Submit.<br>" +
                 "The URL will look something like this: https://login.live.com/oauth20_desktop.srf?code=M6b0ce71e-8961-1395-2435-f78db54f82ae&lc=1033 <br>" +
                 " <form><input type='text' name='codeUrl' size='50'>  <input type='submit' value='Submit'></form></li>";
-            html += "</ol>";
+            html += "</ol><br><br>";
+
+            if (OneDrive.IsLoggedIn())
+            {
+                html += "<p class='sectionHeader'>Log out of OneDrive:</p>";
+                html += "<form><button type='submit' name='logout'>Logout</button></form>";
+            }
 
             return GeneratePage("OneDrive Config", "OneDrive Config", html);
         }
@@ -148,6 +154,10 @@ namespace SecuritySystemUWP
                             }
                         }
                         break;
+                    }
+                    else if (entry.Name.Equals("logout"))
+                    {
+                        await OneDrive.Logout();
                     }
                 }
             }

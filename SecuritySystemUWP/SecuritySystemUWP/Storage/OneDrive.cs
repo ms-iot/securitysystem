@@ -21,6 +21,8 @@ namespace SecuritySystemUWP
         private static bool isLoggedIn = false;
         private static Mutex uploadPicturesMutexLock = new Mutex();
         private DispatcherTimer refreshTimer;
+
+        private static int numberUploaded = 0;
                 
 
         /*******************************************************************************************
@@ -33,6 +35,7 @@ namespace SecuritySystemUWP
             refreshTimer.Tick += refreshTimer_Tick;
             refreshTimer.Start();
         }
+
         public Type LoginType()
         {
             return typeof(OnedriveLoginPage);
@@ -57,8 +60,18 @@ namespace SecuritySystemUWP
                     foreach (StorageFile file in files)
                     {
                         string imageName = string.Format(AppSettings.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
-                        await uploadPictureToOnedrive(App.XmlSettings.FolderName, imageName, file);
-                        await file.DeleteAsync();
+                        try
+                        {
+                            await uploadPictureToOneDrive(App.XmlSettings.FolderName, imageName, file);
+                            numberUploaded++;
+
+                            // uploadPictureToOnedrive should throw an exception if it fails, so it's safe to delete
+                            await file.DeleteAsync();
+                        }
+                        catch(Exception e)
+                        {
+                            Debug.WriteLine(e.Message);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -93,12 +106,16 @@ namespace SecuritySystemUWP
         {
             CreateHttpClient(ref httpClient);
             await getTokens(accessCode, "code", "authorization_code");
-            AuthorizeWithAccessToken(App.XmlSettings.OneDriveAccessToken);
+            SetAuthorization("Bearer", App.XmlSettings.OneDriveAccessToken);
+            cts = new CancellationTokenSource();
+            isLoggedIn = true;
         }
 
-        public static void AuthorizeWithAccessToken(string accessToken)
+        public static async Task AuthorizeWithRefreshToken(string refreshToken)
         {
-            SetAuthorization("Bearer", accessToken);
+            CreateHttpClient(ref httpClient);
+            await getTokens(refreshToken, "refresh_token", "refresh_token");
+            SetAuthorization("Bearer", App.XmlSettings.OneDriveAccessToken);
             cts = new CancellationTokenSource();
             isLoggedIn = true;
         }
@@ -107,27 +124,40 @@ namespace SecuritySystemUWP
         {
             return isLoggedIn;
         }
+
+        public static async Task Logout()
+        {
+            string uri = string.Format(AppSettings.OneDriveLogoutUrl, App.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl);
+            await httpClient.GetAsync(new Uri(uri));
+            App.XmlSettings.OneDriveAccessToken = "";
+            App.XmlSettings.OneDriveRefreshToken = "";
+            isLoggedIn = false;
+            httpClient.Dispose();
+        }
+
+        public static int GetNumberOfUploadedPictures()
+        {
+            return numberUploaded;
+        }
+
         /*******************************************************************************************
         * PRIVATE METHODS
         ********************************************************************************************/
-        private async Task uploadPictureToOnedrive(string folderName, string imageName, StorageFile imageFile)
+        private async Task uploadPictureToOneDrive(string folderName, string imageName, StorageFile imageFile)
         {
-            try
+            if (isLoggedIn)
             {
-                if (isLoggedIn)
-                {
-                    String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
+                String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
 
-                    await SendFileAsync(
-                        uriString, 
-                        imageFile,
-                        Windows.Web.Http.HttpMethod.Put
-                        );
-                }
+                await SendFileAsync(
+                    uriString,
+                    imageFile,
+                    Windows.Web.Http.HttpMethod.Put
+                    );
             }
-            catch (Exception ex)
+            else
             {
-                Debug.WriteLine("Exception in uploading pictures to OneDrive: " + ex.Message);
+                throw new Exception("Not logged into OneDrive");
             }
         }
 
@@ -180,6 +210,7 @@ namespace SecuritySystemUWP
             }
             return null;
         }
+
         private async Task deletePicture(string folderName, string imageName)
         {
             try
@@ -204,6 +235,7 @@ namespace SecuritySystemUWP
                 Debug.WriteLine(ex.Message);
             }
         }
+
         private static async Task getTokens(string accessCodeOrRefreshToken, string requestType, string grantType)
         {
             
@@ -247,7 +279,6 @@ namespace SecuritySystemUWP
         */
         private static async Task reauthorize()
         {
-
             if (!isLoggedIn)
             {
                 return;
@@ -255,18 +286,7 @@ namespace SecuritySystemUWP
 
             await getTokens(App.XmlSettings.OneDriveRefreshToken, "refresh_token", "refresh_token");
         }
-
-        private static async Task logout()
-        {
-            string uri = string.Format(AppSettings.OneDriveLogoutUrl, App.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl);
-            await httpClient.GetAsync(new Uri(uri));
-            App.XmlSettings.OneDriveAccessToken = "";
-            App.XmlSettings.OneDriveRefreshToken = "";
-            isLoggedIn = false;
-            httpClient.Dispose();
-        }
-
-
+        
         private static void CreateHttpClient(ref HttpClient httpClient)
         {
             if (httpClient != null) httpClient.Dispose();
@@ -288,6 +308,7 @@ namespace SecuritySystemUWP
             Dictionary<string, string> properties = new Dictionary<string, string> { { "File Size", fileProperties.Size.ToString() } };
             App.TelemetryClient.TrackEvent("OneDrive picture upload attempt", properties);
             HttpStreamContent streamContent = null;
+
             try
             {
                 Stream stream = await sFile.OpenStreamForReadAsync();
@@ -296,16 +317,16 @@ namespace SecuritySystemUWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("SendFileAsync() - Cannot open file. Err= " + ex.Message);
-                Debug.WriteLine("  File Path = " + (sFile != null ? sFile.Path : "?"));
+                throw new Exception("SendFileAsync() - Cannot open file. Err= " + ex.Message);
             }
+
             if (streamContent == null)
             {
-                Debug.WriteLine("SendFileAsync() - Cannot open file.");
                 Debug.WriteLine("  File Path = " + (sFile != null ? sFile.Path : "?"));
                 streamContent.Dispose();
-                return;
+                throw new Exception("SendFileAsync() - Cannot open file.");
             }
+
             try
             {
                 Uri resourceAddress = new Uri(url);
@@ -322,17 +343,18 @@ namespace SecuritySystemUWP
             }
             catch (TaskCanceledException ex)
             {
-                Debug.WriteLine("SendFileAsync() - Request canceled: " + ex.Message);
+                throw ex;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("SendFileAsync() - Error: " + ex.Message);
+                throw new Exception("SendFileAsync() - Error: " + ex.Message);                
             }
             finally
             {
                 streamContent.Dispose();
                 Debug.WriteLine("SendFileAsync() - final.");
             }
+
             App.TelemetryClient.TrackEvent("OneDrive picture upload success", properties);
         }
 
