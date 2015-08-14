@@ -37,8 +37,6 @@ namespace SecuritySystemUWP
         // Keeps track of which subfolder level we're on relative to the root folder
         int folderLevel = 0;
 
-        Stopwatch stopwatch = Stopwatch.StartNew();
-
         Mutex listViewMutex = new Mutex();
         Mutex galleryMutex = new Mutex();
 
@@ -458,9 +456,6 @@ namespace SecuritySystemUWP
 
         private void homeButton_Click(object sender, RoutedEventArgs e)
         {
-            // Track completion of the Gallery page view:
-            stopwatch.Stop();
-
             // Set up some properties:
             var properties = new Dictionary<string, string>
             { {"signalSource", "Gallery Page"}};
