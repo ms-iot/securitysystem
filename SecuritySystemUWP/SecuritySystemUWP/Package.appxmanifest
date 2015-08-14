@@ -44,6 +44,8 @@
           <uap:FileTypeAssociation Name="full">
             <uap:SupportedFileTypes>
               <uap:FileType>.xml</uap:FileType>
+              <uap:FileType>.jpg</uap:FileType>
+              <uap:FileType>.png</uap:FileType>
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
         </uap:Extension>
