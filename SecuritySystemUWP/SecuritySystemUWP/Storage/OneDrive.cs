@@ -23,7 +23,7 @@ namespace SecuritySystemUWP
         private DispatcherTimer refreshTimer;
 
         private static int numberUploaded = 0;
-                
+
 
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -36,7 +36,7 @@ namespace SecuritySystemUWP
             refreshTimer.Start();
         }
 
-        public Type LoginType()
+        public Type StorageStartPage()
         {
             return typeof(OnedriveLoginPage);
         }
@@ -68,7 +68,7 @@ namespace SecuritySystemUWP
                             // uploadPictureToOnedrive should throw an exception if it fails, so it's safe to delete
                             await file.DeleteAsync();
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             Debug.WriteLine(e.Message);
                         }
@@ -93,7 +93,7 @@ namespace SecuritySystemUWP
                 List<string> pictures = await listPictures(folder);
                 foreach (string picture in pictures)
                 {
-                   await deletePicture(folder, picture);
+                    await deletePicture(folder, picture);
                 }
             }
             catch (Exception ex)
@@ -217,7 +217,7 @@ namespace SecuritySystemUWP
             {
                 if (isLoggedIn)
                 {
-                    String uriString = string.Format("{0}/Pictures/{1}/{2}",AppSettings.OneDriveRootUrl, folderName, imageName);
+                    String uriString = string.Format("{0}/Pictures/{1}/{2}", AppSettings.OneDriveRootUrl, folderName, imageName);
 
                     Uri uri = new Uri(uriString);
                     using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri))
@@ -238,7 +238,7 @@ namespace SecuritySystemUWP
 
         private static async Task getTokens(string accessCodeOrRefreshToken, string requestType, string grantType)
         {
-            
+
             string uri = AppSettings.OneDriveTokenUrl;
             string content = string.Format(AppSettings.OneDriveTokenContent, App.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl, App.XmlSettings.OneDriveClientSecret, requestType, accessCodeOrRefreshToken, grantType);
             using (HttpClient client = new HttpClient())
@@ -286,7 +286,7 @@ namespace SecuritySystemUWP
 
             await getTokens(App.XmlSettings.OneDriveRefreshToken, "refresh_token", "refresh_token");
         }
-        
+
         private static void CreateHttpClient(ref HttpClient httpClient)
         {
             if (httpClient != null) httpClient.Dispose();
@@ -347,7 +347,7 @@ namespace SecuritySystemUWP
             }
             catch (Exception ex)
             {
-                throw new Exception("SendFileAsync() - Error: " + ex.Message);                
+                throw new Exception("SendFileAsync() - Error: " + ex.Message);
             }
             finally
             {

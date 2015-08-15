@@ -20,6 +20,7 @@ namespace SecuritySystemUWP
             {
                 case StorageProvider.Azure: return new Azure();
                 case StorageProvider.OneDrive: return new OneDrive();
+                case StorageProvider.Local: return new LocalStorage();
                 default: throw new ArgumentNullException("Set StorageProvider in config");
             }
         }

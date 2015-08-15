@@ -17,8 +17,8 @@ namespace SecuritySystemUWP
 
     public enum CameraType
     {
-        DLink,
-        WebCam
+        Ip,
+        Usb
     }
 
     public class AppSettings
@@ -31,8 +31,8 @@ namespace SecuritySystemUWP
         [Description("Number of cameras - I don't really know what this is for")]
         public int NumberOfCameras = 1;
 
-        [Description("Type of camera you're using (e.g. dlink, webcam)")]
-        public CameraType CameraType = CameraType.DLink;
+        [Description("Type of camera you're using (e.g. IP, USB)")]
+        public CameraType CameraType = CameraType.Ip;
 
         [Description("This is the storage provider that you will use to store your photos")]
         public StorageProvider StorageProvider = StorageProvider.OneDrive;
@@ -54,6 +54,7 @@ namespace SecuritySystemUWP
 
         [Description("Name of the folder that contains the images in the Pictures Library")]
         public string FolderName = "imagecontainer";
+        public int GpioMotionPin = 4;
 
         // Obtained from OneDrive Login
         public string OneDriveAccessToken;

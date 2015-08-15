@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -15,39 +18,34 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private DispatcherTimer uploadPicturesTimer;
-        private DispatcherTimer deletePicturesTimer;
+        private static IStorage storage;
+        private static ICamera camera;
+        private string[] cameras = { "Cam1" };
+        private static DispatcherTimer uploadPicturesTimer;
+        private static DispatcherTimer deletePicturesTimer;
+        private const int uploadInterval = 10; //Value in seconds
+        private const int deleteInterval = 1; //Value in hours
 
         private static bool started = false;
 
-        private string[] cameras;
-
         public MainPage()
         {
-            this.InitializeComponent();             
+            this.InitializeComponent();
         }
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        private async Task Initialize()
         {
-            App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
-            WebServer.Start(8000);
 
-            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.XmlSettings.MicrosoftAlias } };
-            App.TelemetryClient.TrackTrace("Start Info", properties);
-            cameras = new string[App.XmlSettings.NumberOfCameras]; 
+            camera = CameraFactory.Get(App.XmlSettings.CameraType);
+            storage = StorageFactory.Get(App.XmlSettings.StorageProvider);
 
-            Initialize();
-        }
-
-        private async void Initialize()
-        {
-            App.Storage = StorageFactory.Get(App.XmlSettings.StorageProvider);
+            await camera.Initialize();
 
             // Try to login using existing Access Token in settings file
-            if(App.Storage.GetType() == typeof(OneDrive))
+            if (App.Storage.GetType() == typeof(OneDrive))
             {
                 var oneDriveStorage = ((OneDrive)App.Storage);
-                if(!OneDrive.IsLoggedIn())
+                if (!OneDrive.IsLoggedIn())
                 {
                     await OneDrive.AuthorizeWithRefreshToken(App.XmlSettings.OneDriveRefreshToken);
                 }
@@ -55,46 +53,46 @@ namespace SecuritySystemUWP
 
             //Timer controlling camera pictures with motion
             uploadPicturesTimer = new DispatcherTimer();
-            uploadPicturesTimer.Interval = TimeSpan.FromSeconds(10);
+            uploadPicturesTimer.Interval = TimeSpan.FromSeconds(uploadInterval);
             uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
             uploadPicturesTimer.Start();
 
             //Timer controlling deletion of old pictures
             deletePicturesTimer = new DispatcherTimer();
-            deletePicturesTimer.Interval = TimeSpan.FromHours(1);
+            deletePicturesTimer.Interval = TimeSpan.FromHours(deleteInterval);
             deletePicturesTimer.Tick += deletePicturesTimer_Tick;
             deletePicturesTimer.Start();
-
-            for (int i = 0; i < App.XmlSettings.NumberOfCameras; i++)
-            {
-                cameras[i] = "Cam" + (i + 1);
-            }
-
         }
 
-        private void RunningToggle_Click(object sender, RoutedEventArgs e)
+        private void Dispose()
+        {
+            uploadPicturesTimer.Stop();
+            deletePicturesTimer.Stop();
+            camera.Dispose();
+        }
+
+        private async void RunningToggle_Click(object sender, RoutedEventArgs e)
         {
             if (!started)
             {
-                uploadPicturesTimer.Start();
-                deletePicturesTimer.Start();
+                await Initialize();
                 started = true;
-                this.Frame.Navigate(App.Storage.LoginType());
+                App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
+                this.Frame.Navigate(storage.StorageStartPage());
             }
             else
             {
-                uploadPicturesTimer.Stop();
-                deletePicturesTimer.Stop();
+                Dispose();
                 started = false;
                 this.Frame.Navigate(typeof(MainPage));
             }
         }
 
-        private async void Start_Click(object sender, RoutedEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            RunningToggle.Content = started ? "Stop" : "Start";  
+            RunningToggle.Content = started ? "Stop" : "Start";
             App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
-            this.Frame.Navigate(App.Storage.LoginType());
+            this.Frame.Navigate(App.Storage.StorageStartPage());
         }
 
         private void uploadPicturesTimer_Tick(object sender, object e)
