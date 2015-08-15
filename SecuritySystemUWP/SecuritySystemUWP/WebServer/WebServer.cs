@@ -173,10 +173,5 @@ namespace SecuritySystemUWP
                 Debug.WriteLine(e.StackTrace);
             }
         }
-
-        private string GeneratePage(string v1, string v2, object p)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
