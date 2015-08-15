@@ -58,6 +58,12 @@ namespace SecuritySystemUWP
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
+            WebServer.Start(8000);
+
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.XmlSettings.MicrosoftAlias } };
+            App.TelemetryClient.TrackTrace("Start Info", properties);
+
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {

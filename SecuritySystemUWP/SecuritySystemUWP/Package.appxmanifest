@@ -23,12 +23,6 @@
           <uap:FileTypeAssociation Name="full">
             <uap:SupportedFileTypes>
               <uap:FileType>.xml</uap:FileType>
-            </uap:SupportedFileTypes>
-          </uap:FileTypeAssociation>
-        </uap:Extension>
-        <uap:Extension Category="windows.fileTypeAssociation">
-          <uap:FileTypeAssociation Name="pictures">
-            <uap:SupportedFileTypes>
               <uap:FileType>.jpg</uap:FileType>
               <uap:FileType>.png</uap:FileType>
             </uap:SupportedFileTypes>
@@ -39,8 +33,10 @@
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
-    <uap:Capability Name="picturesLibrary"/>
+    <uap:Capability Name="picturesLibrary" />
     <uap:Capability Name="documentsLibrary"/>
     <Capability Name="internetClientServer" />
+    <DeviceCapability Name="microphone" />
+    <DeviceCapability Name="webcam" />    
   </Capabilities>
 </Package>
