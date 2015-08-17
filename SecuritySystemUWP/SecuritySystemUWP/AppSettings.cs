@@ -44,10 +44,10 @@ namespace SecuritySystemUWP
         public string AzureAccessKey = "****";
 
         [Description("OneDrive Client ID - Only required if you selected OneDrive as the Storage Provider")]
-        public string OneDriveClientId = "000000004014CD78";
+        public string OneDriveClientId = "";
 
         [Description("OneDrive Secret - Only required if you selected OneDrive as the Storage Provider")]
-        public string OneDriveClientSecret = "9AjwMwmv0CeTYvJa21w1s-ra9wyizfUz";
+        public string OneDriveClientSecret = "";
 
         [Description("Number of days to store your pictures before they are deleted")]
         public int StorageDuration = 7;
