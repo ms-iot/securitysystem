@@ -14,7 +14,7 @@ using Windows.UI.Xaml.Navigation;
 namespace SecuritySystemUWP
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// Main page of the app
     /// </summary>
     public sealed partial class MainPage : Page
     {
