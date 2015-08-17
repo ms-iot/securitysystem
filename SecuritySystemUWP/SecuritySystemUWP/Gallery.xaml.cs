@@ -37,20 +37,12 @@ namespace SecuritySystemUWP
         // Keeps track of which subfolder level we're on relative to the root folder
         int folderLevel = 0;
 
-        private Boolean buttonEnabled;
-        public Boolean ButtonEnabled 
-        {
-            get { return buttonEnabled; }
-            set
-            {
-                buttonEnabled = value;
-            }
-        }
+        public Boolean buttonEnabled { get; private set; }
 
         public Gallery()
         {
             this.InitializeComponent();
-            ButtonEnabled = true;
+            buttonEnabled = true;
             fullImage.PointerReleased += FullImage_PointerReleased;
 
             previousButton.Click += PreviousButton_Click;
@@ -103,9 +95,9 @@ namespace SecuritySystemUWP
                     imageFolder = folder;
 
                     // Display the pictures in the new folder
-                    ButtonEnabled = false;
+                    buttonEnabled = false;
                     displayPictures(imageFolder);
-                    ButtonEnabled = true;
+                    buttonEnabled = true;
                 }
             }
             catch (Exception ex)
@@ -185,9 +177,9 @@ namespace SecuritySystemUWP
         {
             imageFolder = KnownFolders.PicturesLibrary;
             imageFolder = await imageFolder.GetFolderAsync("securitysystem-cameradrop");
-            ButtonEnabled = false;
+            buttonEnabled = false;
             displayPictures(imageFolder);
-            ButtonEnabled = true;
+            buttonEnabled = true;
         }
 
         // Displays the pictures of the folder in the gallery
@@ -409,26 +401,26 @@ namespace SecuritySystemUWP
         private void previousPageButton_Click(object sender, RoutedEventArgs e)
         {
             currentPage = (currentPage + (uint)totalPages - 1) % (uint)totalPages;
-            ButtonEnabled = false;
+            buttonEnabled = false;
             generateGallery(currentPage);
-            ButtonEnabled = true;
+            buttonEnabled = true;
         }
 
         // Go to next page in gallery
         private void nextPageButton_Click(object sender, RoutedEventArgs e)
         {
             currentPage = (currentPage + (uint)totalPages + 1) % (uint)totalPages;
-            ButtonEnabled = false;
+            buttonEnabled = false;
             generateGallery(currentPage);
-            ButtonEnabled = true;
+            buttonEnabled = true;
         }
 
         private void refreshButton_Click(object sender, RoutedEventArgs e)
         {
             // Refresh the images in the gallery
-            ButtonEnabled = false;
+            buttonEnabled = false;
             displayPictures(imageFolder);
-            ButtonEnabled = true;
+            buttonEnabled = true;
         }
 
         private void homeButton_Click(object sender, RoutedEventArgs e)

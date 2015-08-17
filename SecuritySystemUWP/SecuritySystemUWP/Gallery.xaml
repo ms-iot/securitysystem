@@ -34,22 +34,22 @@
                     </AppBarButton>
                 </StackPanel>
                 <StackPanel x:Name="galleryBarPanel" Orientation="Horizontal">
-                    <AppBarButton x:Name="homeButton" Label="Go Home" Click="homeButton_Click" IsEnabled="{Binding ButtonEnabled}" >
+                    <AppBarButton x:Name="homeButton" Label="Go Home" Click="homeButton_Click" IsEnabled="{Binding buttonEnabled}" >
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE10F;" FontFamily="Segoe UI Symbol"/>
                         </AppBarButton.Icon>
                     </AppBarButton>
-                    <AppBarButton x:Name="previousPageButton" Label="Previous Page" Click="previousPageButton_Click" IsEnabled="{Binding ButtonEnabled}" >
+                    <AppBarButton x:Name="previousPageButton" Label="Previous Page" Click="previousPageButton_Click" IsEnabled="{Binding buttonEnabled}" >
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE0BA;" FontFamily="Segoe UI Symbol" FontSize="15"/>
                         </AppBarButton.Icon>
                     </AppBarButton>
-                    <AppBarButton x:Name="nextPageButton" Label="Next Page" Click="nextPageButton_Click" IsEnabled="{Binding ButtonEnabled}" >
+                    <AppBarButton x:Name="nextPageButton" Label="Next Page" Click="nextPageButton_Click" IsEnabled="{Binding buttonEnabled}" >
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE0AC;" FontFamily="Segoe UI Symbol" FontSize="15"/>
                         </AppBarButton.Icon>
                     </AppBarButton>
-                    <AppBarButton x:Name="refreshButton" Label="Refresh" Click="refreshButton_Click" IsEnabled="{Binding ButtonEnabled}" >
+                    <AppBarButton x:Name="refreshButton" Label="Refresh" Click="refreshButton_Click" IsEnabled="{Binding buttonEnabled}" >
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE117;" FontFamily="Segoe UI Symbol" FontSize="15"/>
                         </AppBarButton.Icon>
