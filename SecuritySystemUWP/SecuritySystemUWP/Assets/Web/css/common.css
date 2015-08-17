@@ -562,3 +562,37 @@ div .slick-headerrow .slick-headerrow-columns {
 .subText {
     font-size:smaller;
 }
+
+div.img {
+    margin: 5px;
+    padding: 2px;
+    border: 1px solid #018bcb;
+    height: 200px;
+    width: 200px;
+    float: left;
+    text-align: center;
+    background-color: #018bcb;
+}
+
+div.img img {
+    display: inline;
+    margin: 2px;
+    border:1px solid #018bcb;
+}
+
+div.img a {
+    color: white;
+    text-decoration: none;
+}
+
+div.img a:hover img {
+    border:1px solid #ffffff;
+}
+
+div.desc {
+    text-align: center;
+    font-weight: normal;
+    font-size: small;
+    width: auto;
+    margin: 2px;
+}

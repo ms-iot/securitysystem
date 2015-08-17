@@ -319,7 +319,7 @@ namespace SecuritySystemUWP
             catch (Exception err)
             {
                 // Log telemetry event about this exception
-                App.TelemetryClient.TrackException(err);
+                App.Controller.TelemetryClient.TrackException(err);
 
                 // Print exception if there is one
                 stackPanel.Children.Clear();

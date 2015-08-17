@@ -34,7 +34,7 @@ namespace SecuritySystemUWP
 
                 foreach (StorageFile file in files)
                 {
-                    long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(App.XmlSettings.StorageDuration).Ticks;
+                    long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration).Ticks;
                     string picName = file.DisplayName.Split('_')[5];
                     if (picName.CompareTo(oldestTime.ToString()) < 0)
                     {

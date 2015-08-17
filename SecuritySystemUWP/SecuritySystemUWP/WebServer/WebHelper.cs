@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Networking.Sockets;
 using Windows.Storage;
+using Windows.Storage.Search;
 using Windows.Storage.Streams;
 
 namespace SecuritySystemUWP
@@ -17,6 +18,13 @@ namespace SecuritySystemUWP
     public class WebHelper
     {
         private string htmlTemplate;
+        private Dictionary<string, string> links = new Dictionary<string, string>
+            {
+                {"Home", "/" + NavConstants.HOME_PAGE },
+                {"Settings", "/" + NavConstants.SETTINGS_PAGE },
+                {"OneDrive", "/" + NavConstants.ONEDRIVE_PAGE },
+                {"Gallery", "/" + NavConstants.GALLERY_PAGE },
+            };
 
         public async Task InitializeAsync()
         {
@@ -42,19 +50,19 @@ namespace SecuritySystemUWP
                     html += "</td><td>";
                     if (info.FieldType == typeof(string))
                     {
-                        html += "<input type='text' name='" + info.Name + "' value='" + info.GetValue(App.XmlSettings) + "' size='50'>";
+                        html += "<input type='text' name='" + info.Name + "' value='" + info.GetValue(App.Controller.XmlSettings) + "' size='50'>";
                     }
                     else if (info.FieldType == typeof(int))
                     {
-                        html += "<input type='number' name='" + info.Name + "' value='" + info.GetValue(App.XmlSettings) + "' size='50'>";
+                        html += "<input type='number' name='" + info.Name + "' value='" + info.GetValue(App.Controller.XmlSettings) + "' size='50'>";
                     }
                     else if (info.FieldType == typeof(CameraType) || info.FieldType == typeof(StorageProvider))
                     {
                         html += "<select name='" + info.Name + "'>";
-                        foreach(string type in Enum.GetNames(info.FieldType))
+                        foreach (string type in Enum.GetNames(info.FieldType))
                         {
                             html += "<option value='" + type + "' " +
-                                (info.GetValue(App.XmlSettings).Equals(Enum.Parse(info.FieldType, type)) ? "selected='selected'" : "")
+                                (info.GetValue(App.Controller.XmlSettings).Equals(Enum.Parse(info.FieldType, type)) ? "selected='selected'" : "")
                                 + ">" + type + "</option>";
                         }
                         html += "</select>";
@@ -77,14 +85,8 @@ namespace SecuritySystemUWP
 
         private string createNavBar()
         {
-            Dictionary<string, string> links = new Dictionary<string, string>
-            {
-                {"Config", "/" },
-                {"OneDrive", "/OneDrive.htm" },
-            };
-
             string html = "<p>Navigation</p><ul>";
-            foreach(string key in links.Keys)
+            foreach (string key in links.Keys)
             {
                 html += "<li><a href='" + links[key] + "'>" + key + "</a></li>";
             }
@@ -96,12 +98,12 @@ namespace SecuritySystemUWP
         {
             string html = "";
             html += "OneDrive Status:  " + (OneDrive.IsLoggedIn() ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br><br>";
-            string uri = string.Format(AppSettings.OneDriveLoginUrl, App.XmlSettings.OneDriveClientId, AppSettings.OneDriveScope, AppSettings.OneDriveRedirectUrl);
+            string uri = string.Format(AppSettings.OneDriveLoginUrl, App.Controller.XmlSettings.OneDriveClientId, AppSettings.OneDriveScope, AppSettings.OneDriveRedirectUrl);
             html += "<p class='sectionHeader'>Log into OneDrive:</p>";
             html += "<ol>";
-            html += "<li>Click on this link:  <a href='" + uri + "' target='_blank'>OneDrive Login</a><br>"+
+            html += "<li>Click on this link:  <a href='" + uri + "' target='_blank'>OneDrive Login</a><br>" +
                 "A new window will open.  Log into OneDrive.<br><br></li>";
-            html += "<li>After you're done, you should arrive at a blank page.<br>" + 
+            html += "<li>After you're done, you should arrive at a blank page.<br>" +
                 "Copy the URL, paste it into this box, and click Submit.<br>" +
                 "The URL will look something like this: https://login.live.com/oauth20_desktop.srf?code=M6b0ce71e-8961-1395-2435-f78db54f82ae&lc=1033 <br>" +
                 " <form><input type='text' name='codeUrl' size='50'>  <input type='submit' value='Submit'></form></li>";
@@ -115,7 +117,50 @@ namespace SecuritySystemUWP
 
             return GeneratePage("OneDrive Config", "OneDrive Config", html);
         }
-        
+
+        public string GenerateStatusPage()
+        {
+            string html = "";
+
+            html += "<b>Camera Type:</b> " + App.Controller.Camera.GetType().Name + "<br>";
+            html += "<b>Storage Type:</b> " + App.Controller.Storage.GetType().Name + "<br>";
+            html += "<br>";
+            html += "<input type='button' onclick='location.href=\"/api/reloadapp\"' value='Reload App'/>";
+
+            return GeneratePage("Security System", "Home", html);
+        }
+
+        public async Task<string> GenerateGallery(StorageFolder folder)
+        {
+            int maxNameLength = 25;
+
+            string html = "";
+
+            // Get the files in current folder and subfolders
+            var queryOptions = new QueryOptions();
+            queryOptions.FolderDepth = FolderDepth.Deep;
+
+            var results = folder.CreateFileQueryWithOptions(queryOptions);
+
+            // Only get the number of files that we need, since getting the entire folder would be slow
+            var files = await results.GetFilesAsync();
+
+            // Sort the list files by date
+            IEnumerable<StorageFile> sortedFiles = files.OrderByDescending((x) => x.DateCreated);
+
+            foreach(StorageFile file in sortedFiles)
+            {
+                html += "<div class='img'>";
+                html += "<a target='_blank' href='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "'>";
+                html += "<img src='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "' alt='" + file.Name + "' width='190'>";
+                html += "<div class='desc'>" + file.Name + "</div>";
+                html += "</a>";
+                html += "</div>";
+            }
+
+            return html;
+        }
+
         public string GeneratePage(string title, string titleBar, string content, string message)
         {
             string html = htmlTemplate;
@@ -177,16 +222,16 @@ namespace SecuritySystemUWP
                     var field = typeof(AppSettings).GetField(entry.Name);
                     if (field.FieldType == typeof(int))
                     {
-                        field.SetValue(App.XmlSettings, Convert.ToInt32(entry.Value));
+                        field.SetValue(App.Controller.XmlSettings, Convert.ToInt32(entry.Value));
                     }
                     else if(field.FieldType == typeof(CameraType) ||
                         field.FieldType == typeof(StorageProvider))
                     {
-                        field.SetValue(App.XmlSettings, Enum.Parse(field.FieldType, entry.Value));
+                        field.SetValue(App.Controller.XmlSettings, Enum.Parse(field.FieldType, entry.Value));
                     }
                     else
                     {
-                        field.SetValue(App.XmlSettings, entry.Value);
+                        field.SetValue(App.Controller.XmlSettings, entry.Value);
                     }
                 }
                 catch (Exception e)
@@ -210,6 +255,42 @@ namespace SecuritySystemUWP
                 byte[] headerArray = Encoding.UTF8.GetBytes(header);
                 await resp.WriteAsync(headerArray, 0, headerArray.Length);
                 await stream.CopyToAsync(resp);
+                await resp.FlushAsync();
+            }
+        }
+
+        public static async Task WriteFileToStream(StorageFile file, IOutputStream os)
+        {
+            using (Stream resp = os.AsStreamForWrite())
+            {
+                bool exists = true;
+                try
+                {
+                    using (Stream fs = await file.OpenStreamForReadAsync())
+                    {
+                        string header = String.Format("HTTP/1.1 200 OK\r\n" +
+                                        "Content-Length: {0}\r\n" +
+                                        "Connection: close\r\n\r\n",
+                                        fs.Length);
+                        byte[] headerArray = Encoding.UTF8.GetBytes(header);
+                        await resp.WriteAsync(headerArray, 0, headerArray.Length);
+                        await fs.CopyToAsync(resp);
+                    }
+                }
+                catch (FileNotFoundException)
+                {
+                    exists = false;
+                }
+
+                if (!exists)
+                {
+                    byte[] headerArray = Encoding.UTF8.GetBytes(
+                                          "HTTP/1.1 404 Not Found\r\n" +
+                                          "Content-Length:0\r\n" +
+                                          "Connection: close\r\n\r\n");
+                    await resp.WriteAsync(headerArray, 0, headerArray.Length);
+                }
+
                 await resp.FlushAsync();
             }
         }

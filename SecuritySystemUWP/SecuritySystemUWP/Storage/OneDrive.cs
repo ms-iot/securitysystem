@@ -53,7 +53,7 @@ namespace SecuritySystemUWP
                     querySubfolders.FolderDepth = FolderDepth.Deep;
 
                     StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
-                    cacheFolder = await cacheFolder.GetFolderAsync(App.XmlSettings.FolderName);
+                    cacheFolder = await cacheFolder.GetFolderAsync(App.Controller.XmlSettings.FolderName);
                     var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
                     var files = await result.GetFilesAsync();
 
@@ -62,7 +62,7 @@ namespace SecuritySystemUWP
                         string imageName = string.Format(AppSettings.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
                         try
                         {
-                            await uploadPictureToOneDrive(App.XmlSettings.FolderName, imageName, file);
+                            await uploadPictureToOneDrive(App.Controller.XmlSettings.FolderName, imageName, file);
                             numberUploaded++;
 
                             // uploadPictureToOnedrive should throw an exception if it fails, so it's safe to delete
@@ -89,7 +89,7 @@ namespace SecuritySystemUWP
         {
             try
             {
-                string folder = string.Format("{0}/{1}/{2}", App.XmlSettings.FolderName, camera, DateTime.Now.Subtract(TimeSpan.FromDays(App.XmlSettings.StorageDuration)).ToString("MM_dd_yyyy"));
+                string folder = string.Format("{0}/{1}/{2}", App.Controller.XmlSettings.FolderName, camera, DateTime.Now.Subtract(TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration)).ToString("MM_dd_yyyy"));
                 List<string> pictures = await listPictures(folder);
                 foreach (string picture in pictures)
                 {
@@ -106,7 +106,7 @@ namespace SecuritySystemUWP
         {
             CreateHttpClient(ref httpClient);
             await getTokens(accessCode, "code", "authorization_code");
-            SetAuthorization("Bearer", App.XmlSettings.OneDriveAccessToken);
+            SetAuthorization("Bearer", App.Controller.XmlSettings.OneDriveAccessToken);
             cts = new CancellationTokenSource();
             isLoggedIn = true;
         }
@@ -115,7 +115,7 @@ namespace SecuritySystemUWP
         {
             CreateHttpClient(ref httpClient);
             await getTokens(refreshToken, "refresh_token", "refresh_token");
-            SetAuthorization("Bearer", App.XmlSettings.OneDriveAccessToken);
+            SetAuthorization("Bearer", App.Controller.XmlSettings.OneDriveAccessToken);
             cts = new CancellationTokenSource();
             isLoggedIn = true;
         }
@@ -127,10 +127,10 @@ namespace SecuritySystemUWP
 
         public static async Task Logout()
         {
-            string uri = string.Format(AppSettings.OneDriveLogoutUrl, App.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl);
+            string uri = string.Format(AppSettings.OneDriveLogoutUrl, App.Controller.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl);
             await httpClient.GetAsync(new Uri(uri));
-            App.XmlSettings.OneDriveAccessToken = "";
-            App.XmlSettings.OneDriveRefreshToken = "";
+            App.Controller.XmlSettings.OneDriveAccessToken = "";
+            App.Controller.XmlSettings.OneDriveRefreshToken = "";
             isLoggedIn = false;
             httpClient.Dispose();
         }
@@ -240,7 +240,7 @@ namespace SecuritySystemUWP
         {
 
             string uri = AppSettings.OneDriveTokenUrl;
-            string content = string.Format(AppSettings.OneDriveTokenContent, App.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl, App.XmlSettings.OneDriveClientSecret, requestType, accessCodeOrRefreshToken, grantType);
+            string content = string.Format(AppSettings.OneDriveTokenContent, App.Controller.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl, App.Controller.XmlSettings.OneDriveClientSecret, requestType, accessCodeOrRefreshToken, grantType);
             using (HttpClient client = new HttpClient())
             using (HttpRequestMessage reqMessage = new HttpRequestMessage(HttpMethod.Post, new Uri(uri)))
             {
@@ -251,8 +251,8 @@ namespace SecuritySystemUWP
                     responseMessage.EnsureSuccessStatusCode();
 
                     string responseContentString = await responseMessage.Content.ReadAsStringAsync();
-                    App.XmlSettings.OneDriveAccessToken = getAccessToken(responseContentString);
-                    App.XmlSettings.OneDriveRefreshToken = getRefreshToken(responseContentString);
+                    App.Controller.XmlSettings.OneDriveAccessToken = getAccessToken(responseContentString);
+                    App.Controller.XmlSettings.OneDriveRefreshToken = getRefreshToken(responseContentString);
                 }
             }
         }
@@ -284,7 +284,7 @@ namespace SecuritySystemUWP
                 return;
             }
 
-            await getTokens(App.XmlSettings.OneDriveRefreshToken, "refresh_token", "refresh_token");
+            await getTokens(App.Controller.XmlSettings.OneDriveRefreshToken, "refresh_token", "refresh_token");
         }
 
         private static void CreateHttpClient(ref HttpClient httpClient)
@@ -306,7 +306,7 @@ namespace SecuritySystemUWP
         {
             Windows.Storage.FileProperties.BasicProperties fileProperties = await sFile.GetBasicPropertiesAsync();
             Dictionary<string, string> properties = new Dictionary<string, string> { { "File Size", fileProperties.Size.ToString() } };
-            App.TelemetryClient.TrackEvent("OneDrive picture upload attempt", properties);
+            App.Controller.TelemetryClient.TrackEvent("OneDrive picture upload attempt", properties);
             HttpStreamContent streamContent = null;
 
             try
@@ -355,7 +355,7 @@ namespace SecuritySystemUWP
                 Debug.WriteLine("SendFileAsync() - final.");
             }
 
-            App.TelemetryClient.TrackEvent("OneDrive picture upload success", properties);
+            App.Controller.TelemetryClient.TrackEvent("OneDrive picture upload success", properties);
         }
 
         internal static async Task DebugTextResultAsync(HttpResponseMessage response)

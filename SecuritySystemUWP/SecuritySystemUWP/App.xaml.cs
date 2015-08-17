@@ -24,36 +24,18 @@ namespace SecuritySystemUWP
     /// </summary>
     sealed partial class App : Application
     {
-        /// <summary>
-        /// Allows tracking page views, exceptions and other telemetry through the Microsoft Application Insights service.
-        /// </summary>
-        public static Microsoft.ApplicationInsights.TelemetryClient TelemetryClient;
-
-        /// <summary>
-        /// Configuration settings for app
-        /// </summary>
-        public static AppSettings XmlSettings;
+        public static AppController Controller;
         
-        /// <summary>
-        /// Storage type
-        /// </summary>
-        public static IStorage Storage;
-
-        /// <summary>
-        /// Camera type
-        /// </summary>
-        public static ICamera Camera;
-
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
         public App()
         {
-            TelemetryClient = new Microsoft.ApplicationInsights.TelemetryClient();
-
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            Controller = new AppController();
         }
 
         /// <summary>
@@ -63,11 +45,10 @@ namespace SecuritySystemUWP
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            App.XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
-            WebServer.Start(8000);
+            await Controller.Initialize();
 
-            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.XmlSettings.MicrosoftAlias } };
-            App.TelemetryClient.TrackTrace("Start Info", properties);
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.Controller.XmlSettings.MicrosoftAlias } };
+            App.Controller.TelemetryClient.TrackTrace("Start Info", properties);
 
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)

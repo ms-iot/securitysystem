@@ -8,13 +8,5 @@
     mc:Ignorable="d" RequestedTheme="Dark">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid.ChildrenTransitions>
-            <TransitionCollection>
-                <EntranceThemeTransition/>
-            </TransitionCollection>
-        </Grid.ChildrenTransitions>
-
-        <TextBlock x:Name="titleTextBlock" TextWrapping="Wrap" Text="Security System" FontSize="72" FontWeight="Thin" HorizontalAlignment="Center"/>
-        <Button Name="RunningToggle" FontWeight="Light" Content="Start" FontSize="29.333" Click="RunningToggle_Click" Height="52"  Width="175" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </Page>

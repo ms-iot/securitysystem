@@ -28,14 +28,14 @@ namespace SecuritySystemUWP
         [Description("The Microsoft alias of the user")]
         public string MicrosoftAlias = "";
 
-        [Description("Number of cameras - I don't really know what this is for")]
+        // Future add-on, should remain unchanged for now.
         public int NumberOfCameras = 1;
 
         [Description("Type of camera you're using (e.g. IP, USB)")]
-        public CameraType CameraType = CameraType.Ip;
+        public CameraType CameraType = CameraType.Usb;
 
         [Description("This is the storage provider that you will use to store your photos")]
-        public StorageProvider StorageProvider = StorageProvider.OneDrive;
+        public StorageProvider StorageProvider = StorageProvider.Local;
 
         [Description("Azure Account Name - Only required if you selected Azure as the Storage Provider")]
         public string AzureAccountName = "SecuritySystemPictures";
@@ -54,6 +54,8 @@ namespace SecuritySystemUWP
 
         [Description("Name of the folder that contains the images in the Pictures Library")]
         public string FolderName = "imagecontainer";
+
+        [Description("GPIO input pin for the motion sensor signal - Only required if you are using a motion sensor")]
         public int GpioMotionPin = 4;
 
         // Obtained from OneDrive Login
@@ -118,17 +120,9 @@ namespace SecuritySystemUWP
     {
         public DescriptionAttribute(string description)
         {
-            this.description = description;
+            Description = description;
         }
 
-        public string Description
-        {
-            get
-            {
-                return description;
-            }
-        }
-
-        private string description;
+        public string Description { get; private set; }
     }
 }

@@ -20,10 +20,10 @@ namespace SecuritySystemUWP
         
         public Azure()
         {
-            string connectionSettings = string.Format(AppSettings.AzureConnectionSettings, App.XmlSettings.AzureAccountName, App.XmlSettings.AzureAccessKey);
+            string connectionSettings = string.Format(AppSettings.AzureConnectionSettings, App.Controller.XmlSettings.AzureAccountName, App.Controller.XmlSettings.AzureAccessKey);
             storageAccount = CloudStorageAccount.Parse(connectionSettings);
             blobClient = storageAccount.CreateCloudBlobClient();
-            blobContainer = blobClient.GetContainerReference(App.XmlSettings.FolderName);
+            blobContainer = blobClient.GetContainerReference(App.Controller.XmlSettings.FolderName);
         }
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -72,14 +72,14 @@ namespace SecuritySystemUWP
         {
             try
             {
-                List<string> pictures = await listPictures(App.XmlSettings.FolderName);
+                List<string> pictures = await listPictures(App.Controller.XmlSettings.FolderName);
                 foreach (string picture in pictures)
                 {
-                    long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(App.XmlSettings.StorageDuration).Ticks;
+                    long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration).Ticks;
                     string picName = picture.Split('_')[3];
                     if (picName.CompareTo(oldestTime.ToString()) < 0)
                     {
-                        int index = picture.LastIndexOf(App.XmlSettings.FolderName + "/") + App.XmlSettings.FolderName.Length + 1;
+                        int index = picture.LastIndexOf(App.Controller.XmlSettings.FolderName + "/") + App.Controller.XmlSettings.FolderName.Length + 1;
                         await deletePicture(picture.Substring(index));
                     }
                 }
@@ -97,7 +97,7 @@ namespace SecuritySystemUWP
         {
             Windows.Storage.FileProperties.BasicProperties fileProperties = await imageFile.GetBasicPropertiesAsync();
             Dictionary<string, string> properties = new Dictionary<string, string> { { "File Size", fileProperties.Size.ToString() } };
-            App.TelemetryClient.TrackEvent("Azure picture upload attempt", properties);
+            App.Controller.TelemetryClient.TrackEvent("Azure picture upload attempt", properties);
             try
             {
                 CloudBlockBlob newBlob = blobContainer.GetBlockBlobReference(imageName);
@@ -108,7 +108,7 @@ namespace SecuritySystemUWP
                 Debug.WriteLine("Exception in uploading pictures to Azure: " + ex.Message);
                 throw;
             }
-            App.TelemetryClient.TrackEvent("Azure picture upload success", properties);
+            App.Controller.TelemetryClient.TrackEvent("Azure picture upload success", properties);
         }
 
 

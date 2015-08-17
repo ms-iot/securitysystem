@@ -20,7 +20,9 @@ namespace SecuritySystemUWP
 {
     public class WebServer
     {
-        public static void Start(int serverPort)
+        public bool IsRunning { get; private set; }
+
+        public void Start(int serverPort)
         {
             var server = new HttpServer(serverPort);
             IAsyncAction asyncAction = ThreadPool.RunAsync(
@@ -28,6 +30,8 @@ namespace SecuritySystemUWP
                 {
                     server.StartServer();
                 });
+
+            IsRunning = true;
         }
     }
 
@@ -90,44 +94,100 @@ namespace SecuritySystemUWP
             }
         }
 
+        private async Task redirectToPage(string path, IOutputStream os)
+        {
+            using (Stream resp = os.AsStreamForWrite())
+            {
+                byte[] headerArray = Encoding.UTF8.GetBytes(
+                                  "HTTP/1.1 302 Found\r\n" +
+                                  "Content-Length:0\r\n" +
+                                  "Location: /" + path + "\r\n" +
+                                  "Connection: close\r\n\r\n");
+                await resp.WriteAsync(headerArray, 0, headerArray.Length);
+                await resp.FlushAsync();
+            }
+        }
+
         private async Task WriteResponseAsync(string request, IOutputStream os, StreamSocketInformation socketInfo)
         {
             try
             {
+                string[] requestParts = request.Split('/');
+
                 if (request.Equals("/"))
                 {
-                    // Generate the default config page
-                    string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(socketInfo));
-                    await WebHelper.WriteToStream(html, os);
+                    await redirectToPage(NavConstants.HOME_PAGE, os);
                 }
-                else if (request.Contains("?") && !request.Contains("htm"))
+                else if(request.Contains(NavConstants.HOME_PAGE))
                 {
-                    Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
-
-                    // Take the parameters from the URL and put it into Settings
-                    helper.ParseUriIntoSettings(uri);
-                    await AppSettings.SaveAsync(App.XmlSettings, "Settings.xml");
-
-                    string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(socketInfo), "<span style='color:Green'>Configuration saved!</span><br><br>");
+                    // Generate the default config page
+                    string html = helper.GenerateStatusPage();
                     await WebHelper.WriteToStream(html, os);
                 }
-                else if(request.Contains("OneDrive.htm"))
+                else if (request.Contains(NavConstants.SETTINGS_PAGE))
+                {
+                    if (request.Contains("?"))
+                    {
+                        Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
+
+                        // Take the parameters from the URL and put it into Settings
+                        helper.ParseUriIntoSettings(uri);
+                        await AppSettings.SaveAsync(App.Controller.XmlSettings, "Settings.xml");
+
+                        string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(socketInfo), "<span style='color:Green'>Configuration saved!</span><br><br>");
+                        await WebHelper.WriteToStream(html, os);
+                    }
+                    else
+                    {
+                        // Generate the default config page
+                        string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(socketInfo));
+                        await WebHelper.WriteToStream(html, os);
+                    }
+                }
+                else if (request.Contains(NavConstants.ONEDRIVE_PAGE))
                 {
                     // Take in the parameters and try to login to OneDrive
-                    if(request.Contains("?"))
+                    if (request.Contains("?"))
                     {
                         Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
                         await helper.ParseOneDriveUri(uri);
 
-                        if(OneDrive.IsLoggedIn())
+                        if (OneDrive.IsLoggedIn())
                         {
                             // Save tokens to settings file
-                            await AppSettings.SaveAsync(App.XmlSettings, "Settings.xml");
+                            await AppSettings.SaveAsync(App.Controller.XmlSettings, "Settings.xml");
                         }
                     }
 
                     string html = helper.GenerateOneDrivePage();
                     await WebHelper.WriteToStream(html, os);
+                }
+                else if(request.Contains(NavConstants.GALLERY_PAGE))
+                {
+                    var folder = KnownFolders.PicturesLibrary;
+                    folder = await folder.GetFolderAsync(App.Controller.XmlSettings.FolderName);
+                    string galleryHtml = await helper.GenerateGallery(folder);
+                    string html = helper.GeneratePage("Gallery", "Gallery", galleryHtml);
+                    await WebHelper.WriteToStream(html, os);
+                }
+                else if(request.Contains("api"))
+                {
+                    if(requestParts.Length > 2)
+                    {
+                        switch(requestParts[2].ToLower())
+                        {
+                            case "reloadapp":
+                                await App.Controller.Initialize();
+                                await redirectToPage(NavConstants.HOME_PAGE, os);
+                                break;
+                            case "gallery":
+                                var temp = request.Split(new string[] { "gallery/" }, StringSplitOptions.None);
+                                string decodedPath = WebUtility.UrlDecode(temp[1]);
+                                StorageFile file = await StorageFile.GetFileFromPathAsync(decodedPath);
+                                await WebHelper.WriteFileToStream(file, os);
+                                break;
+                        }
+                    }
                 }
                 else
                 {
@@ -171,6 +231,13 @@ namespace SecuritySystemUWP
             {
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
+
+                try
+                {
+                    string html = helper.GeneratePage("Error", "Error", "There's been an error: " + e.Message + "<br><br>" + e.StackTrace);
+                    await WebHelper.WriteToStream(html, os);
+                }
+                catch (Exception) { }
             }
         }
     }
