@@ -26,7 +26,7 @@ namespace SecuritySystemUWP
         // Any fields without descriptions will not appear in the web interface
 
         [Description("The Microsoft alias of the user")]
-        public string MicrosoftAlias;
+        public string MicrosoftAlias = "";
 
         [Description("Number of cameras - I don't really know what this is for")]
         public int NumberOfCameras = 1;
@@ -44,10 +44,10 @@ namespace SecuritySystemUWP
         public string AzureAccessKey = "****";
 
         [Description("OneDrive Client ID - Only required if you selected OneDrive as the Storage Provider")]
-        public string OneDriveClientId = "";
+        public string OneDriveClientId = "****";
 
         [Description("OneDrive Secret - Only required if you selected OneDrive as the Storage Provider")]
-        public string OneDriveClientSecret = "";
+        public string OneDriveClientSecret = "****";
 
         [Description("Number of days to store your pictures before they are deleted")]
         public int StorageDuration = 7;
@@ -57,8 +57,8 @@ namespace SecuritySystemUWP
         public int GpioMotionPin = 4;
 
         // Obtained from OneDrive Login
-        public string OneDriveAccessToken;
-        public string OneDriveRefreshToken;
+        public string OneDriveAccessToken = "";
+        public string OneDriveRefreshToken = "";
 
         //The following values are not changed, and not read in from the xml file
         public const string AzureConnectionSettings = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}";
@@ -94,7 +94,7 @@ namespace SecuritySystemUWP
                     return new AppSettings();
                 }
                 IInputStream sessionInputStream = await sessionFile.OpenReadAsync();
-                var serializer = XmlSerializer.FromTypes(new[] { typeof(AppSettings) })[0];
+                var serializer = new XmlSerializer(typeof(AppSettings));
                 AppSettings temp = (AppSettings)serializer.Deserialize(sessionInputStream.AsStreamForRead());
                 sessionInputStream.Dispose();
 

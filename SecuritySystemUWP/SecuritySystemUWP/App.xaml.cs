@@ -35,9 +35,14 @@ namespace SecuritySystemUWP
         public static AppSettings XmlSettings;
         
         /// <summary>
-        /// Storage interface
+        /// Storage type
         /// </summary>
         public static IStorage Storage;
+
+        /// <summary>
+        /// Camera type
+        /// </summary>
+        public static ICamera Camera;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
