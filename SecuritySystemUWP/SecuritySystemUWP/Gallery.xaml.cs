@@ -37,13 +37,20 @@ namespace SecuritySystemUWP
         // Keeps track of which subfolder level we're on relative to the root folder
         int folderLevel = 0;
 
-        Mutex listViewMutex = new Mutex();
-        Mutex galleryMutex = new Mutex();
+        private Boolean buttonEnabled;
+        public Boolean ButtonEnabled 
+        {
+            get { return buttonEnabled; }
+            set
+            {
+                buttonEnabled = value;
+            }
+        }
 
         public Gallery()
         {
             this.InitializeComponent();
-
+            ButtonEnabled = true;
             fullImage.PointerReleased += FullImage_PointerReleased;
 
             previousButton.Click += PreviousButton_Click;
@@ -66,8 +73,6 @@ namespace SecuritySystemUWP
 
         private async void ListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            listViewMutex.WaitOne();
-
             try
             {
                 string clicked = e.ClickedItem as string;
@@ -98,19 +103,17 @@ namespace SecuritySystemUWP
                     imageFolder = folder;
 
                     // Display the pictures in the new folder
+                    ButtonEnabled = false;
                     displayPictures(imageFolder);
+                    ButtonEnabled = true;
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
             }
-            finally
-            {
-                listViewMutex.ReleaseMutex();
-            }
-        } 
-        
+        }
+
 
         private void AppBar_PointerExited(object sender, PointerRoutedEventArgs e)
         {
@@ -182,8 +185,9 @@ namespace SecuritySystemUWP
         {
             imageFolder = KnownFolders.PicturesLibrary;
             imageFolder = await imageFolder.GetFolderAsync("securitysystem-cameradrop");
-
+            ButtonEnabled = false;
             displayPictures(imageFolder);
+            ButtonEnabled = true;
         }
 
         // Displays the pictures of the folder in the gallery
@@ -210,7 +214,7 @@ namespace SecuritySystemUWP
 
             // Calculate total pages for gallery
             totalPages = Math.Max(1, (int)Math.Ceiling((float)totalPictures / gallerySize));
-            
+
             // Set current page to 0
             currentPage = 0;
 
@@ -275,8 +279,6 @@ namespace SecuritySystemUWP
 
         private async void generateGallery(uint page)
         {
-            galleryMutex.WaitOne();
-
             loadingText.Visibility = Visibility.Visible;
             stackPanel.Children.Clear();
 
@@ -333,8 +335,6 @@ namespace SecuritySystemUWP
             }
 
             loadingText.Visibility = Visibility.Collapsed;
-
-            galleryMutex.ReleaseMutex();
         }
 
         public async Task<Image> CreateImage(double width, double height, StorageFile file)
@@ -409,20 +409,26 @@ namespace SecuritySystemUWP
         private void previousPageButton_Click(object sender, RoutedEventArgs e)
         {
             currentPage = (currentPage + (uint)totalPages - 1) % (uint)totalPages;
+            ButtonEnabled = false;
             generateGallery(currentPage);
+            ButtonEnabled = true;
         }
 
         // Go to next page in gallery
         private void nextPageButton_Click(object sender, RoutedEventArgs e)
         {
             currentPage = (currentPage + (uint)totalPages + 1) % (uint)totalPages;
+            ButtonEnabled = false;
             generateGallery(currentPage);
+            ButtonEnabled = true;
         }
 
         private void refreshButton_Click(object sender, RoutedEventArgs e)
         {
             // Refresh the images in the gallery
+            ButtonEnabled = false;
             displayPictures(imageFolder);
+            ButtonEnabled = true;
         }
 
         private void homeButton_Click(object sender, RoutedEventArgs e)
