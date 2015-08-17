@@ -5,7 +5,7 @@
     xmlns:local="using:SecuritySystemUWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" RequestedTheme="Dark">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.ChildrenTransitions>
@@ -15,6 +15,6 @@
         </Grid.ChildrenTransitions>
 
         <TextBlock x:Name="titleTextBlock" TextWrapping="Wrap" Text="Security System" FontSize="72" FontWeight="Thin" HorizontalAlignment="Center"/>
-        <Button Name="RunningToggle" FontWeight="Light" Content="Start" FontSize="29.333" Click="RunningToggle_Click" Height="52" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <Button Name="RunningToggle" FontWeight="Light" Content="Start" FontSize="29.333" Click="RunningToggle_Click" Height="52"  Width="175" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </Page>

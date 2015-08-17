@@ -119,6 +119,7 @@ namespace SecuritySystemUWP
             catch (Exception ex)
             {
                 Debug.WriteLine("Exception in uploading pictures to OneDrive: " + ex.Message);
+                throw;
             }
         }
 

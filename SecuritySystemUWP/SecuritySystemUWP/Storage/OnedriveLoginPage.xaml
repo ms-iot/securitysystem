@@ -5,7 +5,7 @@
     xmlns:local="using:SecuritySystemUWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" RequestedTheme="Dark">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.ChildrenTransitions>
@@ -35,6 +35,7 @@
                 </Button.Content>
             </Button>
         </Grid>
+        <TextBlock Name="LoginTitle" Text="OneDrive Login Page" HorizontalAlignment="Center" FontSize="50" Canvas.Left="34" Canvas.Top="1003" FontWeight="Light"></TextBlock>
         <Grid Grid.Row="1">
             <WebView x:Name="browser" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollMode="Auto" NavigationCompleted="browser_NavigationCompleted"/>
         </Grid>
