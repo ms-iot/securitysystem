@@ -21,7 +21,7 @@ namespace SecuritySystemUWP
         private static bool isLoggedIn = false;
         private static Mutex uploadPicturesMutexLock = new Mutex();
         private DispatcherTimer refreshTimer;
-
+                
         private static int numberUploaded = 0;
 
 
@@ -45,44 +45,44 @@ namespace SecuritySystemUWP
         {
             if (isLoggedIn)
             {
-                uploadPicturesMutexLock.WaitOne();
+            uploadPicturesMutexLock.WaitOne();
 
-                try
-                {
-                    QueryOptions querySubfolders = new QueryOptions();
-                    querySubfolders.FolderDepth = FolderDepth.Deep;
+            try
+            {
+                QueryOptions querySubfolders = new QueryOptions();
+                querySubfolders.FolderDepth = FolderDepth.Deep;
 
-                    StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
+                StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
                     cacheFolder = await cacheFolder.GetFolderAsync(App.XmlSettings.FolderName);
-                    var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
-                    var files = await result.GetFilesAsync();
+                var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
+                var files = await result.GetFilesAsync();
 
-                    foreach (StorageFile file in files)
-                    {
-                        string imageName = string.Format(AppSettings.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
+                foreach (StorageFile file in files)
+                {
+                    string imageName = string.Format(AppSettings.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
                         try
                         {
                             await uploadPictureToOneDrive(App.XmlSettings.FolderName, imageName, file);
                             numberUploaded++;
 
                             // uploadPictureToOnedrive should throw an exception if it fails, so it's safe to delete
-                            await file.DeleteAsync();
-                        }
+                    await file.DeleteAsync();
+                }
                         catch (Exception e)
                         {
                             Debug.WriteLine(e.Message);
-                        }
+            }
                     }
                 }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Exception in uploadPictures() " + ex.Message);
-                }
-                finally
-                {
-                    uploadPicturesMutexLock.ReleaseMutex();
-                }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception in uploadPictures() " + ex.Message);
             }
+            finally
+            {
+                uploadPicturesMutexLock.ReleaseMutex();
+            }
+        }
         }
 
         public async void DeleteExpiredPictures(string camera)
@@ -93,7 +93,7 @@ namespace SecuritySystemUWP
                 List<string> pictures = await listPictures(folder);
                 foreach (string picture in pictures)
                 {
-                    await deletePicture(folder, picture);
+                   await deletePicture(folder, picture);
                 }
             }
             catch (Exception ex)
@@ -144,17 +144,17 @@ namespace SecuritySystemUWP
         * PRIVATE METHODS
         ********************************************************************************************/
         private async Task uploadPictureToOneDrive(string folderName, string imageName, StorageFile imageFile)
-        {
-            if (isLoggedIn)
             {
-                String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
+            if (isLoggedIn)
+                {
+                    String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
 
-                await SendFileAsync(
-                    uriString,
-                    imageFile,
-                    Windows.Web.Http.HttpMethod.Put
-                    );
-            }
+                    await SendFileAsync(
+                        uriString, 
+                        imageFile,
+                        Windows.Web.Http.HttpMethod.Put
+                        );
+                }
             else
             {
                 throw new Exception("Not logged into OneDrive");
@@ -238,7 +238,7 @@ namespace SecuritySystemUWP
 
         private static async Task getTokens(string accessCodeOrRefreshToken, string requestType, string grantType)
         {
-
+            
             string uri = AppSettings.OneDriveTokenUrl;
             string content = string.Format(AppSettings.OneDriveTokenContent, App.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl, App.XmlSettings.OneDriveClientSecret, requestType, accessCodeOrRefreshToken, grantType);
             using (HttpClient client = new HttpClient())
