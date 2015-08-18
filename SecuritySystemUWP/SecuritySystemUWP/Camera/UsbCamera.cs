@@ -90,9 +90,20 @@ namespace SecuritySystemUWP
 
         public void Dispose()
         {
-            mediaCapture.Dispose();
-            takePhotoTimer.Stop();
-            pirSensor.Dispose();
+            if (mediaCapture != null)
+            {
+                mediaCapture.Dispose();
+            }
+
+            if (takePhotoTimer != null)
+            {
+                takePhotoTimer.Stop();
+            }
+
+            if (pirSensor != null)
+            {
+                pirSensor.Dispose();
+            }
         }
 
         /*******************************************************************************************
