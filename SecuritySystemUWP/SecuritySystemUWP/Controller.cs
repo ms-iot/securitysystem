@@ -42,6 +42,7 @@ namespace SecuritySystemUWP
         private static DispatcherTimer deletePicturesTimer;
         private const int uploadInterval = 10; //Value in seconds
         private const int deleteInterval = 1; //Value in hours
+        private bool isInitialized = false;
 
         public AppController()
         {
@@ -94,9 +95,11 @@ namespace SecuritySystemUWP
                     deletePicturesTimer.Interval = TimeSpan.FromHours(deleteInterval);
                     deletePicturesTimer.Tick += deletePicturesTimer_Tick;
                     deletePicturesTimer.Start();
+
+                    isInitialized = true;
                 }catch(Exception e)
                 {
-                    Debug.WriteLine(e.Message);
+                    Debug.WriteLine("Controller.Initialize() Error: " + e.Message);
                 }
             });
         }
@@ -125,6 +128,8 @@ namespace SecuritySystemUWP
                 {
                     Debug.WriteLine("Controller.Dispose(): " + e.Message);
                 }
+
+                isInitialized = false;
             });
         }
 
@@ -146,6 +151,11 @@ namespace SecuritySystemUWP
         private void deletePicturesTimer_Tick(object sender, object e)
         {
             Storage.DeleteExpiredPictures(cameras[0]);
+        }
+
+        public bool IsInitialized()
+        {
+            return isInitialized;
         }
     }
 }

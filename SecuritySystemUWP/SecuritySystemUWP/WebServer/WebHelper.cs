@@ -122,8 +122,9 @@ namespace SecuritySystemUWP
         {
             string html = "";
 
-            html += "<b>Camera Type:</b> " + App.Controller.Camera.GetType().Name + "<br>";
-            html += "<b>Storage Type:</b> " + App.Controller.Storage.GetType().Name + "<br>";
+            html += "<b>Camera Type:&nbsp;&nbsp;</b>" + App.Controller.Camera.GetType().Name + "<br>";
+            html += "<b>Storage Type:&nbsp;&nbsp;</b>" + App.Controller.Storage.GetType().Name + "<br>";
+            html += "<b>Status:&nbsp;&nbsp;</b>" + ((App.Controller.IsInitialized()) ? "<span style='color:Green'>Running" : "<span style='color:Red'>Not Running") + "</span>";
 
             return GeneratePage("Security System", "Home", html);
         }
