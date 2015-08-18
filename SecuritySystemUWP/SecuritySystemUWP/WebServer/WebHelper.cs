@@ -17,6 +17,7 @@ namespace SecuritySystemUWP
 {
     public class WebHelper
     {
+        private string picturesLibPath = "C:\\Users\\DefaultAccount\\Pictures";
         private string htmlTemplate;
         private Dictionary<string, string> links = new Dictionary<string, string>
             {
@@ -131,35 +132,33 @@ namespace SecuritySystemUWP
 
         public async Task<string> GenerateGallery(StorageFolder folder)
         {
+            var subFolders = await folder.GetFoldersAsync();
+            var parentFolder = await folder.GetParentAsync();
+
             string html = "";
             html += "<script> $(document).ready(function(){" +
                 "$('#folder_nav_pane').hide();" +
                 "$('#toggle').click(function(){ $('#folder_nav_pane').toggle(); }); });" +
                 "</script>";
 
-            html += "<button id='toggle'>Toggle Folder Navigation</button><br>";
+            //html += "<button id='toggle'>Toggle Folder Navigation</button>&nbsp;&nbsp;";
+            var temp = folder;
+            string breadcrumbs = "<b><a id='toggle' href='#'>" + temp.Name + "</a></b>";
+            while(!temp.Path.Equals(picturesLibPath, StringComparison.OrdinalIgnoreCase))
+            {
+                temp = await temp.GetParentAsync();
+                string hyperlink = MakeHyperlink(temp.Name, "/gallery.htm?folder=" + WebUtility.UrlEncode(temp.Path), false);
+                breadcrumbs = ((!isPicturesFolder(temp)) ? hyperlink : temp.Name) + " > " + breadcrumbs;
+            }
+            html += breadcrumbs + "<br>";
             // Generate folder navigation pane
             html += "<div id='folder_nav_pane'>";
-            html += "<ul>";
-            var subFolders = await folder.GetFoldersAsync();
-            var parentFolder = await folder.GetParentAsync();
-            if(parentFolder.Path.Equals("C:\\Users\\DefaultAccount\\Pictures", StringComparison.OrdinalIgnoreCase))
-            {
-                html += "<li>" + parentFolder.Name + "</li>";
-            }
-            else
-            {
-                html += "<li><a href='/gallery.htm?folder=" + WebUtility.UrlEncode(parentFolder.Path) + "'>" + parentFolder.Name + "</a></li>";
-            }
-
-            html += "<ul>";
-            html += "<li><b>" + folder.Name + "</b></li>";
             html += "<ul>";
             foreach (StorageFolder subFolder in subFolders)
             {
                 html += "<li><a href='/gallery.htm?folder=" + WebUtility.UrlEncode(subFolder.Path) + "'>" + subFolder.Name + "</a></li>";
             }
-            html += "</ul></ul></ul></div><br>";
+            html += "</ul></div><br>";
 
             // Get the files in current folder and subfolders
             var queryOptions = new QueryOptions();
@@ -331,6 +330,16 @@ namespace SecuritySystemUWP
 
                 await resp.FlushAsync();
             }
+        }
+
+        public static string MakeHyperlink(string text, string url, bool newWindow)
+        {
+            return "<a href='" + url + "' " + ((newWindow) ? "target='_blank'" : "") + ">" + text + "</a>";
+        }
+
+        private bool isPicturesFolder(StorageFolder folder)
+        {
+            return folder.Path.Equals(picturesLibPath, StringComparison.OrdinalIgnoreCase);
         }
     }
 }
