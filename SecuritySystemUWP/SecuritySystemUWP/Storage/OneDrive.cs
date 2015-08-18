@@ -310,6 +310,10 @@ namespace SecuritySystemUWP
                 streamContent = new HttpStreamContent(stream.AsInputStream());
                 Debug.WriteLine("SendFileAsync() - sending: " + sFile.Path);
             }
+            catch (FileNotFoundException ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
             catch (Exception ex)
             {
                 throw new Exception("SendFileAsync() - Cannot open file. Err= " + ex.Message);
