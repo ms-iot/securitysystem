@@ -323,7 +323,6 @@ namespace SecuritySystemUWP
             if (streamContent == null)
             {
                 Debug.WriteLine("  File Path = " + (sFile != null ? sFile.Path : "?"));
-                streamContent.Dispose();
                 throw new Exception("SendFileAsync() - Cannot open file.");
             }
 

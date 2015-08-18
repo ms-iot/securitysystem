@@ -132,7 +132,13 @@ namespace SecuritySystemUWP
         {
             uploadPicturesTimer.Stop();
 
-            Storage.UploadPictures(cameras[0]);
+            try
+            {
+                Storage.UploadPictures(cameras[0]);
+            }catch(Exception ex)
+            {
+                Debug.WriteLine("uploadPicturesTimer_Tick() Exception: " + ex.Message);
+            }
 
             uploadPicturesTimer.Start();
         }
