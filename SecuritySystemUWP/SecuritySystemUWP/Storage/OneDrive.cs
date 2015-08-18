@@ -36,11 +36,6 @@ namespace SecuritySystemUWP
             refreshTimer.Start();
         }
 
-        public Type StorageStartPage()
-        {
-            return typeof(OnedriveLoginPage);
-        }
-
         public async void UploadPictures(string camera)
         {
             if (isLoggedIn)
@@ -314,6 +309,10 @@ namespace SecuritySystemUWP
                 Stream stream = await sFile.OpenStreamForReadAsync();
                 streamContent = new HttpStreamContent(stream.AsInputStream());
                 Debug.WriteLine("SendFileAsync() - sending: " + sFile.Path);
+            }
+            catch (FileNotFoundException ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
             catch (Exception ex)
             {
