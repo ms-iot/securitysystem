@@ -28,11 +28,6 @@ namespace SecuritySystemUWP
         /*******************************************************************************************
         * PUBLIC METHODS
         *******************************************************************************************/
-
-        public Type StorageStartPage()
-        {
-            return typeof(MainPage);
-        }
         public async void UploadPictures(string camera)
         {
             uploadPicturesMutexLock.WaitOne();

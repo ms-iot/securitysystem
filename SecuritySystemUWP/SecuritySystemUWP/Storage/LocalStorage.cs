@@ -10,11 +10,6 @@ namespace SecuritySystemUWP
         /*******************************************************************************************
         * PUBLIC METHODS
         *******************************************************************************************/
-
-        public Type StorageStartPage()
-        {
-            return typeof(Gallery);
-        }
         public void UploadPictures(string camera)
         {
             return;

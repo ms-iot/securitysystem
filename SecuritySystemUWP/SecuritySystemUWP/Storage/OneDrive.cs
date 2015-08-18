@@ -36,11 +36,6 @@ namespace SecuritySystemUWP
             refreshTimer.Start();
         }
 
-        public Type StorageStartPage()
-        {
-            return typeof(OnedriveLoginPage);
-        }
-
         public async void UploadPictures(string camera)
         {
             if (isLoggedIn)
