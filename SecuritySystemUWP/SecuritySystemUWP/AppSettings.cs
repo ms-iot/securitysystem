@@ -50,10 +50,7 @@ namespace SecuritySystemUWP
 
         [Description("Number of days to store your pictures before they are deleted")]
         public int StorageDuration = 7;
-
-        [Description("Name of the folder that contains the images in the Pictures Library")]
-        public string FolderName = "imagecontainer";
-
+        
         [Description("GPIO input pin for the motion sensor signal - Only required if you are using a motion sensor")]
         public int GpioMotionPin = 4;
 
@@ -62,6 +59,7 @@ namespace SecuritySystemUWP
         public string OneDriveRefreshToken = "";
 
         //The following values are not changed, and not read in from the xml file
+        public const string FolderName = "imagecontainer";
         public const string AzureConnectionSettings = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}";
         public const string OneDriveRedirectUrl = "https://login.live.com/oauth20_desktop.srf";
         public const string OneDriveLoginUrl = "https://login.live.com/oauth20_authorize.srf?client_id={0}&scope={1}&response_type=code&redirect_uri={2}";

@@ -23,7 +23,7 @@ namespace SecuritySystemUWP
             string connectionSettings = string.Format(AppSettings.AzureConnectionSettings, App.Controller.XmlSettings.AzureAccountName, App.Controller.XmlSettings.AzureAccessKey);
             storageAccount = CloudStorageAccount.Parse(connectionSettings);
             blobClient = storageAccount.CreateCloudBlobClient();
-            blobContainer = blobClient.GetContainerReference(App.Controller.XmlSettings.FolderName);
+            blobContainer = blobClient.GetContainerReference(AppSettings.FolderName);
         }
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -72,14 +72,14 @@ namespace SecuritySystemUWP
         {
             try
             {
-                List<string> pictures = await listPictures(App.Controller.XmlSettings.FolderName);
+                List<string> pictures = await listPictures(AppSettings.FolderName);
                 foreach (string picture in pictures)
                 {
                     long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration).Ticks;
                     string picName = picture.Split('_')[3];
                     if (picName.CompareTo(oldestTime.ToString()) < 0)
                     {
-                        int index = picture.LastIndexOf(App.Controller.XmlSettings.FolderName + "/") + App.Controller.XmlSettings.FolderName.Length + 1;
+                        int index = picture.LastIndexOf(AppSettings.FolderName + "/") + AppSettings.FolderName.Length + 1;
                         await deletePicture(picture.Substring(index));
                     }
                 }

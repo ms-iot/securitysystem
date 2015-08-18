@@ -53,7 +53,7 @@ namespace SecuritySystemUWP
                     querySubfolders.FolderDepth = FolderDepth.Deep;
 
                     StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
-                    cacheFolder = await cacheFolder.GetFolderAsync(App.Controller.XmlSettings.FolderName);
+                    cacheFolder = await cacheFolder.GetFolderAsync(AppSettings.FolderName);
                     var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
                     var files = await result.GetFilesAsync();
 
@@ -62,7 +62,7 @@ namespace SecuritySystemUWP
                         string imageName = string.Format(AppSettings.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
                         try
                         {
-                            await uploadPictureToOneDrive(App.Controller.XmlSettings.FolderName, imageName, file);
+                            await uploadPictureToOneDrive(AppSettings.FolderName, imageName, file);
                             numberUploaded++;
 
                             // uploadPictureToOnedrive should throw an exception if it fails, so it's safe to delete
@@ -89,7 +89,7 @@ namespace SecuritySystemUWP
         {
             try
             {
-                string folder = string.Format("{0}/{1}/{2}", App.Controller.XmlSettings.FolderName, camera, DateTime.Now.Subtract(TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration)).ToString("MM_dd_yyyy"));
+                string folder = string.Format("{0}/{1}/{2}", AppSettings.FolderName, camera, DateTime.Now.Subtract(TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration)).ToString("MM_dd_yyyy"));
                 List<string> pictures = await listPictures(folder);
                 foreach (string picture in pictures)
                 {

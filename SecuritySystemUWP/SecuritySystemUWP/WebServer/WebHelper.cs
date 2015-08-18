@@ -77,7 +77,7 @@ namespace SecuritySystemUWP
                     html += "</td></tr><tr><td colspan='2'>&nbsp;</td></tr>";
                 }
             }
-            html += "<tr><td colspan='2'><input type='submit' value='Save'></td></tr>";
+            html += "<tr><td colspan='2'><input type='submit' value='Save & Apply'></td></tr>";
             html += "</table>";
             html += "</form>";
             return html;
@@ -124,8 +124,6 @@ namespace SecuritySystemUWP
 
             html += "<b>Camera Type:</b> " + App.Controller.Camera.GetType().Name + "<br>";
             html += "<b>Storage Type:</b> " + App.Controller.Storage.GetType().Name + "<br>";
-            html += "<br>";
-            html += "<input type='button' onclick='location.href=\"/api/reloadapp\"' value='Restart'/>";
 
             return GeneratePage("Security System", "Home", html);
         }

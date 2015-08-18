@@ -139,6 +139,7 @@ namespace SecuritySystemUWP
                         // Take the parameters from the URL and put it into Settings
                         helper.ParseUriIntoSettings(uri);
                         await AppSettings.SaveAsync(App.Controller.XmlSettings, "Settings.xml");
+                        await App.Controller.Initialize();
 
                         string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(socketInfo), "<span style='color:Green'>Configuration saved!</span><br><br>");
                         await WebHelper.WriteToStream(html, os);
@@ -170,28 +171,37 @@ namespace SecuritySystemUWP
                 }
                 else if(request.Contains(NavConstants.GALLERY_PAGE))
                 {
-                    StorageFolder folder = KnownFolders.PicturesLibrary;
-                    if (request.Contains("?"))
+                    if(App.Controller.Storage.GetType() == typeof(OneDrive))
                     {
-                        Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
-                        var parameters = helper.ParseGetParametersFromUrl(uri);
-                        try
-                        {
-                            folder = await StorageFolder.GetFolderFromPathAsync(parameters["folder"]);
-                        }catch(Exception e)
-                        {
-                            Debug.WriteLine(e.Message);
-                            folder = await folder.GetFolderAsync(App.Controller.XmlSettings.FolderName);
-                        }
+                        string html = helper.GeneratePage("Gallery", "Gallery", "OneDrive is enabled.  Please view your pictures on <a href='http://www.onedrive.com' target='_blank'>OneDrive</a>.<br>");
+                        await WebHelper.WriteToStream(html, os);
                     }
                     else
                     {
-                        folder = await folder.GetFolderAsync(App.Controller.XmlSettings.FolderName);
-                    }
+                        StorageFolder folder = KnownFolders.PicturesLibrary;
+                        if (request.Contains("?"))
+                        {
+                            Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
+                            var parameters = helper.ParseGetParametersFromUrl(uri);
+                            try
+                            {
+                                folder = await StorageFolder.GetFolderFromPathAsync(parameters["folder"]);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.WriteLine(e.Message);
+                                folder = await folder.GetFolderAsync(AppSettings.FolderName);
+                            }
+                        }
+                        else
+                        {
+                            folder = await folder.GetFolderAsync(AppSettings.FolderName);
+                        }
 
-                    string galleryHtml = await helper.GenerateGallery(folder);
-                    string html = helper.GeneratePage("Gallery", "Gallery", galleryHtml);
-                    await WebHelper.WriteToStream(html, os);
+                        string galleryHtml = await helper.GenerateGallery(folder);
+                        string html = helper.GeneratePage("Gallery", "Gallery", galleryHtml);
+                        await WebHelper.WriteToStream(html, os);
+                    }
                 }
                 else if(request.Contains("api"))
                 {
