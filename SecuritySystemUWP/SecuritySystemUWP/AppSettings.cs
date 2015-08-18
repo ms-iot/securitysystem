@@ -11,8 +11,7 @@ namespace SecuritySystemUWP
     {
         OneDrive,
         Azure,
-        Local,
-        RemovableMedia
+        Local
     }
 
     public enum CameraType

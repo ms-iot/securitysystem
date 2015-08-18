@@ -66,31 +66,37 @@ namespace SecuritySystemUWP
 
         private async void ProcessRequestAsync(StreamSocket socket)
         {
-            // this works for text only
-            StringBuilder request = new StringBuilder();
-            using (IInputStream input = socket.InputStream)
+            try
             {
-                byte[] data = new byte[BufferSize];
-                IBuffer buffer = data.AsBuffer();
-                uint dataRead = BufferSize;
-                while (dataRead == BufferSize)
+                // this works for text only
+                StringBuilder request = new StringBuilder();
+                using (IInputStream input = socket.InputStream)
                 {
-                    await input.ReadAsync(buffer, BufferSize, InputStreamOptions.Partial);
-                    request.Append(Encoding.UTF8.GetString(data, 0, data.Length));
-                    dataRead = buffer.Length;
+                    byte[] data = new byte[BufferSize];
+                    IBuffer buffer = data.AsBuffer();
+                    uint dataRead = BufferSize;
+                    while (dataRead == BufferSize)
+                    {
+                        await input.ReadAsync(buffer, BufferSize, InputStreamOptions.Partial);
+                        request.Append(Encoding.UTF8.GetString(data, 0, data.Length));
+                        dataRead = buffer.Length;
+                    }
                 }
-            }
 
-            using (IOutputStream output = socket.OutputStream)
+                using (IOutputStream output = socket.OutputStream)
+                {
+                    string requestMethod = request.ToString().Split('\n')[0];
+                    string[] requestParts = requestMethod.Split(' ');
+
+                    if (requestParts[0] == "GET")
+                        await WriteResponseAsync(requestParts[1], output, socket.Information);
+                    else
+                        throw new InvalidDataException("HTTP method not supported: "
+                                                       + requestParts[0]);
+                }
+            }catch(Exception e)
             {
-                string requestMethod = request.ToString().Split('\n')[0];
-                string[] requestParts = requestMethod.Split(' ');
-
-                if (requestParts[0] == "GET")
-                    await WriteResponseAsync(requestParts[1], output, socket.Information);
-                else
-                    throw new InvalidDataException("HTTP method not supported: "
-                                                   + requestParts[0]);
+                Debug.WriteLine(e.Message);
             }
         }
 
@@ -164,29 +170,52 @@ namespace SecuritySystemUWP
                 }
                 else if(request.Contains(NavConstants.GALLERY_PAGE))
                 {
-                    var folder = KnownFolders.PicturesLibrary;
-                    folder = await folder.GetFolderAsync(App.Controller.XmlSettings.FolderName);
+                    StorageFolder folder = KnownFolders.PicturesLibrary;
+                    if (request.Contains("?"))
+                    {
+                        Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
+                        var parameters = helper.ParseGetParametersFromUrl(uri);
+                        try
+                        {
+                            folder = await StorageFolder.GetFolderFromPathAsync(parameters["folder"]);
+                        }catch(Exception e)
+                        {
+                            Debug.WriteLine(e.Message);
+                            folder = await folder.GetFolderAsync(App.Controller.XmlSettings.FolderName);
+                        }
+                    }
+                    else
+                    {
+                        folder = await folder.GetFolderAsync(App.Controller.XmlSettings.FolderName);
+                    }
+
                     string galleryHtml = await helper.GenerateGallery(folder);
                     string html = helper.GeneratePage("Gallery", "Gallery", galleryHtml);
                     await WebHelper.WriteToStream(html, os);
                 }
                 else if(request.Contains("api"))
                 {
-                    if(requestParts.Length > 2)
+                    try
                     {
-                        switch(requestParts[2].ToLower())
+                        if (requestParts.Length > 2)
                         {
-                            case "reloadapp":
-                                await App.Controller.Initialize();
-                                await redirectToPage(NavConstants.HOME_PAGE, os);
-                                break;
-                            case "gallery":
-                                var temp = request.Split(new string[] { "gallery/" }, StringSplitOptions.None);
-                                string decodedPath = WebUtility.UrlDecode(temp[1]);
-                                StorageFile file = await StorageFile.GetFileFromPathAsync(decodedPath);
-                                await WebHelper.WriteFileToStream(file, os);
-                                break;
+                            switch (requestParts[2].ToLower())
+                            {
+                                case "reloadapp":
+                                    await App.Controller.Initialize();
+                                    await redirectToPage(NavConstants.HOME_PAGE, os);
+                                    break;
+                                case "gallery":
+                                    var temp = request.Split(new string[] { "gallery/" }, StringSplitOptions.None);
+                                    string decodedPath = WebUtility.UrlDecode(temp[1]);
+                                    StorageFile file = await StorageFile.GetFileFromPathAsync(decodedPath);
+                                    await WebHelper.WriteFileToStream(file, os);
+                                    break;
+                            }
                         }
+                    }catch(Exception e)
+                    {
+                        Debug.WriteLine(e.Message);
                     }
                 }
                 else

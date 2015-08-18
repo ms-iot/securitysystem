@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
+using Windows.Foundation;
 using Windows.UI.Xaml;
 
 namespace SecuritySystemUWP
@@ -46,50 +47,57 @@ namespace SecuritySystemUWP
         {
             TelemetryClient = new Microsoft.ApplicationInsights.TelemetryClient();
             Server = new WebServer();
+            XmlSettings = new AppSettings();
         }
 
-        public async Task Initialize()
+        public IAsyncAction Initialize()
         {
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            return CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
             {
-                XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
-
-                if(!Server.IsRunning)
-                    Server.Start(8000);
-
-                Camera = CameraFactory.Get(XmlSettings.CameraType);
-                Storage = StorageFactory.Get(XmlSettings.StorageProvider);
-
-                await Camera.Initialize();
-
-                // Try to login using existing Access Token in settings file
-                if (Storage.GetType() == typeof(OneDrive))
+                try
                 {
-                    var oneDriveStorage = ((OneDrive)Storage);
-                    if (!OneDrive.IsLoggedIn())
+                    XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
+
+                    if (!Server.IsRunning)
+                        Server.Start(8000);
+
+                    Camera = CameraFactory.Get(XmlSettings.CameraType);
+                    Storage = StorageFactory.Get(XmlSettings.StorageProvider);
+
+                    await Camera.Initialize();
+
+                    // Try to login using existing Access Token in settings file
+                    if (Storage.GetType() == typeof(OneDrive))
                     {
-                        try
+                        var oneDriveStorage = ((OneDrive)Storage);
+                        if (!OneDrive.IsLoggedIn())
                         {
-                            await OneDrive.AuthorizeWithRefreshToken(XmlSettings.OneDriveRefreshToken);
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.WriteLine(e.Message);
+                            try
+                            {
+                                await OneDrive.AuthorizeWithRefreshToken(XmlSettings.OneDriveRefreshToken);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.WriteLine(e.Message);
+                            }
                         }
                     }
+
+                    //Timer controlling camera pictures with motion
+                    uploadPicturesTimer = new DispatcherTimer();
+                    uploadPicturesTimer.Interval = TimeSpan.FromSeconds(uploadInterval);
+                    uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
+                    uploadPicturesTimer.Start();
+
+                    //Timer controlling deletion of old pictures
+                    deletePicturesTimer = new DispatcherTimer();
+                    deletePicturesTimer.Interval = TimeSpan.FromHours(deleteInterval);
+                    deletePicturesTimer.Tick += deletePicturesTimer_Tick;
+                    deletePicturesTimer.Start();
+                }catch(Exception e)
+                {
+                    Debug.WriteLine(e.Message);
                 }
-
-                //Timer controlling camera pictures with motion
-                uploadPicturesTimer = new DispatcherTimer();
-                uploadPicturesTimer.Interval = TimeSpan.FromSeconds(uploadInterval);
-                uploadPicturesTimer.Tick += uploadPicturesTimer_Tick;
-                uploadPicturesTimer.Start();
-
-                //Timer controlling deletion of old pictures
-                deletePicturesTimer = new DispatcherTimer();
-                deletePicturesTimer.Interval = TimeSpan.FromHours(deleteInterval);
-                deletePicturesTimer.Tick += deletePicturesTimer_Tick;
-                deletePicturesTimer.Start();
             });
         }
 

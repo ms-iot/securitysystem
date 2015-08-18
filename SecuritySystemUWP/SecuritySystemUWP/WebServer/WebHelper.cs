@@ -22,8 +22,8 @@ namespace SecuritySystemUWP
             {
                 {"Home", "/" + NavConstants.HOME_PAGE },
                 {"Settings", "/" + NavConstants.SETTINGS_PAGE },
-                {"OneDrive", "/" + NavConstants.ONEDRIVE_PAGE },
                 {"Gallery", "/" + NavConstants.GALLERY_PAGE },
+                {"OneDrive", "/" + NavConstants.ONEDRIVE_PAGE },
             };
 
         public async Task InitializeAsync()
@@ -125,16 +125,42 @@ namespace SecuritySystemUWP
             html += "<b>Camera Type:</b> " + App.Controller.Camera.GetType().Name + "<br>";
             html += "<b>Storage Type:</b> " + App.Controller.Storage.GetType().Name + "<br>";
             html += "<br>";
-            html += "<input type='button' onclick='location.href=\"/api/reloadapp\"' value='Reload App'/>";
+            html += "<input type='button' onclick='location.href=\"/api/reloadapp\"' value='Restart'/>";
 
             return GeneratePage("Security System", "Home", html);
         }
 
         public async Task<string> GenerateGallery(StorageFolder folder)
         {
-            int maxNameLength = 25;
-
             string html = "";
+            html += "<script> $(document).ready(function(){" +
+                "$('#folder_nav_pane').hide();" +
+                "$('#toggle').click(function(){ $('#folder_nav_pane').toggle(); }); });" +
+                "</script>";
+
+            html += "<button id='toggle'>Toggle Folder Navigation</button><br>";
+            // Generate folder navigation pane
+            html += "<div id='folder_nav_pane'>";
+            html += "<ul>";
+            var subFolders = await folder.GetFoldersAsync();
+            var parentFolder = await folder.GetParentAsync();
+            if(parentFolder.Path.Equals("C:\\Users\\DefaultAccount\\Pictures", StringComparison.OrdinalIgnoreCase))
+            {
+                html += "<li>" + parentFolder.Name + "</li>";
+            }
+            else
+            {
+                html += "<li><a href='/gallery.htm?folder=" + WebUtility.UrlEncode(parentFolder.Path) + "'>" + parentFolder.Name + "</a></li>";
+            }
+
+            html += "<ul>";
+            html += "<li><b>" + folder.Name + "</b></li>";
+            html += "<ul>";
+            foreach (StorageFolder subFolder in subFolders)
+            {
+                html += "<li><a href='/gallery.htm?folder=" + WebUtility.UrlEncode(subFolder.Path) + "'>" + subFolder.Name + "</a></li>";
+            }
+            html += "</ul></ul></ul></div><br>";
 
             // Get the files in current folder and subfolders
             var queryOptions = new QueryOptions();
@@ -208,6 +234,19 @@ namespace SecuritySystemUWP
             }
             catch (Exception)
             { }
+        }
+
+        public Dictionary<string, string> ParseGetParametersFromUrl(Uri uri)
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+
+            var decoder = new WwwFormUrlDecoder(uri.Query);
+            foreach (WwwFormUrlDecoderEntry entry in decoder)
+            {
+                parameters.Add(entry.Name, entry.Value);
+            }
+
+            return parameters;
         }
 
         public void ParseUriIntoSettings(Uri uri)
