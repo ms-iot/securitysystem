@@ -141,7 +141,7 @@ namespace SecuritySystemUWP
                 "$('#toggle').click(function(){ $('#folder_nav_pane').toggle(); }); });" +
                 "</script>";
 
-            //html += "<button id='toggle'>Toggle Folder Navigation</button>&nbsp;&nbsp;";
+            // Create breadcrumbs for folder nav
             var temp = folder;
             string breadcrumbs = "<b><a id='toggle' href='#'>" + temp.Name + "</a></b>";
             while(!temp.Path.Equals(picturesLibPath, StringComparison.OrdinalIgnoreCase))
@@ -151,6 +151,7 @@ namespace SecuritySystemUWP
                 breadcrumbs = ((!isPicturesFolder(temp)) ? hyperlink : temp.Name) + " > " + breadcrumbs;
             }
             html += breadcrumbs + "<br>";
+            
             // Generate folder navigation pane
             html += "<div id='folder_nav_pane'>";
             html += "<ul>";
