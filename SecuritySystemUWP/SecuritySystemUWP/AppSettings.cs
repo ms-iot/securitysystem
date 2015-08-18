@@ -59,7 +59,7 @@ namespace SecuritySystemUWP
         public string OneDriveRefreshToken = "";
 
         //The following values are not changed, and not read in from the xml file
-        public const string FolderName = "imagecontainer";
+        public const string FolderName = "securitysystem-cameradrop";
         public const string AzureConnectionSettings = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}";
         public const string OneDriveRedirectUrl = "https://login.live.com/oauth20_desktop.srf";
         public const string OneDriveLoginUrl = "https://login.live.com/oauth20_authorize.srf?client_id={0}&scope={1}&response_type=code&redirect_uri={2}";
