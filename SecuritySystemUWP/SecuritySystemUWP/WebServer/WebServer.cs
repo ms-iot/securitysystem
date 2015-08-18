@@ -139,6 +139,7 @@ namespace SecuritySystemUWP
                         // Take the parameters from the URL and put it into Settings
                         helper.ParseUriIntoSettings(uri);
                         await AppSettings.SaveAsync(App.Controller.XmlSettings, "Settings.xml");
+                        await App.Controller.Dispose();
                         await App.Controller.Initialize();
 
                         string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(socketInfo), "<span style='color:Green'>Configuration saved!</span><br><br>");
@@ -212,6 +213,7 @@ namespace SecuritySystemUWP
                             switch (requestParts[2].ToLower())
                             {
                                 case "reloadapp":
+                                    await App.Controller.Dispose();
                                     await App.Controller.Initialize();
                                     await redirectToPage(NavConstants.HOME_PAGE, os);
                                     break;

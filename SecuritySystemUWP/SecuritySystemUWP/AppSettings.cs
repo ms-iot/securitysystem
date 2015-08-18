@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -99,8 +100,10 @@ namespace SecuritySystemUWP
 
                 return temp;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Debug.WriteLine("AppSettings.RestoreAsync(): " + e.Message);
+
                 // If settings.xml file is corrupted and cannot be read - behave as if it does not exist.
                 return new AppSettings();
             }

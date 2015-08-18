@@ -70,13 +70,13 @@ namespace SecuritySystemUWP
                         }
                         catch (Exception e)
                         {
-                            Debug.WriteLine(e.Message);
+                            Debug.WriteLine("UploadPictures(): " + e.Message);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("Exception in uploadPictures() " + ex.Message);
+                    Debug.WriteLine("Exception in UploadPictures() " + ex.Message);
                 }
                 finally
                 {
@@ -343,7 +343,7 @@ namespace SecuritySystemUWP
             }
             catch (TaskCanceledException ex)
             {
-                throw ex;
+                throw new Exception("SendFileAsync() - " + ex.Message);
             }
             catch (Exception ex)
             {

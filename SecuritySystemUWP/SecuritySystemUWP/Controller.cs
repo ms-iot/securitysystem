@@ -101,19 +101,29 @@ namespace SecuritySystemUWP
             });
         }
 
-        public async void Dispose()
+        public IAsyncAction Dispose()
         {
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            return CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                uploadPicturesTimer.Stop();
-                deletePicturesTimer.Stop();
-                Camera.Dispose();
+                try
+                {
+                    uploadPicturesTimer.Stop();
+                    deletePicturesTimer.Stop();
+                    Camera.Dispose();
+                }catch(Exception e)
+                {
+                    Debug.WriteLine("Controller.Dispose(): " + e.Message);
+                }
             });
         }
 
         private void uploadPicturesTimer_Tick(object sender, object e)
         {
+            uploadPicturesTimer.Stop();
+
             Storage.UploadPictures(cameras[0]);
+
+            uploadPicturesTimer.Start();
         }
 
         private void deletePicturesTimer_Tick(object sender, object e)
