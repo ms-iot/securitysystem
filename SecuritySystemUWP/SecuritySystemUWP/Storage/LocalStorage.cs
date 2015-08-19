@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.Storage;
 using Windows.Storage.Search;
@@ -40,6 +41,10 @@ namespace SecuritySystemUWP
             catch (Exception ex)
             {
                 Debug.WriteLine("Exception in deleteExpiredPictures() " + ex.Message);
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "LocalStorage", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToDeletePicture", events);
             }
         }
     }

@@ -253,8 +253,13 @@ namespace SecuritySystemUWP
                     }
                 }
             }
-            catch (Exception)
-            { }
+            catch (Exception ex)
+            {
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "WebHelper", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToParseOneDriveUri", events);
+            }
+
         }
 
         public Dictionary<string, string> ParseGetParametersFromUrl(Uri uri)
@@ -294,9 +299,13 @@ namespace SecuritySystemUWP
                         field.SetValue(App.Controller.XmlSettings, entry.Value);
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    Debug.WriteLine(e.Message);
+                    Debug.WriteLine(ex.Message);
+
+                    // Log telemetry event about this exception
+                    var events = new Dictionary<string, string> { { "WebHelper", ex.Message } };
+                    App.Controller.TelemetryClient.TrackEvent("FailedToParseUriIntoSettings", events);
                 }
             }
         }
@@ -337,9 +346,13 @@ namespace SecuritySystemUWP
                         await fs.CopyToAsync(resp);
                     }
                 }
-                catch (FileNotFoundException)
+                catch (FileNotFoundException ex)
                 {
                     exists = false;
+
+                    // Log telemetry event about this exception
+                    var events = new Dictionary<string, string> { { "WebHelper", ex.Message } };
+                    App.Controller.TelemetryClient.TrackEvent("FailedToWriteFileToStream", events);
                 }
 
                 if (!exists)

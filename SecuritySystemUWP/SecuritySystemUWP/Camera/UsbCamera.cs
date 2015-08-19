@@ -10,7 +10,7 @@ using Windows.Media.MediaProperties;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Core;
-
+using System.Collections.Generic;
 
 namespace SecuritySystemUWP
 {
@@ -48,13 +48,21 @@ namespace SecuritySystemUWP
                 {
                     await mediaCapture.InitializeAsync(settings);
                 }
-                catch (UnauthorizedAccessException)
+                catch (UnauthorizedAccessException ex)
                 {
                     Debug.WriteLine("The app was denied access to the camera. Ensure webcam capability is added in the manifest.");
+
+                    // Log telemetry event about this exception
+                    var events = new Dictionary<string, string> { { "UsbCamera", ex.Message } };
+                    App.Controller.TelemetryClient.TrackEvent("FailedToInitializeMediaCapture", events);
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(string.Format("Exception when initializing MediaCapture with {0}: {1}", cameraDevice.Id, ex.ToString()));
+
+                    // Log telemetry event about this exception
+                    var events = new Dictionary<string, string> { { "UsbCamera", ex.Message } };
+                    App.Controller.TelemetryClient.TrackEvent("FailedToInitializeMediaCapture", events);
                 }
             }
             //Timer controlling camera pictures with motion
@@ -144,6 +152,10 @@ namespace SecuritySystemUWP
             {
                 Debug.WriteLine(string.Format("Exception when taking a photo: {0}", ex.ToString()));
                 await image.DeleteAsync();
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "UsbCamera", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToCapturePhoto", events);
             }
         }
     }

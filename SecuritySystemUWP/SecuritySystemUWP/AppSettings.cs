@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -100,9 +101,13 @@ namespace SecuritySystemUWP
 
                 return temp;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Debug.WriteLine("AppSettings.RestoreAsync(): " + e.Message);
+                Debug.WriteLine("AppSettings.RestoreAsync(): " + ex.Message);
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "AppSettings", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToRestoreSettings", events);
 
                 // If settings.xml file is corrupted and cannot be read - behave as if it does not exist.
                 return new AppSettings();
