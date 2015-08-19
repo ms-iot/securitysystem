@@ -42,7 +42,8 @@ namespace SecuritySystemUWP
         private static DispatcherTimer deletePicturesTimer;
         private const int uploadInterval = 10; //Value in seconds
         private const int deleteInterval = 1; //Value in hours
-        private bool isInitialized = false;
+
+        public bool IsInitialized { get; private set; } = false;
 
         public AppController()
         {
@@ -70,7 +71,6 @@ namespace SecuritySystemUWP
                     // Try to login using existing Access Token in settings file
                     if (Storage.GetType() == typeof(OneDrive))
                     {
-                        var oneDriveStorage = ((OneDrive)Storage);
                         if (!OneDrive.IsLoggedIn())
                         {
                             try
@@ -96,7 +96,7 @@ namespace SecuritySystemUWP
                     deletePicturesTimer.Tick += deletePicturesTimer_Tick;
                     deletePicturesTimer.Start();
 
-                    isInitialized = true;
+                    IsInitialized = true;
                 }catch(Exception e)
                 {
                     Debug.WriteLine("Controller.Initialize() Error: " + e.Message);
@@ -110,26 +110,15 @@ namespace SecuritySystemUWP
             {
                 try
                 {
-                    if (uploadPicturesTimer != null)
-                    {
-                        uploadPicturesTimer.Stop();
-                    }
-
-                    if (deletePicturesTimer != null)
-                    {
-                        deletePicturesTimer.Stop();
-                    }
-
-                    if (Camera != null)
-                    {
-                        Camera.Dispose();
-                    }
+                    uploadPicturesTimer?.Stop();
+                    deletePicturesTimer?.Stop();
+                    Camera?.Dispose();
                 }catch(Exception e)
                 {
                     Debug.WriteLine("Controller.Dispose(): " + e.Message);
                 }
 
-                isInitialized = false;
+                IsInitialized = false;
             });
         }
 
@@ -151,11 +140,6 @@ namespace SecuritySystemUWP
         private void deletePicturesTimer_Tick(object sender, object e)
         {
             Storage.DeleteExpiredPictures(cameras[0]);
-        }
-
-        public bool IsInitialized()
-        {
-            return isInitialized;
         }
     }
 }

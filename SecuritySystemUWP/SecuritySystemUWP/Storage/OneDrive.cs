@@ -140,26 +140,26 @@ namespace SecuritySystemUWP
         ********************************************************************************************/
         private async Task uploadPictureToOneDrive(string folderName, string imageName, StorageFile imageFile)
         {
-            if (isLoggedIn)
-            {
-                String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
-
-                await SendFileAsync(
-                    uriString,
-                    imageFile,
-                    Windows.Web.Http.HttpMethod.Put
-                    );
-            }
-            else
+            if (!isLoggedIn)
             {
                 throw new Exception("Not logged into OneDrive");
             }
+
+            String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
+
+            await SendFileAsync(
+                uriString,
+                imageFile,
+                Windows.Web.Http.HttpMethod.Put
+                );
         }
 
         private async Task<List<string>> listPictures(string folderName)
         {
             String uriString = string.Format("{0}/Pictures/{1}:/children", AppSettings.OneDriveRootUrl, folderName);
             List<string> files = null;
+
+            // TODO: Possibly move this try closer to where we expect the exception to be
             try
             {
                 if (isLoggedIn)
