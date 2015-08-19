@@ -145,16 +145,19 @@ namespace SecuritySystemUWP
             var subFolders = await folder.GetFoldersAsync();
             var parentFolder = await folder.GetParentAsync();
 
-            // jQuery code for toggling the subfolder list
+            // JavaScript code for toggling the subfolder list
             string html = "";
-            html += "<script> $(document).ready(function(){" +
-                "$('#folder_nav_pane').hide();" +
-                "$('#toggle').click(function(){ $('#folder_nav_pane').toggle(); }); });" +
+            html += "<script type='text/javascript'>" +
+                "function toggleSubfolderList(){"+
+                "var folderNavPane = document.getElementById('folder_nav_pane');" +
+                "if(folderNavPane.style.display == 'block') folderNavPane.style.display = 'none';" +
+                "else folderNavPane.style.display = 'block'" +
+                "}" +
                 "</script>";
 
             // Create breadcrumbs for folder nav
             var temp = folder;
-            string breadcrumbs = "<b>"+ ((subFolders.Count > 0) ? "<a id='toggle' href='#'>" + temp.Name + "</a>" : temp.Name) + "</b>";
+            string breadcrumbs = "<b>"+ ((subFolders.Count > 0) ? "<a onclick='toggleSubfolderList()' href='javascript:void(0);'>" + temp.Name + "</a>" : temp.Name) + "</b>";
             while(!temp.Path.Equals(picturesLibPath, StringComparison.OrdinalIgnoreCase))
             {
                 temp = await temp.GetParentAsync();
@@ -166,7 +169,7 @@ namespace SecuritySystemUWP
             if (subFolders.Count > 0)
             {
                 // Generate folder navigation pane
-                html += "<div id='folder_nav_pane'>";
+                html += "<div id='folder_nav_pane' style='display:none'>";
                 html += "<ul>";
                 foreach (StorageFolder subFolder in subFolders)
                 {

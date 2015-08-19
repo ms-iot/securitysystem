@@ -71,9 +71,11 @@ namespace SecuritySystemUWP
         public const string OneDriveTokenContent = "client_id={0}&redirect_uri={1}&client_secret={2}&{3}={4}&grant_type={5}";
         public const string ImageNameFormat = "{0}/{1}_{2}.jpg";
 
+        public static readonly StorageFolder SettingsFolder = ApplicationData.Current.LocalFolder;
+
         public static async Task SaveAsync(AppSettings settings, string filename)
         {
-            StorageFile sessionFile = await GetSettingsLocation().CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
+            StorageFile sessionFile = await SettingsFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
             IRandomAccessStream sessionRandomAccess = await sessionFile.OpenAsync(FileAccessMode.ReadWrite);
             IOutputStream sessionOutputStream = sessionRandomAccess.GetOutputStreamAt(0);
             var serializer = new XmlSerializer(typeof(AppSettings), new Type[] { typeof(AppSettings) });
@@ -88,7 +90,7 @@ namespace SecuritySystemUWP
         {
             try
             {
-                StorageFile sessionFile = await GetSettingsLocation().CreateFileAsync(filename, CreationCollisionOption.OpenIfExists);
+                StorageFile sessionFile = await SettingsFolder.CreateFileAsync(filename, CreationCollisionOption.OpenIfExists);
                 if (sessionFile == null)
                 {
                     return new AppSettings();
@@ -107,11 +109,6 @@ namespace SecuritySystemUWP
                 // If settings.xml file is corrupted and cannot be read - behave as if it does not exist.
                 return new AppSettings();
             }
-        }
-
-        public static StorageFolder GetSettingsLocation()
-        {
-            return ApplicationData.Current.LocalFolder;
         }
     }
 
