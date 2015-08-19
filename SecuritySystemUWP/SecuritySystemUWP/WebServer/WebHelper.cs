@@ -98,7 +98,7 @@ namespace SecuritySystemUWP
         public string GenerateOneDrivePage()
         {
             string html = "";
-            html += "OneDrive Status:  " + (OneDrive.IsLoggedIn() ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br><br>";
+            html += "<b>OneDrive Status:&nbsp;&nbsp;</b>" + (OneDrive.IsLoggedIn() ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br>";
             string uri = string.Format(AppSettings.OneDriveLoginUrl, App.Controller.XmlSettings.OneDriveClientId, AppSettings.OneDriveScope, AppSettings.OneDriveRedirectUrl);
             html += "<p class='sectionHeader'>Log into OneDrive:</p>";
             html += "<ol>";
@@ -124,8 +124,14 @@ namespace SecuritySystemUWP
             string html = "";
 
             html += "<b>Camera Type:&nbsp;&nbsp;</b>" + App.Controller.Camera.GetType().Name + "<br>";
-            html += "<b>Storage Type:&nbsp;&nbsp;</b>" + App.Controller.Storage.GetType().Name + "<br>";
-            html += "<b>Status:&nbsp;&nbsp;</b>" + ((App.Controller.IsInitialized()) ? "<span style='color:Green'>Running" : "<span style='color:Red'>Not Running") + "</span>";
+            html += "<b>Storage Type:&nbsp;&nbsp;</b>" + App.Controller.Storage.GetType().Name + "<br><br>";
+            html += "<b>Status:&nbsp;&nbsp;</b>" + ((App.Controller.IsInitialized()) ? "<span style='color:Green'>Running" : "<span style='color:Red'>Not Running") + "</span><br>";
+
+            // Show OneDrive status if the Storage Provider selected is OneDrive
+            if(App.Controller.Storage.GetType() == typeof(OneDrive))
+            {
+                html += "<b>OneDrive Status:&nbsp;&nbsp;</b>" + (OneDrive.IsLoggedIn() ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br>";
+            }
 
             return GeneratePage("Security System", "Home", html);
         }
