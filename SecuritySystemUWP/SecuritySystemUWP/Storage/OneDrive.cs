@@ -159,12 +159,11 @@ namespace SecuritySystemUWP
             String uriString = string.Format("{0}/Pictures/{1}:/children", AppSettings.OneDriveRootUrl, folderName);
             List<string> files = null;
 
-            // TODO: Possibly move this try closer to where we expect the exception to be
-            try
+            if (isLoggedIn)
             {
-                if (isLoggedIn)
+                Uri uri = new Uri(uriString);
+                try
                 {
-                    Uri uri = new Uri(uriString);
                     using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri))
                     using (HttpResponseMessage response = await httpClient.SendRequestAsync(request))
                     {
@@ -190,18 +189,18 @@ namespace SecuritySystemUWP
                                     }
                                 }
                             }
+                            return files;
                         }
                         else
                         {
                             Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
                         }
                     }
-                    return files;
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
             }
             return null;
         }
