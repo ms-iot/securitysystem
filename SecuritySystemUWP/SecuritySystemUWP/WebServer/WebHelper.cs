@@ -49,14 +49,18 @@ namespace SecuritySystemUWP
                     html += "<td>";
                     html += "<b>" + info.Name + "</b>    ";
                     html += "</td><td>";
+
+                    // Create textbox for strings
                     if (info.FieldType == typeof(string))
                     {
                         html += "<input type='text' name='" + info.Name + "' value='" + info.GetValue(App.Controller.XmlSettings) + "' size='50'>";
                     }
+                    // Create textbox for numbers
                     else if (info.FieldType == typeof(int))
                     {
                         html += "<input type='number' name='" + info.Name + "' value='" + info.GetValue(App.Controller.XmlSettings) + "' size='50'>";
                     }
+                    // Create dropdown for enums
                     else if (info.FieldType == typeof(CameraType) || info.FieldType == typeof(StorageProvider))
                     {
                         html += "<select name='" + info.Name + "'>";
@@ -141,6 +145,7 @@ namespace SecuritySystemUWP
             var subFolders = await folder.GetFoldersAsync();
             var parentFolder = await folder.GetParentAsync();
 
+            // jQuery code for toggling the subfolder list
             string html = "";
             html += "<script> $(document).ready(function(){" +
                 "$('#folder_nav_pane').hide();" +
@@ -149,7 +154,7 @@ namespace SecuritySystemUWP
 
             // Create breadcrumbs for folder nav
             var temp = folder;
-            string breadcrumbs = "<b><a id='toggle' href='#'>" + temp.Name + "</a></b>";
+            string breadcrumbs = "<b>"+ ((subFolders.Count > 0) ? "<a id='toggle' href='#'>" + temp.Name + "</a>" : temp.Name) + "</b>";
             while(!temp.Path.Equals(picturesLibPath, StringComparison.OrdinalIgnoreCase))
             {
                 temp = await temp.GetParentAsync();
@@ -157,36 +162,47 @@ namespace SecuritySystemUWP
                 breadcrumbs = ((!isPicturesFolder(temp)) ? hyperlink : temp.Name) + " > " + breadcrumbs;
             }
             html += breadcrumbs + "<br>";
-            
-            // Generate folder navigation pane
-            html += "<div id='folder_nav_pane'>";
-            html += "<ul>";
-            foreach (StorageFolder subFolder in subFolders)
+
+            if (subFolders.Count > 0)
             {
-                html += "<li><a href='/gallery.htm?folder=" + WebUtility.UrlEncode(subFolder.Path) + "'>" + subFolder.Name + "</a></li>";
+                // Generate folder navigation pane
+                html += "<div id='folder_nav_pane'>";
+                html += "<ul>";
+                foreach (StorageFolder subFolder in subFolders)
+                {
+                    html += "<li><a href='/gallery.htm?folder=" + WebUtility.UrlEncode(subFolder.Path) + "'>" + subFolder.Name + "</a></li>";
+                }
+                html += "</ul></div>";
             }
-            html += "</ul></div><br>";
+
+            html += "<br>";
 
             // Get the files in current folder and subfolders
             var queryOptions = new QueryOptions();
             queryOptions.FolderDepth = FolderDepth.Deep;
 
             var results = folder.CreateFileQueryWithOptions(queryOptions);
-
-            // Only get the number of files that we need, since getting the entire folder would be slow
+            
             var files = await results.GetFilesAsync();
 
-            // Sort the list files by date
-            IEnumerable<StorageFile> sortedFiles = files.OrderByDescending((x) => x.DateCreated);
-
-            foreach(StorageFile file in sortedFiles)
+            if (files.Count > 0)
             {
-                html += "<div class='img'>";
-                html += "<a target='_blank' href='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "'>";
-                html += "<img src='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "' alt='" + file.Name + "' width='190'>";
-                html += "<div class='desc'>" + file.Name + "</div>";
-                html += "</a>";
-                html += "</div>";
+                // Sort the list files by date
+                IEnumerable<StorageFile> sortedFiles = files.OrderByDescending((x) => x.DateCreated);
+
+                foreach (StorageFile file in sortedFiles)
+                {
+                    html += "<div class='img'>";
+                    html += "<a target='_blank' href='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "'>";
+                    html += "<img src='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "' alt='" + file.Name + "' width='190'>";
+                    html += "<div class='desc'>" + file.Name + "</div>";
+                    html += "</a>";
+                    html += "</div>";
+                }
+            }
+            else
+            {
+                html += "No pictures found in " + folder.Path;
             }
 
             return html;
