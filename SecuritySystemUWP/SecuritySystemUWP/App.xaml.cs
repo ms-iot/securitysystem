@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Microsoft.ApplicationInsights;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -34,6 +35,9 @@ namespace SecuritySystemUWP
         /// </summary>
         public App()
         {
+            // Initialize AI telemetry in the app.
+            WindowsAppInitializer.InitializeAsync();
+
             this.InitializeComponent();
             this.Suspending += OnSuspending;
             this.Resuming += OnResuming;
