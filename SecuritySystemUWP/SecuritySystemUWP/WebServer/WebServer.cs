@@ -47,7 +47,16 @@ namespace SecuritySystemUWP
             helper = new WebHelper();
             listener = new StreamSocketListener();
             port = serverPort;
-            listener.ConnectionReceived += (s, e) => processRequestAsync(e.Socket);
+            listener.ConnectionReceived += (s, e) =>
+            {
+                try
+                {
+                    processRequestAsync(e.Socket);
+                }catch(Exception ex)
+                {
+                    Debug.WriteLine("Exception in StreamSocketListener.ConnectionReceived(): " + ex.Message);
+                }
+            };
         }
 
         public async void StartServer()
@@ -96,7 +105,7 @@ namespace SecuritySystemUWP
                 }
             }catch(Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                Debug.WriteLine("Exception in processRequestAsync(): " + ex.Message);
 
                 //This exception is thrown when someone clicks on a link while the current page is still loading. This isn't really an exception worth tracking as it will be thrown a lot, but doesn't affect anything.
                 /*
@@ -183,7 +192,7 @@ namespace SecuritySystemUWP
                             }
                             catch (Exception ex)
                             {
-                                Debug.WriteLine(ex.Message);
+                                Debug.WriteLine("Exception finding folder: " + ex.Message);
                                 folder = await folder.GetFolderAsync(AppSettings.FolderName);
 
                                 // Log telemetry event about this exception
@@ -224,7 +233,7 @@ namespace SecuritySystemUWP
                         }
                     }catch(Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
+                        Debug.WriteLine("Exception in web API: " + ex.Message);
 
                         // Log telemetry event about this exception
                         var events = new Dictionary<string, string> { { "WebServer", ex.Message } };
@@ -275,7 +284,7 @@ namespace SecuritySystemUWP
                 }
             }catch(Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                Debug.WriteLine("Exception in writeResponseAsync(): " + ex.Message);
                 Debug.WriteLine(ex.StackTrace);
 
                 // Log telemetry event about this exception
