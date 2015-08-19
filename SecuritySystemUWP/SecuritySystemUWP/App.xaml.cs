@@ -35,7 +35,7 @@ namespace SecuritySystemUWP
         /// </summary>
         public App()
         {
-            // Add this initilization line. 
+            // Initialize AI telemetry in the app.
             WindowsAppInitializer.InitializeAsync();
 
             this.InitializeComponent();
