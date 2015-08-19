@@ -63,15 +63,23 @@ namespace SecuritySystemUWP
                             // uploadPictureToOnedrive should throw an exception if it fails, so it's safe to delete
                             await file.DeleteAsync();
                         }
-                        catch (Exception e)
+                        catch (Exception ex)
                         {
-                            Debug.WriteLine("UploadPictures(): " + e.Message);
+                            Debug.WriteLine("UploadPictures(): " + ex.Message);
+
+                            // Log telemetry event about this exception
+                            var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                            App.Controller.TelemetryClient.TrackEvent("FailedToUploadPicture", events);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine("Exception in UploadPictures() " + ex.Message);
+
+                    // Log telemetry event about this exception
+                    var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                    App.Controller.TelemetryClient.TrackEvent("FailedToUploadPicture", events);
                 }
                 finally
                 {
@@ -94,6 +102,10 @@ namespace SecuritySystemUWP
             catch (Exception ex)
             {
                 Debug.WriteLine("Exception in deleteExpiredPictures() " + ex.Message);
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToDeletePicture", events);
             }
         }
 
@@ -145,14 +157,14 @@ namespace SecuritySystemUWP
                 throw new Exception("Not logged into OneDrive");
             }
 
-            String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
+                String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
 
-            await SendFileAsync(
-                uriString,
-                imageFile,
-                Windows.Web.Http.HttpMethod.Put
-                );
-        }
+                await SendFileAsync(
+                    uriString,
+                    imageFile,
+                    Windows.Web.Http.HttpMethod.Put
+                    );
+            }
 
         private async Task<List<string>> listPictures(string folderName)
         {
@@ -200,6 +212,10 @@ namespace SecuritySystemUWP
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
+
+                    // Log telemetry event about this exception
+                    var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                    App.Controller.TelemetryClient.TrackEvent("FailedToListPictures", events);
                 }
             }
             return null;
@@ -227,6 +243,10 @@ namespace SecuritySystemUWP
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToDeletePicture", events);
             }
         }
 
@@ -312,9 +332,17 @@ namespace SecuritySystemUWP
             catch (FileNotFoundException ex)
             {
                 Debug.WriteLine(ex.Message);
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToOpenFile", events);
             }
             catch (Exception ex)
             {
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToOpenFile", events);
+
                 throw new Exception("SendFileAsync() - Cannot open file. Err= " + ex.Message);
             }
 
@@ -340,10 +368,16 @@ namespace SecuritySystemUWP
             }
             catch (TaskCanceledException ex)
             {
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("CancelledFileUpload", events);
+
                 throw new Exception("SendFileAsync() - " + ex.Message);
             }
             catch (Exception ex)
             {
+                // This failure will already be logged in telemetry in the enclosing UploadPictures function. We don't want this to be recorded twice.
+
                 throw new Exception("SendFileAsync() - Error: " + ex.Message);
             }
             finally

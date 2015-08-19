@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -25,7 +26,8 @@ namespace SecuritySystemUWP
     sealed partial class App : Application
     {
         public static AppController Controller;
-        
+        private Stopwatch stopwatch = Stopwatch.StartNew();
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -34,8 +36,17 @@ namespace SecuritySystemUWP
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            this.Resuming += OnResuming;
 
             Controller = new AppController();
+        }
+
+        /// <summary>
+        /// Invoked when the application resumes from suspend.
+        /// </summary>
+        private void OnResuming(Object sender, Object e)
+        {
+            stopwatch.Start();
         }
 
         /// <summary>
@@ -45,6 +56,8 @@ namespace SecuritySystemUWP
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            stopwatch.Start();
+
             await Controller.Initialize();
 
             Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.Controller.XmlSettings.MicrosoftAlias } };
@@ -107,6 +120,13 @@ namespace SecuritySystemUWP
         /// <param name="e">Details about the suspend request.</param>
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
+            // Track App suspension/exit:
+            stopwatch.Stop();
+            App.Controller.TelemetryClient.TrackMetric("AppRuntime", stopwatch.Elapsed.TotalMilliseconds);
+
+            var metrics = new Dictionary<string, string> { { "userAlias", App.Controller.XmlSettings.MicrosoftAlias }, { "appRuntime", stopwatch.Elapsed.TotalMilliseconds.ToString() } };
+            App.Controller.TelemetryClient.TrackEvent("UserRuntime", metrics);
+
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();

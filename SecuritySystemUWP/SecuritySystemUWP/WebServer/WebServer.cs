@@ -94,9 +94,16 @@ namespace SecuritySystemUWP
                         throw new InvalidDataException("HTTP method not supported: "
                                                        + requestParts[0]);
                 }
-            }catch(Exception e)
+            }catch(Exception ex)
             {
-                Debug.WriteLine(e.Message);
+                Debug.WriteLine(ex.Message);
+
+                //This exception is thrown when someone clicks on a link while the current page is still loading. This isn't really an exception worth tracking as it will be thrown a lot, but doesn't affect anything.
+                /*
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "WebServer", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToProcessRequestAsync", events);
+                */
             }
         }
         
@@ -174,10 +181,14 @@ namespace SecuritySystemUWP
                             {
                                 folder = await StorageFolder.GetFolderFromPathAsync(parameters["folder"]);
                             }
-                            catch (Exception e)
+                            catch (Exception ex)
                             {
-                                Debug.WriteLine(e.Message);
+                                Debug.WriteLine(ex.Message);
                                 folder = await folder.GetFolderAsync(AppSettings.FolderName);
+
+                                // Log telemetry event about this exception
+                                var events = new Dictionary<string, string> { { "WebServer", ex.Message } };
+                                App.Controller.TelemetryClient.TrackEvent("FailedToGetFolderFromPath", events);
                             }
                         }
                         else
@@ -211,9 +222,13 @@ namespace SecuritySystemUWP
                                     break;
                             }
                         }
-                    }catch(Exception e)
+                    }catch(Exception ex)
                     {
-                        Debug.WriteLine(e.Message);
+                        Debug.WriteLine(ex.Message);
+
+                        // Log telemetry event about this exception
+                        var events = new Dictionary<string, string> { { "WebServer", ex.Message } };
+                        App.Controller.TelemetryClient.TrackEvent("FailedToProcessApiRequest", events);
                     }
                 }
                 else
@@ -237,9 +252,13 @@ namespace SecuritySystemUWP
                                 await fs.CopyToAsync(resp);
                             }
                         }
-                        catch (FileNotFoundException)
+                        catch (FileNotFoundException ex)
                         {
                             exists = false;
+
+                            // Log telemetry event about this exception
+                            var events = new Dictionary<string, string> { { "WebServer", ex.Message } };
+                            App.Controller.TelemetryClient.TrackEvent("FailedToOpenStream", events);
                         }
 
                         if (!exists)
@@ -254,17 +273,24 @@ namespace SecuritySystemUWP
                         await resp.FlushAsync();
                     }
                 }
-            }catch(Exception e)
+            }catch(Exception ex)
             {
-                Debug.WriteLine(e.Message);
-                Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(ex.Message);
+                Debug.WriteLine(ex.StackTrace);
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "WebServer", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToWriteResponse", events);
 
                 try
                 {
-                    string html = helper.GeneratePage("Error", "Error", "There's been an error: " + e.Message + "<br><br>" + e.StackTrace);
+                    string html = helper.GeneratePage("Error", "Error", "There's been an error: " + ex.Message + "<br><br>" + ex.StackTrace);
                     await WebHelper.WriteToStream(html, os);
                 }
-                catch (Exception) { }
+                catch (Exception e)
+                {
+                    App.Controller.TelemetryClient.TrackException(e);
+                }
             }
         }
 

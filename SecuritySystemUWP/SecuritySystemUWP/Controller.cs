@@ -77,9 +77,13 @@ namespace SecuritySystemUWP
                             {
                                 await OneDrive.AuthorizeWithRefreshToken(XmlSettings.OneDriveRefreshToken);
                             }
-                            catch (Exception e)
+                            catch (Exception ex)
                             {
-                                Debug.WriteLine(e.Message);
+                                Debug.WriteLine(ex.Message);
+
+                                // Log telemetry event about this exception
+                                var events = new Dictionary<string, string> { { "Controller", ex.Message } };
+                                App.Controller.TelemetryClient.TrackEvent("FailedToLoginOneDrive", events);
                             }
                         }
                     }
@@ -97,9 +101,14 @@ namespace SecuritySystemUWP
                     deletePicturesTimer.Start();
 
                     IsInitialized = true;
-                }catch(Exception e)
+                }
+                catch(Exception ex)
                 {
-                    Debug.WriteLine("Controller.Initialize() Error: " + e.Message);
+                    Debug.WriteLine("Controller.Initialize() Error: " + ex.Message);
+
+                    // Log telemetry event about this exception
+                    var events = new Dictionary<string, string> { { "Controller", ex.Message } };
+                    App.Controller.TelemetryClient.TrackEvent("FailedToInitialize", events);
                 }
             });
         }
@@ -113,9 +122,13 @@ namespace SecuritySystemUWP
                     uploadPicturesTimer?.Stop();
                     deletePicturesTimer?.Stop();
                     Camera?.Dispose();
-                }catch(Exception e)
+                }catch(Exception ex)
                 {
-                    Debug.WriteLine("Controller.Dispose(): " + e.Message);
+                    Debug.WriteLine("Controller.Dispose(): " + ex.Message);
+
+                    // Log telemetry event about this exception
+                    var events = new Dictionary<string, string> { { "Controller", ex.Message } };
+                    App.Controller.TelemetryClient.TrackEvent("FailedToDispose", events);
                 }
 
                 IsInitialized = false;
@@ -132,6 +145,10 @@ namespace SecuritySystemUWP
             }catch(Exception ex)
             {
                 Debug.WriteLine("uploadPicturesTimer_Tick() Exception: " + ex.Message);
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "Controller", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToUploadPicture", events);
             }
 
             uploadPicturesTimer.Start();

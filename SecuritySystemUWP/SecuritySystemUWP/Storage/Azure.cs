@@ -56,6 +56,10 @@ namespace SecuritySystemUWP
             catch (Exception ex)
             {
                 Debug.WriteLine("Exception in uploadPictures() " + ex.Message);
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "Azure", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToUploadPicture", events);
             }
             finally
             {
@@ -82,6 +86,10 @@ namespace SecuritySystemUWP
             catch (Exception ex)
             {
                 Debug.WriteLine("Exception in deleteExpiredPictures() " + ex.Message);
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "Azure", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToDeletePicture", events);
             }
         }
 
@@ -101,6 +109,9 @@ namespace SecuritySystemUWP
             catch(Exception ex)
             {
                 Debug.WriteLine("Exception in uploading pictures to Azure: " + ex.Message);
+
+                // This failure will be logged in telemetry in the enclosing UploadPictures function. We don't want this to be recorded twice.
+
                 throw;
             }
             App.Controller.TelemetryClient.TrackEvent("Azure picture upload success", properties);
