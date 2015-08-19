@@ -47,7 +47,7 @@ namespace SecuritySystemUWP
             helper = new WebHelper();
             listener = new StreamSocketListener();
             port = serverPort;
-            listener.ConnectionReceived += (s, e) => ProcessRequestAsync(e.Socket);
+            listener.ConnectionReceived += (s, e) => processRequestAsync(e.Socket);
         }
 
         public async void StartServer()
@@ -64,7 +64,7 @@ namespace SecuritySystemUWP
             listener.Dispose();
         }
 
-        private async void ProcessRequestAsync(StreamSocket socket)
+        private async void processRequestAsync(StreamSocket socket)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace SecuritySystemUWP
                     string[] requestParts = requestMethod.Split(' ');
 
                     if (requestParts[0] == "GET")
-                        await WriteResponseAsync(requestParts[1], output, socket.Information);
+                        await writeResponseAsync(requestParts[1], output, socket.Information);
                     else
                         throw new InvalidDataException("HTTP method not supported: "
                                                        + requestParts[0]);
@@ -106,22 +106,8 @@ namespace SecuritySystemUWP
                 */
             }
         }
-
-        private async Task redirectToPage(string path, IOutputStream os)
-        {
-            using (Stream resp = os.AsStreamForWrite())
-            {
-                byte[] headerArray = Encoding.UTF8.GetBytes(
-                                  "HTTP/1.1 302 Found\r\n" +
-                                  "Content-Length:0\r\n" +
-                                  "Location: /" + path + "\r\n" +
-                                  "Connection: close\r\n\r\n");
-                await resp.WriteAsync(headerArray, 0, headerArray.Length);
-                await resp.FlushAsync();
-            }
-        }
-
-        private async Task WriteResponseAsync(string request, IOutputStream os, StreamSocketInformation socketInfo)
+        
+        private async Task writeResponseAsync(string request, IOutputStream os, StreamSocketInformation socketInfo)
         {
             try
             {
@@ -149,13 +135,13 @@ namespace SecuritySystemUWP
                         await App.Controller.Dispose();
                         await App.Controller.Initialize();
 
-                        string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(socketInfo), "<span style='color:Green'>Configuration saved!</span><br><br>");
+                        string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(), "<span style='color:Green'>Configuration saved!</span><br><br>");
                         await WebHelper.WriteToStream(html, os);
                     }
                     else
                     {
                         // Generate the default config page
-                        string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(socketInfo));
+                        string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings());
                         await WebHelper.WriteToStream(html, os);
                     }
                 }
@@ -305,6 +291,20 @@ namespace SecuritySystemUWP
                 {
                     App.Controller.TelemetryClient.TrackException(e);
                 }
+            }
+        }
+
+        private async Task redirectToPage(string path, IOutputStream os)
+        {
+            using (Stream resp = os.AsStreamForWrite())
+            {
+                byte[] headerArray = Encoding.UTF8.GetBytes(
+                                  "HTTP/1.1 302 Found\r\n" +
+                                  "Content-Length:0\r\n" +
+                                  "Location: /" + path + "\r\n" +
+                                  "Connection: close\r\n\r\n");
+                await resp.WriteAsync(headerArray, 0, headerArray.Length);
+                await resp.FlushAsync();
             }
         }
     }

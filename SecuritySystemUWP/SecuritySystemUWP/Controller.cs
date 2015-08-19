@@ -42,7 +42,8 @@ namespace SecuritySystemUWP
         private static DispatcherTimer deletePicturesTimer;
         private const int uploadInterval = 10; //Value in seconds
         private const int deleteInterval = 1; //Value in hours
-        private bool isInitialized = false;
+
+        public bool IsInitialized { get; private set; } = false;
 
         public AppController()
         {
@@ -70,7 +71,6 @@ namespace SecuritySystemUWP
                     // Try to login using existing Access Token in settings file
                     if (Storage.GetType() == typeof(OneDrive))
                     {
-                        var oneDriveStorage = ((OneDrive)Storage);
                         if (!OneDrive.IsLoggedIn())
                         {
                             try
@@ -99,9 +99,12 @@ namespace SecuritySystemUWP
                     deletePicturesTimer.Interval = TimeSpan.FromHours(deleteInterval);
                     deletePicturesTimer.Tick += deletePicturesTimer_Tick;
                     deletePicturesTimer.Start();
-                }catch(Exception ex)
+
+                    IsInitialized = true;
+                }
+                catch(Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
+                    Debug.WriteLine("Controller.Initialize() Error: " + ex.Message);
 
                     // Log telemetry event about this exception
                     var events = new Dictionary<string, string> { { "Controller", ex.Message } };
@@ -116,20 +119,9 @@ namespace SecuritySystemUWP
             {
                 try
                 {
-                    if (uploadPicturesTimer != null)
-                    {
-                        uploadPicturesTimer.Stop();
-                    }
-
-                    if (deletePicturesTimer != null)
-                    {
-                        deletePicturesTimer.Stop();
-                    }
-
-                    if (Camera != null)
-                    {
-                        Camera.Dispose();
-                    }
+                    uploadPicturesTimer?.Stop();
+                    deletePicturesTimer?.Stop();
+                    Camera?.Dispose();
                 }catch(Exception ex)
                 {
                     Debug.WriteLine("Controller.Dispose(): " + ex.Message);
@@ -139,7 +131,7 @@ namespace SecuritySystemUWP
                     App.Controller.TelemetryClient.TrackEvent("FailedToDispose", events);
                 }
 
-                isInitialized = false;
+                IsInitialized = false;
             });
         }
 
@@ -165,11 +157,6 @@ namespace SecuritySystemUWP
         private void deletePicturesTimer_Tick(object sender, object e)
         {
             Storage.DeleteExpiredPictures(cameras[0]);
-        }
-
-        public bool IsInitialized()
-        {
-            return isInitialized;
         }
     }
 }

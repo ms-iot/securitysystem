@@ -152,8 +152,11 @@ namespace SecuritySystemUWP
         ********************************************************************************************/
         private async Task uploadPictureToOneDrive(string folderName, string imageName, StorageFile imageFile)
         {
-            if (isLoggedIn)
+            if (!isLoggedIn)
             {
+                throw new Exception("Not logged into OneDrive");
+            }
+
                 String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
 
                 await SendFileAsync(
@@ -162,21 +165,17 @@ namespace SecuritySystemUWP
                     Windows.Web.Http.HttpMethod.Put
                     );
             }
-            else
-            {
-                throw new Exception("Not logged into OneDrive");
-            }
-        }
 
         private async Task<List<string>> listPictures(string folderName)
         {
             String uriString = string.Format("{0}/Pictures/{1}:/children", AppSettings.OneDriveRootUrl, folderName);
             List<string> files = null;
-            try
+
+            if (isLoggedIn)
             {
-                if (isLoggedIn)
+                Uri uri = new Uri(uriString);
+                try
                 {
-                    Uri uri = new Uri(uriString);
                     using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri))
                     using (HttpResponseMessage response = await httpClient.SendRequestAsync(request))
                     {
@@ -202,22 +201,22 @@ namespace SecuritySystemUWP
                                     }
                                 }
                             }
+                            return files;
                         }
                         else
                         {
                             Debug.WriteLine("ERROR: " + response.StatusCode + " - " + response.ReasonPhrase);
                         }
                     }
-                    return files;
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
 
-                // Log telemetry event about this exception
-                var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToListPictures", events);
+                    // Log telemetry event about this exception
+                    var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                    App.Controller.TelemetryClient.TrackEvent("FailedToListPictures", events);
+                }
             }
             return null;
         }

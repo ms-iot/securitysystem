@@ -27,6 +27,10 @@ namespace SecuritySystemUWP
                 {"OneDrive", "/" + NavConstants.ONEDRIVE_PAGE },
             };
 
+        /// <summary>
+        /// Initializes the WebHelper with the default.htm template
+        /// </summary>
+        /// <returns></returns>
         public async Task InitializeAsync()
         {
             var filePath = @"Assets\Web\default.htm";
@@ -34,8 +38,12 @@ namespace SecuritySystemUWP
             var file = await folder.GetFileAsync(filePath);
             htmlTemplate = await FileIO.ReadTextAsync(file);
         }
-
-        public string CreateHtmlFormFromSettings(StreamSocketInformation socketInfo)
+        
+        /// <summary>
+        /// Creates an html form for all of the editable fields in AppSettings
+        /// </summary>
+        /// <returns></returns>
+        public string CreateHtmlFormFromSettings()
         {
             string html = "<form>";
 
@@ -88,6 +96,10 @@ namespace SecuritySystemUWP
             return html;
         }
 
+        /// <summary>
+        /// Generates the html for the navigation bar
+        /// </summary>
+        /// <returns></returns>
         private string createNavBar()
         {
             string html = "<p>Navigation</p><ul>";
@@ -99,6 +111,10 @@ namespace SecuritySystemUWP
             return html;
         }
 
+        /// <summary>
+        /// Generates the html for the OneDrive login page
+        /// </summary>
+        /// <returns></returns>
         public string GenerateOneDrivePage()
         {
             string html = "";
@@ -123,13 +139,17 @@ namespace SecuritySystemUWP
             return GeneratePage("OneDrive Config", "OneDrive Config", html);
         }
 
+        /// <summary>
+        /// Generates the html for the home page (status page)
+        /// </summary>
+        /// <returns></returns>
         public string GenerateStatusPage()
         {
             string html = "";
 
             html += "<b>Camera Type:&nbsp;&nbsp;</b>" + App.Controller.Camera.GetType().Name + "<br>";
             html += "<b>Storage Type:&nbsp;&nbsp;</b>" + App.Controller.Storage.GetType().Name + "<br><br>";
-            html += "<b>Status:&nbsp;&nbsp;</b>" + ((App.Controller.IsInitialized()) ? "<span style='color:Green'>Running" : "<span style='color:Red'>Not Running") + "</span><br>";
+            html += "<b>Status:&nbsp;&nbsp;</b>" + ((App.Controller.IsInitialized) ? "<span style='color:Green'>Running" : "<span style='color:Red'>Not Running") + "</span><br>";
 
             // Show OneDrive status if the Storage Provider selected is OneDrive
             if(App.Controller.Storage.GetType() == typeof(OneDrive))
@@ -140,21 +160,29 @@ namespace SecuritySystemUWP
             return GeneratePage("Security System", "Home", html);
         }
 
+        /// <summary>
+        /// Generates the html for the gallery
+        /// </summary>
+        /// <param name="folder">Folder that contains the pictures for the gallery</param>
+        /// <returns></returns>
         public async Task<string> GenerateGallery(StorageFolder folder)
         {
             var subFolders = await folder.GetFoldersAsync();
             var parentFolder = await folder.GetParentAsync();
 
-            // jQuery code for toggling the subfolder list
+            // JavaScript code for toggling the subfolder list
             string html = "";
-            html += "<script> $(document).ready(function(){" +
-                "$('#folder_nav_pane').hide();" +
-                "$('#toggle').click(function(){ $('#folder_nav_pane').toggle(); }); });" +
+            html += "<script type='text/javascript'>" +
+                "function toggleSubfolderList(){"+
+                "var folderNavPane = document.getElementById('folder_nav_pane');" +
+                "if(folderNavPane.style.display == 'block') folderNavPane.style.display = 'none';" +
+                "else folderNavPane.style.display = 'block'" +
+                "}" +
                 "</script>";
 
             // Create breadcrumbs for folder nav
             var temp = folder;
-            string breadcrumbs = "<b>"+ ((subFolders.Count > 0) ? "<a id='toggle' href='#'>" + temp.Name + "</a>" : temp.Name) + "</b>";
+            string breadcrumbs = "<b>"+ ((subFolders.Count > 0) ? "<a onclick='toggleSubfolderList()' href='javascript:void(0);'>" + temp.Name + "</a>" : temp.Name) + "</b>";
             while(!temp.Path.Equals(picturesLibPath, StringComparison.OrdinalIgnoreCase))
             {
                 temp = await temp.GetParentAsync();
@@ -166,7 +194,7 @@ namespace SecuritySystemUWP
             if (subFolders.Count > 0)
             {
                 // Generate folder navigation pane
-                html += "<div id='folder_nav_pane'>";
+                html += "<div id='folder_nav_pane' style='display:none'>";
                 html += "<ul>";
                 foreach (StorageFolder subFolder in subFolders)
                 {
@@ -208,6 +236,14 @@ namespace SecuritySystemUWP
             return html;
         }
 
+        /// <summary>
+        /// Helper function to generate page
+        /// </summary>
+        /// <param name="title">Title that appears on the window</param>
+        /// <param name="titleBar">Title that appears on the header bar of the page</param>
+        /// <param name="content">Content for the body of the page</param>
+        /// <param name="message">A status message that will appear above the content</param>
+        /// <returns></returns>
         public string GeneratePage(string title, string titleBar, string content, string message)
         {
             string html = htmlTemplate;
@@ -220,11 +256,23 @@ namespace SecuritySystemUWP
             return html;
         }
 
+        /// <summary>
+        /// Helper function to generate page
+        /// </summary>
+        /// <param name="title">Title that appears on the window</param>
+        /// <param name="titleBar">Title that appears on the header bar of the page</param>
+        /// <param name="content">Content for the body of the page</param>
+        /// <returns></returns>
         public string GeneratePage(string title, string titleBar, string content)
         {
             return GeneratePage(title, titleBar, content, "");
         }
 
+        /// <summary>
+        /// Parses the GET parameters from the URL and then uses them to log into OneDrive
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
         public async Task ParseOneDriveUri(Uri uri)
         {
             try
@@ -262,6 +310,11 @@ namespace SecuritySystemUWP
 
         }
 
+        /// <summary>
+        /// Parses the GET parameters from the URL and returns the parameters and values in a Dictionary
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
         public Dictionary<string, string> ParseGetParametersFromUrl(Uri uri)
         {
             Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -275,6 +328,10 @@ namespace SecuritySystemUWP
             return parameters;
         }
 
+        /// <summary>
+        /// Parses the GET parameters from the URL and loads them into the settings
+        /// </summary>
+        /// <param name="uri"></param>
         public void ParseUriIntoSettings(Uri uri)
         {
             var decoder = new WwwFormUrlDecoder(uri.Query);
@@ -310,6 +367,12 @@ namespace SecuritySystemUWP
             }
         }
 
+        /// <summary>
+        /// Writes html data to the stream
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="os"></param>
+        /// <returns></returns>
         public static async Task WriteToStream(string data, IOutputStream os)
         {
             using (Stream resp = os.AsStreamForWrite())
@@ -328,6 +391,12 @@ namespace SecuritySystemUWP
             }
         }
 
+        /// <summary>
+        /// Writes a file to the stream
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="os"></param>
+        /// <returns></returns>
         public static async Task WriteFileToStream(StorageFile file, IOutputStream os)
         {
             using (Stream resp = os.AsStreamForWrite())
@@ -368,11 +437,23 @@ namespace SecuritySystemUWP
             }
         }
 
+        /// <summary>
+        /// Makes a html hyperlink
+        /// </summary>
+        /// <param name="text">Hyperlink text</param>
+        /// <param name="url">Hyperlink URL</param>
+        /// <param name="newWindow">Should the link open in a new window</param>
+        /// <returns></returns>
         public static string MakeHyperlink(string text, string url, bool newWindow)
         {
             return "<a href='" + url + "' " + ((newWindow) ? "target='_blank'" : "") + ">" + text + "</a>";
         }
 
+        /// <summary>
+        /// Checks if the folder is the Pictures library folder
+        /// </summary>
+        /// <param name="folder"></param>
+        /// <returns></returns>
         private bool isPicturesFolder(StorageFolder folder)
         {
             return folder.Path.Equals(picturesLibPath, StringComparison.OrdinalIgnoreCase);
