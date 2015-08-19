@@ -15,8 +15,6 @@ namespace SecuritySystemUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private string[] cameras = { "Cam1" };
-
         public MainPage()
         {
             this.InitializeComponent();
