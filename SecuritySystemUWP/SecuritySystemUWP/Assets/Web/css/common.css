@@ -590,9 +590,9 @@ div.img a:hover img {
 }
 
 div.desc {
-    text-align: center;
+    text-align: left;
     font-weight: normal;
-    font-size: small;
+    font-size: smaller;
     width: auto;
     margin: 2px;
 }

@@ -195,7 +195,7 @@ namespace SecuritySystemUWP
                     html += "<div class='img'>";
                     html += "<a target='_blank' href='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "'>";
                     html += "<img src='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "' alt='" + file.Name + "' width='190'>";
-                    html += "<div class='desc'>" + file.Name + "</div>";
+                    html += "<div class='desc'><b>File Name:</b> " + file.Name + "<br><b>Date Created:</b> " + file.DateCreated + "</div>";
                     html += "</a>";
                     html += "</div>";
                 }
