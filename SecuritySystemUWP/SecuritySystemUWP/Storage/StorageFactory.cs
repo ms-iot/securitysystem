@@ -14,13 +14,13 @@ namespace SecuritySystemUWP
 {
     public static class StorageFactory
     {
-        public static IStorage Get(string type)
+        public static IStorage Get(StorageProvider provider)
         {
-            switch (type.ToLower())
+            switch (provider)
             {
-                case "azure": return new Azure();
-                case "onedrive": return new OneDrive();
-                case "local": return new LocalStorage();
+                case StorageProvider.Azure: return new Azure();
+                case StorageProvider.OneDrive: return new OneDrive();
+                case StorageProvider.Local: return new LocalStorage();
                 default: throw new ArgumentNullException("Set StorageProvider in config");
             }
         }

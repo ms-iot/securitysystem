@@ -17,7 +17,6 @@
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>SecuritySystemUWP_TemporaryKey.pfx</PackageCertificateKeyFile>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <ApplicationInsightsResourceId>/subscriptions/3028579c-d25b-4ab8-87fc-455abc9bb7fb/resourcegroups/Default-Web-WestUS/providers/microsoft.insights/components/SecuritySystem-UWP-public</ApplicationInsightsResourceId>
@@ -99,9 +98,7 @@
     <Compile Include="Camera\IpCamera.cs" />
     <Compile Include="Camera\UsbCamera.cs" />
     <Compile Include="Camera\CameraFactory.cs" />
-    <Compile Include="Gallery.xaml.cs">
-      <DependentUpon>Gallery.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Controller.cs" />
     <Compile Include="MotionSensor.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -111,9 +108,11 @@
     <Compile Include="Storage\Azure.cs" />
     <Compile Include="Storage\IStorage.cs" />
     <Compile Include="Storage\OneDrive.cs" />
-    <Compile Include="Storage\OnedriveLoginPage.xaml.cs" />
     <Compile Include="Storage\StorageFactory.cs" />
     <Compile Include="AppSettings.cs" />
+    <Compile Include="WebServer\NavConstants.cs" />
+    <Compile Include="WebServer\WebHelper.cs" />
+    <Compile Include="WebServer\WebServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -127,10 +126,18 @@
     <None Include="project.json">
       <SubType>Designer</SubType>
     </None>
-    <None Include="SecuritySystemUWP_TemporaryKey.pfx" />
     <None Include="Service References\Application Insights\ConnectedService.json" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\Web\css\common.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Web\default.htm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Web\img\Logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\Logo.scale-100.png" />
     <Content Include="Assets\SmallLogo.scale-100.png" />
@@ -143,15 +150,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Gallery.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Storage\OnedriveLoginPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
