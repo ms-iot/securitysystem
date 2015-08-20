@@ -37,9 +37,9 @@ namespace SecuritySystemUWP
             cts = new CancellationTokenSource();
         }
 
-        public async void Dispose()
+        public void Dispose()
         {
-            await Logout();
+            //await Logout();
             refreshTimer.Stop();
             cts.Dispose();
             httpClient.Dispose();
