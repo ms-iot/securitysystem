@@ -43,6 +43,7 @@ namespace SecuritySystemUWP
             await Logout();
             refreshTimer.Stop();
             cts.Dispose();
+            httpClient.Dispose();
         }
 
         public async void UploadPictures(string camera)
@@ -147,7 +148,7 @@ namespace SecuritySystemUWP
             App.Controller.XmlSettings.OneDriveAccessToken = "";
             App.Controller.XmlSettings.OneDriveRefreshToken = "";
             isLoggedIn = false;
-            httpClient.Dispose();
+            httpClient.DefaultRequestHeaders.Clear();
         }
 
         public static int GetNumberOfUploadedPictures()
@@ -304,7 +305,6 @@ namespace SecuritySystemUWP
 
         private static void SetAuthorization(String scheme, String token)
         {
-            if (httpClient == null) return;
             httpClient.DefaultRequestHeaders.Authorization = new HttpCredentialsHeaderValue(scheme, token);
         }
 
