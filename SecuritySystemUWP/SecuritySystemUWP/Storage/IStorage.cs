@@ -11,5 +11,6 @@ namespace SecuritySystemUWP
     {
         void UploadPictures(string camera);
         void DeleteExpiredPictures(string camera);
+        void Dispose();
     }
 }

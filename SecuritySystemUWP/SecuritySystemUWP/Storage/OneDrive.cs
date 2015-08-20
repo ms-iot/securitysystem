@@ -38,6 +38,13 @@ namespace SecuritySystemUWP
             cts = new CancellationTokenSource();
         }
 
+        public async void Dispose()
+        {
+            await Logout();
+            refreshTimer.Stop();
+            cts.Dispose();
+        }
+
         public async void UploadPictures(string camera)
         {
             if (isLoggedIn)

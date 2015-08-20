@@ -15,6 +15,7 @@ namespace SecuritySystemUWP
         {
             return;
         }
+
         public async void DeleteExpiredPictures(string camera)
         {
             try
@@ -46,6 +47,11 @@ namespace SecuritySystemUWP
                 var events = new Dictionary<string, string> { { "LocalStorage", ex.Message } };
                 App.Controller.TelemetryClient.TrackEvent("FailedToDeletePicture", events);
             }
+        }
+
+        public void Dispose()
+        {
+            return;
         }
     }
 }
