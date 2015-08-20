@@ -34,6 +34,8 @@ namespace SecuritySystemUWP
             refreshTimer.Interval = TimeSpan.FromMinutes(25);
             refreshTimer.Tick += refreshTimer_Tick;
             refreshTimer.Start();
+            CreateHttpClient(ref httpClient);
+            cts = new CancellationTokenSource();
         }
 
         public async void UploadPictures(string camera)
@@ -94,9 +96,12 @@ namespace SecuritySystemUWP
             {
                 string folder = string.Format("{0}/{1}/{2}", AppSettings.FolderName, camera, DateTime.Now.Subtract(TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration)).ToString("MM_dd_yyyy"));
                 List<string> pictures = await listPictures(folder);
-                foreach (string picture in pictures)
+                if (pictures != null)
                 {
-                    await deletePicture(folder, picture);
+                    foreach (string picture in pictures)
+                    {
+                        await deletePicture(folder, picture);
+                    }
                 }
             }
             catch (Exception ex)
@@ -110,20 +115,16 @@ namespace SecuritySystemUWP
         }
 
         public static async Task Authorize(string accessCode)
-        {
-            CreateHttpClient(ref httpClient);
+        {            
             await getTokens(accessCode, "code", "authorization_code");
-            SetAuthorization("Bearer", App.Controller.XmlSettings.OneDriveAccessToken);
-            cts = new CancellationTokenSource();
+            SetAuthorization("Bearer", App.Controller.XmlSettings.OneDriveAccessToken);            
             isLoggedIn = true;
         }
 
         public static async Task AuthorizeWithRefreshToken(string refreshToken)
         {
-            CreateHttpClient(ref httpClient);
             await getTokens(refreshToken, "refresh_token", "refresh_token");
             SetAuthorization("Bearer", App.Controller.XmlSettings.OneDriveAccessToken);
-            cts = new CancellationTokenSource();
             isLoggedIn = true;
         }
 
@@ -255,12 +256,11 @@ namespace SecuritySystemUWP
 
             string uri = AppSettings.OneDriveTokenUrl;
             string content = string.Format(AppSettings.OneDriveTokenContent, App.Controller.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl, App.Controller.XmlSettings.OneDriveClientSecret, requestType, accessCodeOrRefreshToken, grantType);
-            using (HttpClient client = new HttpClient())
             using (HttpRequestMessage reqMessage = new HttpRequestMessage(HttpMethod.Post, new Uri(uri)))
             {
                 reqMessage.Content = new HttpStringContent(content);
                 reqMessage.Content.Headers.ContentType = new HttpMediaTypeHeaderValue("application/x-www-form-urlencoded");
-                using (HttpResponseMessage responseMessage = await client.SendRequestAsync(reqMessage))
+                using (HttpResponseMessage responseMessage = await httpClient.SendRequestAsync(reqMessage))
                 {
                     responseMessage.EnsureSuccessStatusCode();
 
@@ -286,21 +286,6 @@ namespace SecuritySystemUWP
             int endIndex = responseContentString.IndexOf("\"", startIndex);
             return responseContentString.Substring(startIndex, endIndex - startIndex);
         }
-
-        /*
-        Reauthorizes the application with the User's onedrive.
-        The initially obtained access token can expire, so it is safe to refresh for a new token before attempting to upload
-        */
-        private static async Task reauthorize()
-        {
-            if (!isLoggedIn)
-            {
-                return;
-            }
-
-            await getTokens(App.Controller.XmlSettings.OneDriveRefreshToken, "refresh_token", "refresh_token");
-        }
-
         private static void CreateHttpClient(ref HttpClient httpClient)
         {
             if (httpClient != null) httpClient.Dispose();
@@ -363,6 +348,11 @@ namespace SecuritySystemUWP
                     using (HttpResponseMessage response = await httpClient.SendRequestAsync(request).AsTask(cts.Token))
                     {
                         await DebugTextResultAsync(response);
+                        if (response.StatusCode != HttpStatusCode.Created)
+                        {
+                            throw new Exception("SendFileAsync() - " + response.StatusCode);
+                        }
+
                     }
                 }
             }
@@ -422,9 +412,12 @@ namespace SecuritySystemUWP
 
         private async void refreshTimer_Tick(object sender, object e)
         {
-            await reauthorize();
-        }
+            if (isLoggedIn)
+            {
+                await AuthorizeWithRefreshToken(App.Controller.XmlSettings.OneDriveRefreshToken);
 
+            }
+        }
     }
 }
 
