@@ -14,17 +14,12 @@ namespace SecuritySystemUWP
 {
     public static class CameraFactory
     {
-        public static ICamera Get(string type)
+        public static ICamera Get(CameraType type)
         {
-            if(object.ReferenceEquals(type, null))
+            switch (type)
             {
-                throw new NotSupportedException("Set CameraType in Settings.");
-            }
-
-            switch (type.ToLower())
-            {
-                case "usb": return new UsbCamera();
-                case "ip": return new IpCamera();
+                case CameraType.Usb: return new UsbCamera();
+                case CameraType.Ip: return new IpCamera();
                 default: throw new ArgumentNullException("Camera Type not supported. Set Camera Type in Settings.");
             }
         }

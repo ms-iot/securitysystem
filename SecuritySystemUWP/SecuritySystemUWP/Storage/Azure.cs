@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Linq;
-using System.Text;
-using Windows.Web.Http;
 using Windows.Storage;
-using Windows.Security.Cryptography.Core;
-using Windows.Security.Cryptography;
 using Windows.Storage.Search;
-using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 
 
@@ -29,19 +20,14 @@ namespace SecuritySystemUWP
         
         public Azure()
         {
-            string connectionSettings = string.Format(AppSettings.AzureConnectionSettings, App.XmlSettings.AzureAccountName, App.XmlSettings.AzureAccessKey);
+            string connectionSettings = string.Format(AppSettings.AzureConnectionSettings, App.Controller.XmlSettings.AzureAccountName, App.Controller.XmlSettings.AzureAccessKey);
             storageAccount = CloudStorageAccount.Parse(connectionSettings);
             blobClient = storageAccount.CreateCloudBlobClient();
-            blobContainer = blobClient.GetContainerReference(App.XmlSettings.FolderName);
+            blobContainer = blobClient.GetContainerReference(AppSettings.FolderName);
         }
         /*******************************************************************************************
         * PUBLIC METHODS
         *******************************************************************************************/
-
-        public Type StorageStartPage()
-        {
-            return typeof(MainPage);
-        }
         public async void UploadPictures(string camera)
         {
             uploadPicturesMutexLock.WaitOne();
@@ -70,6 +56,10 @@ namespace SecuritySystemUWP
             catch (Exception ex)
             {
                 Debug.WriteLine("Exception in uploadPictures() " + ex.Message);
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "Azure", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToUploadPicture", events);
             }
             finally
             {
@@ -81,14 +71,14 @@ namespace SecuritySystemUWP
         {
             try
             {
-                List<string> pictures = await listPictures(App.XmlSettings.FolderName);
+                List<string> pictures = await listPictures(AppSettings.FolderName);
                 foreach (string picture in pictures)
                 {
-                    long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(App.XmlSettings.StorageDuration).Ticks;
+                    long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration).Ticks;
                     string picName = picture.Split('_')[3];
                     if (picName.CompareTo(oldestTime.ToString()) < 0)
                     {
-                        int index = picture.LastIndexOf(App.XmlSettings.FolderName + "/") + App.XmlSettings.FolderName.Length + 1;
+                        int index = picture.LastIndexOf(AppSettings.FolderName + "/") + AppSettings.FolderName.Length + 1;
                         await deletePicture(picture.Substring(index));
                     }
                 }
@@ -96,6 +86,10 @@ namespace SecuritySystemUWP
             catch (Exception ex)
             {
                 Debug.WriteLine("Exception in deleteExpiredPictures() " + ex.Message);
+
+                // Log telemetry event about this exception
+                var events = new Dictionary<string, string> { { "Azure", ex.Message } };
+                App.Controller.TelemetryClient.TrackEvent("FailedToDeletePicture", events);
             }
         }
 
@@ -106,7 +100,7 @@ namespace SecuritySystemUWP
         {
             Windows.Storage.FileProperties.BasicProperties fileProperties = await imageFile.GetBasicPropertiesAsync();
             Dictionary<string, string> properties = new Dictionary<string, string> { { "File Size", fileProperties.Size.ToString() } };
-            App.TelemetryClient.TrackEvent("Azure picture upload attempt", properties);
+            App.Controller.TelemetryClient.TrackEvent("Azure picture upload attempt", properties);
             try
             {
                 CloudBlockBlob newBlob = blobContainer.GetBlockBlobReference(imageName);
@@ -115,9 +109,12 @@ namespace SecuritySystemUWP
             catch(Exception ex)
             {
                 Debug.WriteLine("Exception in uploading pictures to Azure: " + ex.Message);
+
+                // This failure will be logged in telemetry in the enclosing UploadPictures function. We don't want this to be recorded twice.
+
                 throw;
             }
-            App.TelemetryClient.TrackEvent("Azure picture upload success", properties);
+            App.Controller.TelemetryClient.TrackEvent("Azure picture upload success", properties);
         }
 
 
