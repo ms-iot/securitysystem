@@ -105,6 +105,9 @@ namespace SecuritySystemUWP
             string html = "<p>Navigation</p><ul>";
             foreach (string key in links.Keys)
             {
+                if (key.Equals("OneDrive") && App.Controller.Storage.GetType() != typeof(OneDrive))
+                    continue;
+
                 html += "<li><a href='" + links[key] + "'>" + key + "</a></li>";
             }
             html += "</ul>";
@@ -117,8 +120,15 @@ namespace SecuritySystemUWP
         /// <returns></returns>
         public string GenerateOneDrivePage()
         {
+            bool isOneDriveLoggedIn = false;
+            var oneDrive = App.Controller.Storage as OneDrive;
+            if(oneDrive != null)
+            {
+                isOneDriveLoggedIn = oneDrive.IsLoggedIn();
+            }
+
             string html = "";
-            html += "<b>OneDrive Status:&nbsp;&nbsp;</b>" + (OneDrive.IsLoggedIn() ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br>";
+            html += "<b>OneDrive Status:&nbsp;&nbsp;</b>" + (isOneDriveLoggedIn ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br>";
             string uri = string.Format(AppSettings.OneDriveLoginUrl, App.Controller.XmlSettings.OneDriveClientId, AppSettings.OneDriveScope, AppSettings.OneDriveRedirectUrl);
             html += "<p class='sectionHeader'>Log into OneDrive:</p>";
             html += "<ol>";
@@ -130,7 +140,7 @@ namespace SecuritySystemUWP
                 " <form><input type='text' name='codeUrl' size='50'>  <input type='submit' value='Submit'></form></li>";
             html += "</ol><br><br>";
 
-            if (OneDrive.IsLoggedIn())
+            if (isOneDriveLoggedIn)
             {
                 html += "<p class='sectionHeader'>Log out of OneDrive:</p>";
                 html += "<form><button type='submit' name='logout'>Logout</button></form>";
@@ -154,7 +164,8 @@ namespace SecuritySystemUWP
             // Show OneDrive status if the Storage Provider selected is OneDrive
             if(App.Controller.Storage.GetType() == typeof(OneDrive))
             {
-                html += "<b>OneDrive Status:&nbsp;&nbsp;</b>" + (OneDrive.IsLoggedIn() ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br>";
+                var oneDrive = App.Controller.Storage as OneDrive;
+                html += "<b>OneDrive Status:&nbsp;&nbsp;</b>" + (oneDrive.IsLoggedIn() ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br>";
             }
 
             return GeneratePage("Security System", "Home", html);
@@ -275,6 +286,10 @@ namespace SecuritySystemUWP
         /// <returns></returns>
         public async Task ParseOneDriveUri(Uri uri)
         {
+            var oneDrive = App.Controller.Storage as OneDrive;
+            if (oneDrive == null)
+                return;
+
             try
             {
                 var decoder = new WwwFormUrlDecoder(uri.Query);
@@ -289,7 +304,7 @@ namespace SecuritySystemUWP
                         {
                             if (subEntry.Name.Equals("code"))
                             {
-                                await OneDrive.Authorize(subEntry.Value);
+                                await oneDrive.Authorize(subEntry.Value);
                                 break;
                             }
                         }
@@ -297,7 +312,7 @@ namespace SecuritySystemUWP
                     }
                     else if (entry.Name.Equals("logout"))
                     {
-                        await OneDrive.Logout();
+                        await oneDrive.Logout();
                     }
                 }
             }
