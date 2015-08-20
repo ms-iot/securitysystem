@@ -122,6 +122,7 @@ namespace SecuritySystemUWP
                     uploadPicturesTimer?.Stop();
                     deletePicturesTimer?.Stop();
                     Camera?.Dispose();
+                    Storage?.Dispose();
                 }catch(Exception ex)
                 {
                     Debug.WriteLine("Controller.Dispose(): " + ex.Message);
