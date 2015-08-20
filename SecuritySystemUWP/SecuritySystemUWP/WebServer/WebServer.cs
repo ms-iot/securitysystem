@@ -162,10 +162,14 @@ namespace SecuritySystemUWP
                         Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
                         await helper.ParseOneDriveUri(uri);
 
-                        if (OneDrive.IsLoggedIn())
+                        var oneDrive = App.Controller.Storage as OneDrive;
+                        if (oneDrive != null)
                         {
-                            // Save tokens to settings file
-                            await AppSettings.SaveAsync(App.Controller.XmlSettings, "Settings.xml");
+                            if (oneDrive.IsLoggedIn())
+                            {
+                                // Save tokens to settings file
+                                await AppSettings.SaveAsync(App.Controller.XmlSettings, "Settings.xml");
+                            }
                         }
                     }
 

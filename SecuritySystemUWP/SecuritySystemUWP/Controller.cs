@@ -71,19 +71,24 @@ namespace SecuritySystemUWP
                     // Try to login using existing Access Token in settings file
                     if (Storage.GetType() == typeof(OneDrive))
                     {
-                        if (!OneDrive.IsLoggedIn())
-                        {
-                            try
-                            {
-                                await OneDrive.AuthorizeWithRefreshToken(XmlSettings.OneDriveRefreshToken);
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine(ex.Message);
+                        var oneDrive = App.Controller.Storage as OneDrive;
 
-                                // Log telemetry event about this exception
-                                var events = new Dictionary<string, string> { { "Controller", ex.Message } };
-                                App.Controller.TelemetryClient.TrackEvent("FailedToLoginOneDrive", events);
+                        if (oneDrive != null)
+                        {
+                            if (!oneDrive.IsLoggedIn())
+                            {
+                                try
+                                {
+                                    await oneDrive.AuthorizeWithRefreshToken(XmlSettings.OneDriveRefreshToken);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.WriteLine(ex.Message);
+
+                                    // Log telemetry event about this exception
+                                    var events = new Dictionary<string, string> { { "Controller", ex.Message } };
+                                    App.Controller.TelemetryClient.TrackEvent("FailedToLoginOneDrive", events);
+                                }
                             }
                         }
                     }

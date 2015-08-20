@@ -16,15 +16,14 @@ namespace SecuritySystemUWP
 {
     public class OneDrive : IStorage
     {
-        private static HttpClient httpClient;
-        private static CancellationTokenSource cts;
-        private static bool isLoggedIn = false;
-        private static Mutex uploadPicturesMutexLock = new Mutex();
+        private HttpClient httpClient;
+        private CancellationTokenSource cts;
+        private bool isLoggedIn = false;
+        private Mutex uploadPicturesMutexLock = new Mutex();
         private DispatcherTimer refreshTimer;
 
-        private static int numberUploaded = 0;
-
-
+        private int numberUploaded = 0;
+        
         /*******************************************************************************************
         * PUBLIC METHODS
         *******************************************************************************************/
@@ -38,9 +37,9 @@ namespace SecuritySystemUWP
             cts = new CancellationTokenSource();
         }
 
-        public async void Dispose()
+        public void Dispose()
         {
-            await Logout();
+            //await Logout();
             refreshTimer.Stop();
             cts.Dispose();
             httpClient.Dispose();
@@ -122,26 +121,27 @@ namespace SecuritySystemUWP
             }
         }
 
-        public static async Task Authorize(string accessCode)
-        {            
+        public async Task Authorize(string accessCode)
+        {
             await getTokens(accessCode, "code", "authorization_code");
-            SetAuthorization("Bearer", App.Controller.XmlSettings.OneDriveAccessToken);            
+            SetAuthorization("Bearer", App.Controller.XmlSettings.OneDriveAccessToken);
             isLoggedIn = true;
         }
 
-        public static async Task AuthorizeWithRefreshToken(string refreshToken)
+        public async Task AuthorizeWithRefreshToken(string refreshToken)
         {
+            CreateHttpClient(ref httpClient);
             await getTokens(refreshToken, "refresh_token", "refresh_token");
             SetAuthorization("Bearer", App.Controller.XmlSettings.OneDriveAccessToken);
             isLoggedIn = true;
         }
 
-        public static bool IsLoggedIn()
+        public bool IsLoggedIn()
         {
             return isLoggedIn;
         }
 
-        public static async Task Logout()
+        public async Task Logout()
         {
             string uri = string.Format(AppSettings.OneDriveLogoutUrl, App.Controller.XmlSettings.OneDriveClientId, AppSettings.OneDriveRedirectUrl);
             await httpClient.GetAsync(new Uri(uri));
@@ -151,7 +151,7 @@ namespace SecuritySystemUWP
             httpClient.DefaultRequestHeaders.Clear();
         }
 
-        public static int GetNumberOfUploadedPictures()
+        public int GetNumberOfUploadedPictures()
         {
             return numberUploaded;
         }
@@ -166,14 +166,14 @@ namespace SecuritySystemUWP
                 throw new Exception("Not logged into OneDrive");
             }
 
-                String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
+            String uriString = string.Format("{0}/Pictures/{1}/{2}:/content", AppSettings.OneDriveRootUrl, folderName, imageName);
 
-                await SendFileAsync(
-                    uriString,
-                    imageFile,
-                    Windows.Web.Http.HttpMethod.Put
-                    );
-            }
+            await SendFileAsync(
+                uriString,
+                imageFile,
+                Windows.Web.Http.HttpMethod.Put
+                );
+        }
 
         private async Task<List<string>> listPictures(string folderName)
         {
@@ -259,7 +259,7 @@ namespace SecuritySystemUWP
             }
         }
 
-        private static async Task getTokens(string accessCodeOrRefreshToken, string requestType, string grantType)
+        private async Task getTokens(string accessCodeOrRefreshToken, string requestType, string grantType)
         {
 
             string uri = AppSettings.OneDriveTokenUrl;
@@ -279,7 +279,7 @@ namespace SecuritySystemUWP
             }
         }
 
-        private static string getAccessToken(string responseContent)
+        private string getAccessToken(string responseContent)
         {
             string identifier = "\"access_token\":\"";
             int startIndex = responseContent.IndexOf(identifier) + identifier.Length;
@@ -287,14 +287,15 @@ namespace SecuritySystemUWP
             return responseContent.Substring(startIndex, endIndex - startIndex);
         }
 
-        private static string getRefreshToken(string responseContentString)
+        private string getRefreshToken(string responseContentString)
         {
             string identifier = "\"refresh_token\":\"";
             int startIndex = responseContentString.IndexOf(identifier) + identifier.Length;
             int endIndex = responseContentString.IndexOf("\"", startIndex);
             return responseContentString.Substring(startIndex, endIndex - startIndex);
         }
-        private static void CreateHttpClient(ref HttpClient httpClient)
+
+        private void CreateHttpClient(ref HttpClient httpClient)
         {
             if (httpClient != null) httpClient.Dispose();
             var filter = new HttpBaseProtocolFilter();
@@ -303,12 +304,12 @@ namespace SecuritySystemUWP
             httpClient = new HttpClient(filter);
         }
 
-        private static void SetAuthorization(String scheme, String token)
+        private void SetAuthorization(String scheme, String token)
         {
             httpClient.DefaultRequestHeaders.Authorization = new HttpCredentialsHeaderValue(scheme, token);
         }
 
-        private static async Task SendFileAsync(String url, StorageFile sFile, HttpMethod httpMethod)
+        private async Task SendFileAsync(String url, StorageFile sFile, HttpMethod httpMethod)
         {
             Windows.Storage.FileProperties.BasicProperties fileProperties = await sFile.GetBasicPropertiesAsync();
             Dictionary<string, string> properties = new Dictionary<string, string> { { "File Size", fileProperties.Size.ToString() } };
@@ -386,7 +387,7 @@ namespace SecuritySystemUWP
             App.Controller.TelemetryClient.TrackEvent("OneDrive picture upload success", properties);
         }
 
-        internal static async Task DebugTextResultAsync(HttpResponseMessage response)
+        internal async Task DebugTextResultAsync(HttpResponseMessage response)
         {
             string Text = SerializeHeaders(response);
             string responseBodyAsText = await response.Content.ReadAsStringAsync().AsTask(cts.Token);
@@ -398,7 +399,7 @@ namespace SecuritySystemUWP
             Debug.WriteLine(responseBodyAsText);
         }
 
-        internal static string SerializeHeaders(HttpResponseMessage response)
+        internal string SerializeHeaders(HttpResponseMessage response)
         {
             StringBuilder output = new StringBuilder();
             output.Append(((int)response.StatusCode) + " " + response.ReasonPhrase + "\r\n");
@@ -409,7 +410,7 @@ namespace SecuritySystemUWP
             return output.ToString();
         }
 
-        internal static void SerializeHeaderCollection(IEnumerable<KeyValuePair<string, string>> headers, StringBuilder output)
+        internal void SerializeHeaderCollection(IEnumerable<KeyValuePair<string, string>> headers, StringBuilder output)
         {
             foreach (var header in headers)
             {
