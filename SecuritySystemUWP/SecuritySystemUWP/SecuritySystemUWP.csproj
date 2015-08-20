@@ -17,7 +17,6 @@
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>SecuritySystemUWP_TemporaryKey.pfx</PackageCertificateKeyFile>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <ApplicationInsightsResourceId>/subscriptions/3028579c-d25b-4ab8-87fc-455abc9bb7fb/resourcegroups/Default-Web-WestUS/providers/microsoft.insights/components/SecuritySystem-UWP-public</ApplicationInsightsResourceId>
@@ -127,7 +126,6 @@
     <None Include="project.json">
       <SubType>Designer</SubType>
     </None>
-    <None Include="SecuritySystemUWP_TemporaryKey.pfx" />
     <None Include="Service References\Application Insights\ConnectedService.json" />
   </ItemGroup>
   <ItemGroup>
