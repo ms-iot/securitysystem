@@ -7,8 +7,10 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.AppService;
+using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Networking.Sockets;
@@ -141,11 +143,29 @@ namespace SecuritySystemUWP
                         // Take the parameters from the URL and put it into Settings
                         helper.ParseUriIntoSettings(uri);
                         await AppSettings.SaveAsync(App.Controller.XmlSettings, "Settings.xml");
-                        await App.Controller.Dispose();
-                        await App.Controller.Initialize();
 
-                        string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(), "<span style='color:Green'>Configuration saved!</span><br><br>");
-                        await WebHelper.WriteToStream(html, os);
+                        AutoResetEvent ase = new AutoResetEvent(false);
+
+                        await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                        {
+                            try
+                            {
+                                App.Controller.Dispose();
+                                await App.Controller.Initialize();
+
+                                string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(), "<span style='color:Green'>Configuration saved!</span><br><br>");
+                                await WebHelper.WriteToStream(html, os);
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine("Error restarting controller: " + ex.Message);
+                            }
+
+                            ase.Set();
+                        });
+
+                        // Wait for controller restart to finish
+                        ase.WaitOne();
                     }
                     else
                     {
@@ -222,11 +242,6 @@ namespace SecuritySystemUWP
                         {
                             switch (requestParts[2].ToLower())
                             {
-                                case "reloadapp":
-                                    await App.Controller.Dispose();
-                                    await App.Controller.Initialize();
-                                    await redirectToPage(NavConstants.HOME_PAGE, os);
-                                    break;
                                 case "gallery":
                                     var temp = request.Split(new string[] { "gallery/" }, StringSplitOptions.None);
                                     string decodedPath = WebUtility.UrlDecode(temp[1]);
