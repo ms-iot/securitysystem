@@ -146,6 +146,7 @@ namespace SecuritySystemUWP
 
                         AutoResetEvent ase = new AutoResetEvent(false);
 
+                        // Dispose and Initialize need to be called on UI thread because of DispatcherTimers
                         await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
                         {
                             try
@@ -198,9 +199,12 @@ namespace SecuritySystemUWP
                 }
                 else if(request.Contains(NavConstants.GALLERY_PAGE))
                 {
-                    if(App.Controller.Storage.GetType() == typeof(OneDrive))
+                    var storageType = App.Controller.Storage.GetType();
+                    if (storageType == typeof(OneDrive))
                     {
-                        string html = helper.GeneratePage("Gallery", "Gallery", "OneDrive is enabled.  Please view your pictures on <a href='http://www.onedrive.com' target='_blank'>OneDrive</a>.<br>");
+                        string html = helper.GeneratePage("Gallery", "Gallery", "<b>" + storageType.Name + "</b> is set as your storage provider.&nbsp;&nbsp;"
+                            + "Please view your pictures on <a href='http://www.onedrive.com' target='_blank'>OneDrive</a>.<br><br>"
+                            + "To view your pictures here, please select <b>" + StorageProvider.Local + "</b> as your storage provider.");
                         await WebHelper.WriteToStream(html, os);
                     }
                     else
