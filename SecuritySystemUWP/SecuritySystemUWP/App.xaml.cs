@@ -26,8 +26,10 @@ namespace SecuritySystemUWP
     /// </summary>
     sealed partial class App : Application
     {
+        private DispatcherTimer HeartbeatTimer;
         public static AppController Controller;
         private Stopwatch stopwatch = Stopwatch.StartNew();
+        private int heartbeatInterval = 1;  // 1 min
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -38,11 +40,27 @@ namespace SecuritySystemUWP
             // Initialize AI telemetry in the app.
             WindowsAppInitializer.InitializeAsync();
 
+            // Timer uploading hearbeat telemetry event
+            HeartbeatTimer = new DispatcherTimer();
+            HeartbeatTimer.Tick += HeartbeatTimer_Tick;
+            HeartbeatTimer.Interval = new TimeSpan(0, heartbeatInterval, 0);    // tick every heartbeatInterval
+            HeartbeatTimer.Start();
+
             this.InitializeComponent();
             this.Suspending += OnSuspending;
             this.Resuming += OnResuming;
 
             Controller = new AppController();
+        }
+
+        /// <summary>
+        /// Invoked when the heartbeat timer ticks.
+        /// </summary>
+        void HeartbeatTimer_Tick(object sender, object e)
+        {
+            // Log telemetry event that the device is alive
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "userAlias", App.Controller.XmlSettings.MicrosoftAlias } };
+            App.Controller.TelemetryClient.TrackMetric("DeviceHeartbeat", heartbeatInterval, properties);
         }
 
         /// <summary>
