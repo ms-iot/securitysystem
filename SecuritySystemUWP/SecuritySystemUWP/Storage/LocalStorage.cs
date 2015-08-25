@@ -13,11 +13,13 @@ namespace SecuritySystemUWP
         *******************************************************************************************/
         public void UploadPictures(string camera)
         {
+            //The pictures are automatically stored in the local storage during image capture.
             return;
         }
 
         public async void DeleteExpiredPictures(string camera)
         {
+            //Delete older images
             try
             {
                 var querySubfolders = new QueryOptions();
@@ -31,9 +33,10 @@ namespace SecuritySystemUWP
 
                 foreach (StorageFile file in files)
                 {
+                    //Caluclate oldest time in ticks using the user selected storage duration 
                     long oldestTime = DateTime.UtcNow.Ticks - TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration).Ticks;
-                    string picName = file.DisplayName.Split('_')[5];
-                    if (picName.CompareTo(oldestTime.ToString()) < 0)
+                    long picCreated = file.DateCreated.Ticks;
+                    if (picCreated < oldestTime)
                     {
                         await file.DeleteAsync();
                     }
