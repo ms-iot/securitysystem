@@ -242,6 +242,9 @@ namespace SecuritySystemUWP
                     else
                     {
                         StorageFolder folder = KnownFolders.PicturesLibrary;
+                        int page = 1;
+                        int pageSize = 30;
+
                         // Parse GET parameters
                         if (request.Contains("?"))
                         {
@@ -251,6 +254,24 @@ namespace SecuritySystemUWP
                             {
                                 // Find the folder that's specified in the parameters
                                 folder = await StorageFolder.GetFolderFromPathAsync(parameters["folder"]);
+
+                                if(parameters.ContainsKey("page"))
+                                {
+                                    try
+                                    {
+                                        page = Convert.ToInt32(parameters["page"]);
+                                    }
+                                    catch (Exception) { }
+                                }
+
+                                if (parameters.ContainsKey("pageSize"))
+                                {
+                                    try
+                                    {
+                                        pageSize = Convert.ToInt32(parameters["pageSize"]);
+                                    }
+                                    catch (Exception) { }
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -268,7 +289,7 @@ namespace SecuritySystemUWP
                         }
 
                         // Generate gallery page and write to stream
-                        string galleryHtml = await helper.GenerateGallery(folder);
+                        string galleryHtml = await helper.GenerateGallery(folder, page, pageSize);
                         html = helper.GeneratePage("Gallery", "Gallery", galleryHtml);
                     }
 

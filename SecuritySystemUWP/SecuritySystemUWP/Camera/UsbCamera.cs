@@ -90,7 +90,7 @@ namespace SecuritySystemUWP
         private async void PirSensor_OnChanged(object sender, GpioPinValueChangedEventArgs e)
         {
             //Start the timer for the duration of motion
-            if ((e.Edge == GpioPinEdge.RisingEdge) != isTimerStarted)
+            if ((e.Edge == GpioPinEdge.FallingEdge) != isTimerStarted)
             {
                 isTimerStarted = !isTimerStarted;
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>

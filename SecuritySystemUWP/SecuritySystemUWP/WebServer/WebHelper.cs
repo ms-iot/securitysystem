@@ -184,12 +184,18 @@ namespace SecuritySystemUWP
         }
 
         /// <summary>
-        /// Generates the html for the gallery
+        /// Generates html for the gallery
         /// </summary>
-        /// <param name="folder">Folder that contains the pictures for the gallery</param>
+        /// <param name="folder">Folder to read the pictures from</param>
+        /// <param name="pageNumber">Page starting from 1</param>
+        /// <param name="pageSize">Number of pictures on each page</param>
         /// <returns></returns>
-        public async Task<string> GenerateGallery(StorageFolder folder)
+        public async Task<string> GenerateGallery(StorageFolder folder, int pageNumber, int pageSize)
         {
+            // Don't allow negatives
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 1;
+
             var subFolders = await folder.GetFoldersAsync();
             var parentFolder = await folder.GetParentAsync();
 
@@ -203,6 +209,8 @@ namespace SecuritySystemUWP
                 "}" +
                 "</script>";
 
+            html += "<table>";
+            html += "<tr><td>";
             // Create breadcrumbs for folder nav
             var temp = folder;
             string breadcrumbs = "<b>"+ ((subFolders.Count > 0) ? "<a onclick='toggleSubfolderList()' href='javascript:void(0);'>" + temp.Name + "</a>" : temp.Name) + "</b>";
@@ -226,7 +234,7 @@ namespace SecuritySystemUWP
                 html += "</ul></div>";
             }
 
-            html += "<br>";
+            html += "<br></td></tr>";
 
             // Get the files in current folder and subfolders
             var queryOptions = new QueryOptions();
@@ -238,23 +246,67 @@ namespace SecuritySystemUWP
 
             if (files.Count > 0)
             {
-                // Sort the list files by date
-                IEnumerable<StorageFile> sortedFiles = files.OrderByDescending((x) => x.DateCreated);
-
-                foreach (StorageFile file in sortedFiles)
+                // Create pages
+                html += "<tr><td>";
+                int totalPages = (int)Math.Ceiling((double)files.Count / pageSize);
+                html += "Pages: ";
+                for (int i = 1; i <= totalPages; i++)
                 {
-                    html += "<div class='img'>";
-                    html += "<a target='_blank' href='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "'>";
-                    html += "<img src='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "' alt='" + file.Name + "' width='190'>";
-                    html += "<div class='desc'><b>File Name:</b> " + file.Name + "<br><b>Date Created:</b> " + file.DateCreated + "</div>";
-                    html += "</a>";
-                    html += "</div>";
+                    if (i != pageNumber)
+                    {
+                        html += MakeHyperlink(i.ToString(), "/gallery.htm?folder=" + WebUtility.UrlEncode(folder.Path) + "&page=" + i + "&pageSize=" + pageSize, false) + "&nbsp;";
+                    }
+                    else
+                    {
+                        html += "<b>" + i + "</b>&nbsp;";
+                    }
                 }
+                html += "<br></td></tr>";
+
+                html += "<tr><td>";
+                // Sort the list files by date
+                StorageFile[] sortedFiles = files.OrderByDescending((x) => x.DateCreated).ToArray();
+
+                // Pick out the subset of files we need based on page
+                int startIndex = (pageNumber - 1) * pageSize;
+                for (int i = startIndex; i < startIndex + pageSize; i++)
+                {
+                    if (i > 0 && i < sortedFiles.Length)
+                    {
+                        StorageFile file = sortedFiles[i];
+                        html += "<div class='img'>";
+                        html += "<a target='_blank' href='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "'>";
+                        html += "<img src='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "' alt='" + file.Name + "' width='190'>";
+                        html += "<div class='desc'><b>File Name:</b> " + file.Name + "<br><b>Date Created:</b> " + file.DateCreated + "</div>";
+                        html += "</a>";
+                        html += "</div>";
+                    }
+                }
+
+                html += "</td></tr>";
+
+                // Create pages
+                html += "<tr><td>";
+                html += "<br>Pages: ";
+                for(int i = 1; i<= totalPages;i++)
+                {
+                    if (i != pageNumber)
+                    {
+                        html += MakeHyperlink(i.ToString(), "/gallery.htm?folder=" + WebUtility.UrlEncode(folder.Path) + "&page=" + i + "&pageSize=" + pageSize, false) + "&nbsp;";
+                    }
+                    else
+                    {
+                        html += "<b>" + i + "</b>&nbsp;";
+                    }
+                }
+                html += "</td></tr>";
             }
             else
             {
                 html += "No pictures found in " + folder.Path;
             }
+
+            html += "</table>";
 
             return html;
         }
