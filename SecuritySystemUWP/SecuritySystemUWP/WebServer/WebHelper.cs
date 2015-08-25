@@ -369,7 +369,7 @@ namespace SecuritySystemUWP
                     else
                     {
                         //if the field being saved is the alias, and the alias has changed, send a telemetry event
-                        if(0 == field.Name.CompareTo("alias") &&
+                        if(0 == field.Name.CompareTo("MicrosoftAlias") &&
                            0 != entry.Value.CompareTo(App.Controller.XmlSettings.MicrosoftAlias))
                         {
                             Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", entry.Value } };
