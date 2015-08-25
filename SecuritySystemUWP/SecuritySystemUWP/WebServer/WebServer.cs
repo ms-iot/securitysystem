@@ -24,6 +24,10 @@ namespace SecuritySystemUWP
     {
         public bool IsRunning { get; private set; }
 
+        /// <summary>
+        /// Starts the web server on the specified port
+        /// </summary>
+        /// <param name="serverPort">Web server port</param>
         public void Start(int serverPort)
         {
             var server = new HttpServer(serverPort);
@@ -37,6 +41,9 @@ namespace SecuritySystemUWP
         }
     }
 
+    /// <summary>
+    /// HttpServer class that services the content for the Security System web interface
+    /// </summary>
     public sealed class HttpServer : IDisposable
     {
         private const uint BufferSize = 8192;
@@ -44,6 +51,10 @@ namespace SecuritySystemUWP
         private readonly StreamSocketListener listener;
         private WebHelper helper;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="serverPort">Port to start server on</param>
         public HttpServer(int serverPort)
         {
             helper = new WebHelper();
@@ -53,6 +64,7 @@ namespace SecuritySystemUWP
             {
                 try
                 {
+                    // Process incoming request
                     processRequestAsync(e.Socket);
                 }catch(Exception ex)
                 {
@@ -75,14 +87,18 @@ namespace SecuritySystemUWP
             listener.Dispose();
         }
 
+        /// <summary>
+        /// Process the incoming request
+        /// </summary>
+        /// <param name="socket"></param>
         private async void processRequestAsync(StreamSocket socket)
         {
             try
             {
-                // this works for text only
                 StringBuilder request = new StringBuilder();
                 using (IInputStream input = socket.InputStream)
                 {
+                    // Convert the request bytes to a string that we understand
                     byte[] data = new byte[BufferSize];
                     IBuffer buffer = data.AsBuffer();
                     uint dataRead = BufferSize;
@@ -96,9 +112,11 @@ namespace SecuritySystemUWP
 
                 using (IOutputStream output = socket.OutputStream)
                 {
+                    // Parse the request
                     string requestMethod = request.ToString().Split('\n')[0];
                     string[] requestParts = requestMethod.Split(' ');
 
+                    // Process the request and write a response to send back to the browser
                     if (requestParts[0] == "GET")
                         await writeResponseAsync(requestParts[1], output, socket.Information);
                     else
@@ -124,26 +142,32 @@ namespace SecuritySystemUWP
             {
                 string[] requestParts = request.Split('/');
 
+                // Request for the root page, so redirect to home page
                 if (request.Equals("/"))
                 {
                     await redirectToPage(NavConstants.HOME_PAGE, os);
                 }
+                // Request for the home page
                 else if(request.Contains(NavConstants.HOME_PAGE))
                 {
                     // Generate the default config page
                     string html = helper.GenerateStatusPage();
                     await WebHelper.WriteToStream(html, os);
                 }
+                // Request for the settings page
                 else if (request.Contains(NavConstants.SETTINGS_PAGE))
                 {
+                    // Process the GET parameters
                     if (request.Contains("?"))
                     {
+                        // Format the URI with the get parameters
                         Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
 
                         // Take the parameters from the URL and put it into Settings
                         helper.ParseUriIntoSettings(uri);
                         await AppSettings.SaveAsync(App.Controller.XmlSettings, "Settings.xml");
 
+                        // This is an event that lets us know what the controller is done restarting after the settings are applied
                         AutoResetEvent ase = new AutoResetEvent(false);
 
                         // Dispose and Initialize need to be called on UI thread because of DispatcherTimers
@@ -151,9 +175,11 @@ namespace SecuritySystemUWP
                         {
                             try
                             {
+                                // Restart the controller to apply new settings
                                 App.Controller.Dispose();
                                 await App.Controller.Initialize();
 
+                                // Create the settings page and add a confirmation message that the settings were applied successfully
                                 string html = helper.GeneratePage("Security System Config", "Security System Config", helper.CreateHtmlFormFromSettings(), "<span style='color:Green'>Configuration saved!</span><br><br>");
                                 await WebHelper.WriteToStream(html, os);
                             }
@@ -162,6 +188,7 @@ namespace SecuritySystemUWP
                                 Debug.WriteLine("Error restarting controller: " + ex.Message);
                             }
 
+                            // Signal that the restart is done
                             ase.Set();
                         });
 
@@ -175,6 +202,7 @@ namespace SecuritySystemUWP
                         await WebHelper.WriteToStream(html, os);
                     }
                 }
+                // Request for the OneDrive page
                 else if (request.Contains(NavConstants.ONEDRIVE_PAGE))
                 {
                     // Take in the parameters and try to login to OneDrive
@@ -188,18 +216,21 @@ namespace SecuritySystemUWP
                         {
                             if (oneDrive.IsLoggedIn())
                             {
-                                // Save tokens to settings file
+                                // Save tokens to settings file if we successfully logged in
                                 await AppSettings.SaveAsync(App.Controller.XmlSettings, "Settings.xml");
                             }
                         }
                     }
 
+                    // Generate page and write to stream
                     string html = helper.GenerateOneDrivePage();
                     await WebHelper.WriteToStream(html, os);
                 }
+                // Request for gallery page
                 else if(request.Contains(NavConstants.GALLERY_PAGE))
                 {
                     var storageType = App.Controller.Storage.GetType();
+                    // If the storage type is OneDrive, generate page with link to OneDrive
                     if (storageType == typeof(OneDrive))
                     {
                         string html = helper.GeneratePage("Gallery", "Gallery", "<b>" + storageType.Name + "</b> is set as your storage provider.&nbsp;&nbsp;"
@@ -207,15 +238,18 @@ namespace SecuritySystemUWP
                             + "To view your pictures here, please select <b>" + StorageProvider.Local + "</b> as your storage provider.");
                         await WebHelper.WriteToStream(html, os);
                     }
+                    // Otherwise show the gallery for the files on the device
                     else
                     {
                         StorageFolder folder = KnownFolders.PicturesLibrary;
+                        // Parse GET parameters
                         if (request.Contains("?"))
                         {
                             Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
                             var parameters = helper.ParseGetParametersFromUrl(uri);
                             try
                             {
+                                // Find the folder that's specified in the parameters
                                 folder = await StorageFolder.GetFolderFromPathAsync(parameters["folder"]);
                             }
                             catch (Exception ex)
@@ -233,11 +267,13 @@ namespace SecuritySystemUWP
                             folder = await folder.GetFolderAsync(AppSettings.FolderName);
                         }
 
+                        // Generate gallery page and write to stream
                         string galleryHtml = await helper.GenerateGallery(folder);
                         string html = helper.GeneratePage("Gallery", "Gallery", galleryHtml);
                         await WebHelper.WriteToStream(html, os);
                     }
                 }
+                // Request for API
                 else if(request.Contains("api"))
                 {
                     try
@@ -246,10 +282,16 @@ namespace SecuritySystemUWP
                         {
                             switch (requestParts[2].ToLower())
                             {
+                                // An image from the gallery was requested
                                 case "gallery":
                                     var temp = request.Split(new string[] { "gallery/" }, StringSplitOptions.None);
+                                    // HTML decode the file path
                                     string decodedPath = WebUtility.UrlDecode(temp[1]);
+
+                                    // Retrieve the file
                                     StorageFile file = await StorageFile.GetFileFromPathAsync(decodedPath);
+
+                                    // Write the file to the stream
                                     await WebHelper.WriteFileToStream(file, os);
                                     break;
                             }
@@ -263,6 +305,7 @@ namespace SecuritySystemUWP
                         App.Controller.TelemetryClient.TrackEvent("FailedToProcessApiRequest", events);
                     }
                 }
+                // Request for a file that is in the Assets\Web folder (e.g. logo, css file)
                 else
                 {
                     using (Stream resp = os.AsStreamForWrite())
@@ -271,7 +314,11 @@ namespace SecuritySystemUWP
                         try
                         {
                             var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+
+                            // Map the requested path to Assets\Web folder
                             string filePath = @"Assets\Web" + request.Replace('/', '\\');
+                            
+                            // Open the file and write it to the stream
                             using (Stream fs = await folder.OpenStreamForReadAsync(filePath))
                             {
                                 string header = String.Format("HTTP/1.1 200 OK\r\n" +
@@ -293,6 +340,7 @@ namespace SecuritySystemUWP
                             App.Controller.TelemetryClient.TrackEvent("FailedToOpenStream", events);
                         }
 
+                        // Send 404 not found if can't find file
                         if (!exists)
                         {
                             byte[] headerArray = Encoding.UTF8.GetBytes(
@@ -316,6 +364,7 @@ namespace SecuritySystemUWP
 
                 try
                 {
+                    // Try to send an error page back if there was a problem servicing the request
                     string html = helper.GeneratePage("Error", "Error", "There's been an error: " + ex.Message + "<br><br>" + ex.StackTrace);
                     await WebHelper.WriteToStream(html, os);
                 }
@@ -326,6 +375,12 @@ namespace SecuritySystemUWP
             }
         }
 
+        /// <summary>
+        /// Redirect to a page
+        /// </summary>
+        /// <param name="path">Relative path to page</param>
+        /// <param name="os"></param>
+        /// <returns></returns>
         private async Task redirectToPage(string path, IOutputStream os)
         {
             using (Stream resp = os.AsStreamForWrite())

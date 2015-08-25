@@ -33,18 +33,21 @@ namespace SecuritySystemUWP
         public ICamera Camera;
 
         /// <summary>
-        /// Web interface
+        /// Server that runs the web interface
         /// </summary>
         public WebServer Server;
-                
+
+        /// <summary>
+        /// Provides status if the controller has been initialized or not
+        /// </summary>
+        public bool IsInitialized { get; private set; } = false;
+
         private string[] cameras = { "Cam1" };
         private static DispatcherTimer uploadPicturesTimer;
         private static DispatcherTimer deletePicturesTimer;
         private const int uploadInterval = 10; //Value in seconds
         private const int deleteInterval = 1; //Value in hours
-
-        public bool IsInitialized { get; private set; } = false;
-
+        
         public AppController()
         {
             TelemetryClient = new Microsoft.ApplicationInsights.TelemetryClient();
@@ -52,12 +55,19 @@ namespace SecuritySystemUWP
             XmlSettings = new AppSettings();
         }
 
+        /// <summary>
+        /// Initializes the controller:  Loads settings, starts web server, sets up the camera and storage providers,
+        /// tries to log into OneDrive (if OneDrive is selected), and starts the file upload and deletion timers
+        /// </summary>
+        /// <returns></returns>
         public async Task Initialize()
         {
             try
             {
+                // Load settings from file
                 XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
 
+                // Start web server on port 8000
                 if (!Server.IsRunning)
                     Server.Start(8000);
 
@@ -66,7 +76,7 @@ namespace SecuritySystemUWP
 
                 await Camera.Initialize();
 
-                // Try to login using existing Access Token in settings file
+                // Try to log into OneDrive using existing Access Token in settings file
                 if (Storage.GetType() == typeof(OneDrive))
                 {
                     var oneDrive = App.Controller.Storage as OneDrive;
@@ -115,6 +125,9 @@ namespace SecuritySystemUWP
             }
         }
 
+        /// <summary>
+        /// Disposes the file upload and deletion timers, camera, and storage
+        /// </summary>
         public void Dispose()
         {
             try

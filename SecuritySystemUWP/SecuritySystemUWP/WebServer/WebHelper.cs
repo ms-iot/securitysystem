@@ -33,6 +33,7 @@ namespace SecuritySystemUWP
         /// <returns></returns>
         public async Task InitializeAsync()
         {
+            // Load the html page template
             var filePath = @"Assets\Web\default.htm";
             var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
             var file = await folder.GetFileAsync(filePath);
@@ -102,6 +103,7 @@ namespace SecuritySystemUWP
         /// <returns></returns>
         private string createNavBar()
         {
+            // Create html for the side bar navigation using the links Dictionary
             string html = "<p>Navigation</p><ul>";
             foreach (string key in links.Keys)
             {
@@ -128,7 +130,11 @@ namespace SecuritySystemUWP
             }
 
             string html = "";
+
+            // Display login status
             html += "<b>OneDrive Status:&nbsp;&nbsp;</b>" + (isOneDriveLoggedIn ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br>";
+
+            // Create OneDrive URL for logging in
             string uri = string.Format(AppSettings.OneDriveLoginUrl, App.Controller.XmlSettings.OneDriveClientId, AppSettings.OneDriveScope, AppSettings.OneDriveRedirectUrl);
             html += "<p class='sectionHeader'>Log into OneDrive:</p>";
             html += "<ol>";
@@ -140,6 +146,7 @@ namespace SecuritySystemUWP
                 " <form><input type='text' name='codeUrl' size='50'>  <input type='submit' value='Submit'></form></li>";
             html += "</ol><br><br>";
 
+            // Create a logout button if we're logged in
             if (isOneDriveLoggedIn)
             {
                 html += "<p class='sectionHeader'>Log out of OneDrive:</p>";
@@ -157,8 +164,13 @@ namespace SecuritySystemUWP
         {
             string html = "";
 
+            // Show camera type on status page
             html += "<b>Camera Type:&nbsp;&nbsp;</b>" + App.Controller.Camera.GetType().Name + "<br>";
+
+            // Show storage type on status page
             html += "<b>Storage Type:&nbsp;&nbsp;</b>" + App.Controller.Storage.GetType().Name + "<br><br>";
+
+            // Show controller status
             html += "<b>Status:&nbsp;&nbsp;</b>" + ((App.Controller.IsInitialized) ? "<span style='color:Green'>Running" : "<span style='color:Red'>Not Running") + "</span><br>";
 
             // Show OneDrive status if the Storage Provider selected is OneDrive
@@ -204,7 +216,7 @@ namespace SecuritySystemUWP
 
             if (subFolders.Count > 0)
             {
-                // Generate folder navigation pane
+                // Generate subfolder navigation pane
                 html += "<div id='folder_nav_pane' style='display:none'>";
                 html += "<ul>";
                 foreach (StorageFolder subFolder in subFolders)
@@ -295,6 +307,7 @@ namespace SecuritySystemUWP
                 var decoder = new WwwFormUrlDecoder(uri.Query);
                 foreach (WwwFormUrlDecoderEntry entry in decoder)
                 {
+                    // codeUrl is the parameter that contains the URL that was pasted into the textbox on the OneDrive page
                     if (entry.Name.Equals("codeUrl"))
                     {
                         string codeUrl = WebUtility.UrlDecode(entry.Value);
