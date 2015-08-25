@@ -74,6 +74,12 @@ namespace SecuritySystemUWP
 
         public static readonly StorageFolder SettingsFolder = ApplicationData.Current.LocalFolder;
 
+        /// <summary>
+        /// Save the settings to a file
+        /// </summary>
+        /// <param name="settings">Settings object to save</param>
+        /// <param name="filename">Name of file to save to</param>
+        /// <returns></returns>
         public static async Task SaveAsync(AppSettings settings, string filename)
         {
             StorageFile sessionFile = await SettingsFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
@@ -86,7 +92,11 @@ namespace SecuritySystemUWP
             sessionOutputStream.Dispose();
         }
 
-        // Deserialize app settings from XML format asynchronously; leave settings be default if file does not exist.
+        /// <summary>
+        /// Load the settings from a file
+        /// </summary>
+        /// <param name="filename">Name of settings file</param>
+        /// <returns></returns>
         public static async Task<AppSettings> RestoreAsync(string filename)
         {
             try
