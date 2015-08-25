@@ -229,14 +229,14 @@ namespace SecuritySystemUWP
                 // Request for gallery page
                 else if(request.Contains(NavConstants.GALLERY_PAGE))
                 {
+                    string html = "";
                     var storageType = App.Controller.Storage.GetType();
                     // If the storage type is OneDrive, generate page with link to OneDrive
                     if (storageType == typeof(OneDrive))
                     {
-                        string html = helper.GeneratePage("Gallery", "Gallery", "<b>" + storageType.Name + "</b> is set as your storage provider.&nbsp;&nbsp;"
+                        html = helper.GeneratePage("Gallery", "Gallery", "<b>" + storageType.Name + "</b> is set as your storage provider.&nbsp;&nbsp;"
                             + "Please view your pictures on <a href='http://www.onedrive.com' target='_blank'>OneDrive</a>.<br><br>"
                             + "To view your pictures here, please select <b>" + StorageProvider.Local + "</b> as your storage provider.");
-                        await WebHelper.WriteToStream(html, os);
                     }
                     // Otherwise show the gallery for the files on the device
                     else
@@ -269,9 +269,10 @@ namespace SecuritySystemUWP
 
                         // Generate gallery page and write to stream
                         string galleryHtml = await helper.GenerateGallery(folder);
-                        string html = helper.GeneratePage("Gallery", "Gallery", galleryHtml);
-                        await WebHelper.WriteToStream(html, os);
+                        html = helper.GeneratePage("Gallery", "Gallery", galleryHtml);
                     }
+
+                    await WebHelper.WriteToStream(html, os);
                 }
                 // Request for API
                 else if(request.Contains("api"))

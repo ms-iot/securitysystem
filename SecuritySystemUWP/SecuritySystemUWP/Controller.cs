@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
+using Windows.Storage;
 using Windows.UI.Xaml;
 
 namespace SecuritySystemUWP
@@ -70,6 +71,16 @@ namespace SecuritySystemUWP
                 // Start web server on port 8000
                 if (!Server.IsRunning)
                     Server.Start(8000);
+
+                // Create local storage folder if it doesn't exist
+                StorageFolder folder = KnownFolders.PicturesLibrary;
+                try
+                {
+                    await folder.GetFolderAsync(AppSettings.FolderName);
+                }catch(System.IO.FileNotFoundException)
+                {
+                    await folder.CreateFolderAsync(AppSettings.FolderName);
+                }
 
                 Camera = CameraFactory.Get(XmlSettings.CameraType);
                 Storage = StorageFactory.Get(XmlSettings.StorageProvider);
