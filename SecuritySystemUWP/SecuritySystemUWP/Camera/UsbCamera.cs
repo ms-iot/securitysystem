@@ -17,10 +17,7 @@ namespace SecuritySystemUWP
     public class UsbCamera : ICamera
     {
         private MediaCapture mediaCapture;
-        private static DispatcherTimer takePhotoTimer;
         private MotionSensor pirSensor;
-        private CoreDispatcher dispatcher;
-        private bool isTimerStarted;
         private static Mutex pictureMutexLock = new Mutex();
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -65,12 +62,6 @@ namespace SecuritySystemUWP
                     App.Controller.TelemetryClient.TrackEvent("FailedToInitializeMediaCapture", events);
                 }
             }
-            //Timer controlling camera pictures with motion
-            isTimerStarted = false;
-            takePhotoTimer = new DispatcherTimer();
-            takePhotoTimer.Interval = TimeSpan.FromSeconds(1);
-            takePhotoTimer.Tick += TakePhotoTimer_Tick;
-            dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
 
             //Initialize PIR Sensor
             pirSensor = new MotionSensor();
@@ -80,7 +71,6 @@ namespace SecuritySystemUWP
         public void Dispose()
         {
             mediaCapture?.Dispose();
-            takePhotoTimer?.Stop();
             pirSensor?.Dispose();
         }
 
@@ -90,23 +80,11 @@ namespace SecuritySystemUWP
         private async void PirSensor_OnChanged(object sender, GpioPinValueChangedEventArgs e)
         {
             //Start the timer for the duration of motion
-            if ((e.Edge == GpioPinEdge.FallingEdge) != isTimerStarted)
+            if (e.Edge == GpioPinEdge.FallingEdge)
             {
-                isTimerStarted = !isTimerStarted;
-                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    if (isTimerStarted)
-                    {
-                        takePhotoTimer.Start();
-                    }
-                    else
-                    {
-                        takePhotoTimer.Stop();
-                    }
-                }).AsTask();
+                await TakePhotoAsync();
             }
         }
-
         private static async Task<DeviceInformation> FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel desiredPanel)
         {
             // Get available devices for capturing pictures
@@ -122,11 +100,6 @@ namespace SecuritySystemUWP
                 return allVideoDevices.FirstOrDefault();
             }
             return desiredDevice;
-        }
-
-        private async void TakePhotoTimer_Tick(object sender, object e)
-        {
-            await TakePhotoAsync();
         }
         private async Task TakePhotoAsync()
         {
@@ -146,13 +119,8 @@ namespace SecuritySystemUWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(string.Format("Exception when taking a photo: {0}", ex.ToString()));
-                //If image capture was unsuccessful, delete the blank file created
+                //Expected Exception. If image capture was unsuccessful, delete the blank file created
                 await image.DeleteAsync();
-
-                // Log telemetry event about this exception
-                var events = new Dictionary<string, string> { { "UsbCamera", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToCapturePhoto", events);
             }
         }
     }
