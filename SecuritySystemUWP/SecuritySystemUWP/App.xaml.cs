@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Microsoft.ApplicationInsights;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -24,26 +26,49 @@ namespace SecuritySystemUWP
     /// </summary>
     sealed partial class App : Application
     {
-        /// <summary>
-        /// Allows tracking page views, exceptions and other telemetry through the Microsoft Application Insights service.
-        /// </summary>
-        public static Microsoft.ApplicationInsights.TelemetryClient TelemetryClient;
-        
-        /// <summary>
-        /// Configuration settings for app
-        /// </summary>
-        public static AppSettings XmlSettings;
+        private DispatcherTimer HeartbeatTimer;
+        public static AppController Controller;
+        private Stopwatch stopwatch = Stopwatch.StartNew();
+        private int heartbeatInterval = 1;  // 1 min
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
         public App()
-        { 
-            TelemetryClient = new Microsoft.ApplicationInsights.TelemetryClient();
+        {
+            // Initialize AI telemetry in the app.
+            WindowsAppInitializer.InitializeAsync();
+
+            // Timer uploading hearbeat telemetry event
+            HeartbeatTimer = new DispatcherTimer();
+            HeartbeatTimer.Tick += HeartbeatTimer_Tick;
+            HeartbeatTimer.Interval = new TimeSpan(0, heartbeatInterval, 0);    // tick every heartbeatInterval
+            HeartbeatTimer.Start();
 
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            this.Resuming += OnResuming;
+
+            Controller = new AppController();
+        }
+
+        /// <summary>
+        /// Invoked when the heartbeat timer ticks.
+        /// </summary>
+        void HeartbeatTimer_Tick(object sender, object e)
+        {
+            // Log telemetry event that the device is alive
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "userAlias", App.Controller.XmlSettings.MicrosoftAlias } };
+            App.Controller.TelemetryClient.TrackMetric("DeviceHeartbeat", heartbeatInterval, properties);
+        }
+
+        /// <summary>
+        /// Invoked when the application resumes from suspend.
+        /// </summary>
+        private void OnResuming(Object sender, Object e)
+        {
+            stopwatch.Start();
         }
 
         /// <summary>
@@ -53,10 +78,13 @@ namespace SecuritySystemUWP
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
+            stopwatch.Start();
 
-            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.XmlSettings.MicrosoftAlias } };
-            App.TelemetryClient.TrackTrace("Start Info", properties);
+            await Controller.Initialize();
+
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.Controller.XmlSettings.MicrosoftAlias } };
+            App.Controller.TelemetryClient.TrackTrace("Start Info", properties);
+
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
@@ -114,6 +142,13 @@ namespace SecuritySystemUWP
         /// <param name="e">Details about the suspend request.</param>
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
+            // Track App suspension/exit:
+            stopwatch.Stop();
+            App.Controller.TelemetryClient.TrackMetric("AppRuntime", stopwatch.Elapsed.TotalMilliseconds);
+
+            var metrics = new Dictionary<string, string> { { "userAlias", App.Controller.XmlSettings.MicrosoftAlias }, { "appRuntime", stopwatch.Elapsed.TotalMilliseconds.ToString() } };
+            App.Controller.TelemetryClient.TrackEvent("UserRuntime", metrics);
+
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
