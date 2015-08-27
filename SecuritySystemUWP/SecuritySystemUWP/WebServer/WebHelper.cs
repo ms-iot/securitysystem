@@ -26,6 +26,7 @@ namespace SecuritySystemUWP
                 {"Gallery", "/" + NavConstants.GALLERY_PAGE },
                 {"OneDrive", "/" + NavConstants.ONEDRIVE_PAGE },
             };
+        private StorageFile[] cachedFiles = null;
 
         /// <summary>
         /// Initializes the WebHelper with the default.htm template
@@ -242,30 +243,43 @@ namespace SecuritySystemUWP
 
             var results = folder.CreateFileQueryWithOptions(queryOptions);
             
-            var files = await results.GetFilesAsync();
+            StorageFile[] sortedFiles = null;
 
-            if (files.Count > 0)
+            // Use cached files if we already got the files and we're navigating to the first page
+            if (cachedFiles != null && pageNumber != 1)
+            {
+                sortedFiles = cachedFiles;
+            }
+            else
+            {
+                var files = await results.GetFilesAsync();
+                sortedFiles = files.OrderByDescending((x) => x.DateCreated).ToArray();
+                cachedFiles = sortedFiles;
+            }
+
+            if (sortedFiles.Length > 0)
             {
                 // Create pages
+                string pagesHtml = "<form>";
                 html += "<tr><td>";
-                int totalPages = (int)Math.Ceiling((double)files.Count / pageSize);
-                html += "Pages: ";
+                int totalPages = (int)Math.Ceiling((double)sortedFiles.Length / pageSize);
+                pagesHtml += "Pages: ";
+
+                pagesHtml += "<select name='page' onchange='this.form.submit()'>";
+
                 for (int i = 1; i <= totalPages; i++)
                 {
-                    if (i != pageNumber)
-                    {
-                        html += MakeHyperlink(i.ToString(), "/gallery.htm?folder=" + WebUtility.UrlEncode(folder.Path) + "&page=" + i + "&pageSize=" + pageSize, false) + "&nbsp;";
-                    }
-                    else
-                    {
-                        html += "<b>" + i + "</b>&nbsp;";
-                    }
+                    pagesHtml += "<option value='" + i + "' " + ((i == pageNumber) ? "selected='selected'" : "") + ">" + i + "</option>";
                 }
+                pagesHtml += "</select>";
+                pagesHtml += "<input type='hidden' name='folder' value='" + folder.Path + "' />";
+                pagesHtml += "<input type='hidden' name='pageSize' value='30' />";
+                pagesHtml += "</form>";
+
+                html += pagesHtml;
                 html += "<br></td></tr>";
 
                 html += "<tr><td>";
-                // Sort the list files by date
-                StorageFile[] sortedFiles = files.OrderByDescending((x) => x.DateCreated).ToArray();
 
                 // Pick out the subset of files we need based on page
                 int startIndex = (pageNumber - 1) * pageSize;
@@ -287,18 +301,7 @@ namespace SecuritySystemUWP
 
                 // Create pages
                 html += "<tr><td>";
-                html += "<br>Pages: ";
-                for(int i = 1; i<= totalPages;i++)
-                {
-                    if (i != pageNumber)
-                    {
-                        html += MakeHyperlink(i.ToString(), "/gallery.htm?folder=" + WebUtility.UrlEncode(folder.Path) + "&page=" + i + "&pageSize=" + pageSize, false) + "&nbsp;";
-                    }
-                    else
-                    {
-                        html += "<b>" + i + "</b>&nbsp;";
-                    }
-                }
+                html += "<br>" + pagesHtml;
                 html += "</td></tr>";
             }
             else
