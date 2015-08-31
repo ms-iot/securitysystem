@@ -31,13 +31,13 @@ router.post('/images',
         Expiry: expiryDate
       },
       };
-        blobService.listBlobsSegmentedWithPrefix('imagecontainer', "Cam1/" + searchDate, null, function(error, result, response){
+        blobService.listBlobsSegmentedWithPrefix('securitysystem-cameradrop', "Cam1/" + searchDate, null, function(error, result, response){
           if(!error){
             images = result;
              for(var i = 0; i < images.entries.length; i++){
                 images.entries[i] = timeFormat.format(images.entries[i], {name: [19,37], hour: [16,18]})
-                token = blobService.generateSharedAccessSignature('imagecontainer', images.entries[i].name, sharedAccessPolicy);
-                images.entries[i].downloadUrl = blobService.getUrl('imagecontainer', images.entries[i].name, token);
+                token = blobService.generateSharedAccessSignature('securitysystem-cameradrop', images.entries[i].name, sharedAccessPolicy);
+                images.entries[i].downloadUrl = blobService.getUrl('securitysystem-cameradrop', images.entries[i].name, token);
               }
             res.send({images: images.entries, token: result.continuationToken});
           } else {
