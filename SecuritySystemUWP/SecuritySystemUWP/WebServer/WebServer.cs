@@ -151,7 +151,7 @@ namespace SecuritySystemUWP
                 else if(request.Contains(NavConstants.HOME_PAGE))
                 {
                     // Generate the default config page
-                    string html = helper.GenerateStatusPage();
+                    string html = await helper.GenerateStatusPage();
                     await WebHelper.WriteToStream(html, os);
                 }
                 // Request for the settings page
