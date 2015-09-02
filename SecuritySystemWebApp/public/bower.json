@@ -20,6 +20,7 @@
     "angular-aria": "~1.4.3",
     "font-awesome": "~4.4.0",
     "angular": "~1.4.3",
-    "angular-route": "~1.4.3"
+    "angular-route": "~1.4.3",
+    "angular-moment": "~0.10.2"
   }
 }
