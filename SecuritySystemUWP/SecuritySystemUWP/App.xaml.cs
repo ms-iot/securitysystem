@@ -28,7 +28,7 @@ namespace SecuritySystemUWP
     {
         private DispatcherTimer HeartbeatTimer;
         public static AppController Controller;
-        private Stopwatch stopwatch = Stopwatch.StartNew();
+        public static Stopwatch GlobalStopwatch = Stopwatch.StartNew();
         private int heartbeatInterval = 1;  // 1 min
 
         // Environment settings
@@ -91,7 +91,7 @@ namespace SecuritySystemUWP
         /// </summary>
         private void OnResuming(Object sender, Object e)
         {
-            stopwatch.Start();
+            GlobalStopwatch.Start();
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace SecuritySystemUWP
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            stopwatch.Start();
+            GlobalStopwatch.Start();
 
             await Controller.Initialize();
 
@@ -166,10 +166,10 @@ namespace SecuritySystemUWP
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             // Track App suspension/exit:
-            stopwatch.Stop();
-            App.Controller.TelemetryClient.TrackMetric("AppRuntime", stopwatch.Elapsed.TotalMilliseconds);
+            GlobalStopwatch.Stop();
+            App.Controller.TelemetryClient.TrackMetric("AppRuntime", GlobalStopwatch.Elapsed.TotalMilliseconds);
 
-            var metrics = new Dictionary<string, string> { { "userAlias", App.Controller.XmlSettings.MicrosoftAlias }, { "appRuntime", stopwatch.Elapsed.TotalMilliseconds.ToString() } };
+            var metrics = new Dictionary<string, string> { { "userAlias", App.Controller.XmlSettings.MicrosoftAlias }, { "appRuntime", GlobalStopwatch.Elapsed.TotalMilliseconds.ToString() } };
             App.Controller.TelemetryClient.TrackEvent("UserRuntime", metrics);
 
             var deferral = e.SuspendingOperation.GetDeferral();
