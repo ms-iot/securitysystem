@@ -161,7 +161,7 @@ namespace SecuritySystemUWP
         /// Generates the html for the home page (status page)
         /// </summary>
         /// <returns></returns>
-        public string GenerateStatusPage()
+        public async Task<string> GenerateStatusPage()
         {
             string html = "";
 
@@ -174,8 +174,22 @@ namespace SecuritySystemUWP
             // Show controller status
             html += "<b>Status:&nbsp;&nbsp;</b>" + ((App.Controller.IsInitialized) ? "<span style='color:Green'>Running" : "<span style='color:Red'>Not Running") + "</span><br>";
 
+            // Show free space
+            var freeSpaceProperty = "System.FreeSpace";
+            var capacityProperty = "System.Capacity";
+            var picLib = KnownFolders.PicturesLibrary;
+            var properties = await picLib.GetBasicPropertiesAsync();
+            var result = await properties.RetrievePropertiesAsync(new string[] { freeSpaceProperty, capacityProperty });
+            double freeSpaceInGb = Convert.ToDouble(result[freeSpaceProperty]) / 1000000000.0;
+            double capacityInGb = Convert.ToDouble(result[capacityProperty]) / 1000000000.0;
+            html += "<b>Space:&nbsp;&nbsp;</b>" + freeSpaceInGb.ToString("#.##")  + " GB free of " + capacityInGb.ToString("#.##") + " GB<br>";
+
+            // Show up time
+            html += "<b>Up Time:&nbsp;&nbsp;</b>" + App.GlobalStopwatch.Elapsed.ToString() + "<br>";
+
+
             // Show OneDrive status if the Storage Provider selected is OneDrive
-            if(App.Controller.Storage.GetType() == typeof(OneDrive))
+            if (App.Controller.Storage.GetType() == typeof(OneDrive))
             {
                 var oneDrive = App.Controller.Storage as OneDrive;
                 html += "<b>OneDrive Status:&nbsp;&nbsp;</b>" + (oneDrive.IsLoggedIn() ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br>";
@@ -285,7 +299,7 @@ namespace SecuritySystemUWP
                 int startIndex = (pageNumber - 1) * pageSize;
                 for (int i = startIndex; i < startIndex + pageSize; i++)
                 {
-                    if (i > 0 && i < sortedFiles.Length)
+                    if (i < sortedFiles.Length)
                     {
                         StorageFile file = sortedFiles[i];
                         html += "<div class='img'>";
@@ -548,5 +562,6 @@ namespace SecuritySystemUWP
         {
             return folder.Path.Equals(picturesLibPath, StringComparison.OrdinalIgnoreCase);
         }
+        
     }
 }
