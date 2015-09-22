@@ -99,6 +99,7 @@
     <Compile Include="Camera\UsbCamera.cs" />
     <Compile Include="Camera\CameraFactory.cs" />
     <Compile Include="Controller.cs" />
+    <Compile Include="EnvironmentSettings.cs" />
     <Compile Include="MotionSensor.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
