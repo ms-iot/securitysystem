@@ -14,6 +14,48 @@
             </TransitionCollection>
         </Grid.ChildrenTransitions>
 
-        <TextBlock x:Name="titleTextBlock" TextWrapping="Wrap" Text="Security System" FontSize="72" FontWeight="Thin" HorizontalAlignment="Center"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="60" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="60" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="titleTextBlock" TextWrapping="Wrap" Text="Security System" FontSize="72" FontWeight="Thin" HorizontalAlignment="Center"
+                   Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"/>
+        
+        <TextBlock x:Name="deviceNameTextBlock" TextWrapping="Wrap" Text="Device Name:" FontSize="36" FontWeight="Thin" HorizontalAlignment="Left"
+                   Grid.Column="0" Grid.Row="2"/>
+        <TextBlock x:Name="deviceNameValueTextBlock" TextWrapping="Wrap" Text="Unknown" FontSize="36" FontWeight="Thin" HorizontalAlignment="Left"
+                   Grid.Column="1" Grid.Row="2"/>
+
+        <TextBlock x:Name="ipAddressTextBlock" TextWrapping="Wrap" Text="IP4 Address:" FontSize="36" FontWeight="Thin" HorizontalAlignment="Left"
+                   Grid.Column="0" Grid.Row="3"/>
+        <TextBlock x:Name="ipAddressValueTextBlock" TextWrapping="Wrap" Text="0.0.0.0" FontSize="36" FontWeight="Thin" HorizontalAlignment="Left"
+                   Grid.Column="1" Grid.Row="3"/>
+
+        <TextBlock x:Name="appVersionTextBlock" TextWrapping="Wrap" Text="Application Version:" FontSize="36" FontWeight="Thin" HorizontalAlignment="Left"
+                   Grid.Column="0" Grid.Row="4"/>
+        <TextBlock x:Name="appVersionValueTextBlock" TextWrapping="Wrap" Text="0.0.0.0" FontSize="36" FontWeight="Thin" HorizontalAlignment="Left"
+                   Grid.Column="1" Grid.Row="4"/>
+
+        <TextBlock x:Name="OSVersionTextBlock" TextWrapping="Wrap" Text="Operating System Version: " FontSize="36" FontWeight="Thin" HorizontalAlignment="Left"
+                   Grid.Column="0" Grid.Row="5"/>
+        <TextBlock x:Name="OSVersionValueTextBlock" TextWrapping="Wrap" Text="0.0.0.0" FontSize="36" FontWeight="Thin" HorizontalAlignment="Left"
+                   Grid.Column="1" Grid.Row="5"/>
+
+        <TextBlock x:Name="instructionsTextBlock" TextWrapping="Wrap" Text="Setup Instructions: To configure this security system please go to URL http://[your device ip address]:8000 on a browser." FontSize="36" FontWeight="Thin" HorizontalAlignment="Left"
+                   Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2"/>
+
+
     </Grid>
 </Page>

@@ -17,7 +17,22 @@ namespace SecuritySystemUWP
     {
         public MainPage()
         {
+            string ipAddress = "";
+            string instructions = "";
+
             this.InitializeComponent();
+
+            // get device environment info and display it in UI
+            deviceNameValueTextBlock.Text = EnvironmentSettings.GetDeviceName();
+            ipAddress = EnvironmentSettings.GetIPAddress();
+            ipAddressValueTextBlock.Text = ipAddress;
+            appVersionValueTextBlock.Text = EnvironmentSettings.GetAppVersion();
+            OSVersionValueTextBlock.Text = EnvironmentSettings.GetOSVersion();
+
+            // instructions text with ip address
+            instructions = "Setup Instructions: To configure this security system please go to URL http://" + ipAddress + ":8000 on a browser.";
+            instructionsTextBlock.Text = instructions;
+
         }
     }
 }
