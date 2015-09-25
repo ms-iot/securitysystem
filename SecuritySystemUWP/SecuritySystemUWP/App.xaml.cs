@@ -31,6 +31,12 @@ namespace SecuritySystemUWP
         public static Stopwatch GlobalStopwatch = Stopwatch.StartNew();
         private int heartbeatInterval = 1;  // 1 min
 
+        // Environment settings
+        private string OSVersion = "";
+        private string appVersion = "";
+        private string deviceName = "";
+        private string ipAddress = "";
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -46,6 +52,14 @@ namespace SecuritySystemUWP
             HeartbeatTimer.Interval = new TimeSpan(0, heartbeatInterval, 0);    // tick every heartbeatInterval
             HeartbeatTimer.Start();
 
+            // Retrieve and set environment settings
+            OSVersion = EnvironmentSettings.GetOSVersion();
+            appVersion = EnvironmentSettings.GetAppVersion();
+            deviceName = EnvironmentSettings.GetDeviceName();
+            ipAddress = EnvironmentSettings.GetIPAddress();
+
+            
+
             this.InitializeComponent();
             this.Suspending += OnSuspending;
             this.Resuming += OnResuming;
@@ -59,7 +73,16 @@ namespace SecuritySystemUWP
         void HeartbeatTimer_Tick(object sender, object e)
         {
             // Log telemetry event that the device is alive
-            Dictionary<string, string> properties = new Dictionary<string, string> { { "userAlias", App.Controller.XmlSettings.MicrosoftAlias } };
+            Dictionary<string, string> properties = new Dictionary<string, string>
+            {
+                { "userAlias", App.Controller.XmlSettings.MicrosoftAlias },                
+                { "Custom_AppVersion", appVersion },
+#if MS_INTERNAL_ONLY // do not send this app insights telemetry data for external customers
+                { "Custom_DeviceName", deviceName }, 
+                { "Custom_IPAddress", ipAddress }, 
+#endif
+                { "Custom_OSVersion", OSVersion },
+            };
             App.Controller.TelemetryClient.TrackMetric("DeviceHeartbeat", heartbeatInterval, properties);
         }
 
@@ -82,7 +105,7 @@ namespace SecuritySystemUWP
 
             await Controller.Initialize();
 
-            Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", App.Controller.XmlSettings.MicrosoftAlias } };
+            Dictionary<string, string> properties = new Dictionary<string, string> { { "userAlias", App.Controller.XmlSettings.MicrosoftAlias } };
             App.Controller.TelemetryClient.TrackTrace("Start Info", properties);
 
 #if DEBUG
