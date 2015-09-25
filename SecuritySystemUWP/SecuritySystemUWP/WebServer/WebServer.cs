@@ -113,15 +113,16 @@ namespace SecuritySystemUWP
                 using (IOutputStream output = socket.OutputStream)
                 {
                     // Parse the request
-                    string requestMethod = request.ToString().Split('\n')[0];
-                    string[] requestParts = requestMethod.Split(' ');
+                    string[] requestParts = request.ToString().Split('\n');
+                    string requestMethod = requestParts[0];
+                    string[] requestMethodParts = requestMethod.Split(' ');
 
                     // Process the request and write a response to send back to the browser
-                    if (requestParts[0] == "GET")
-                        await writeResponseAsync(requestParts[1], output, socket.Information);
+                    if (requestMethodParts[0] == "GET")
+                        await writeResponseAsync(requestMethodParts[1], output, socket.Information);
                     else
                         throw new InvalidDataException("HTTP method not supported: "
-                                                       + requestParts[0]);
+                                                       + requestMethodParts[0]);
                 }
             }catch(Exception ex)
             {
@@ -161,7 +162,7 @@ namespace SecuritySystemUWP
                     if (request.Contains("?"))
                     {
                         // Format the URI with the get parameters
-                        Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
+                        Uri uri = new Uri("http://1.2.3.4:8000" + request);
 
                         // Take the parameters from the URL and put it into Settings
                         helper.ParseUriIntoSettings(uri);
@@ -208,7 +209,8 @@ namespace SecuritySystemUWP
                     // Take in the parameters and try to login to OneDrive
                     if (request.Contains("?"))
                     {
-                        Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
+                        // I just put some arbitrary IP and port just so I have a correctly formatted URI, it's not important to have an actual IP + port
+                        Uri uri = new Uri("http://1.2.3.4:8000" + request);
                         await helper.ParseOneDriveUri(uri);
 
                         var oneDrive = App.Controller.Storage as OneDrive;
@@ -248,7 +250,7 @@ namespace SecuritySystemUWP
                         // Parse GET parameters
                         if (request.Contains("?"))
                         {
-                            Uri uri = new Uri("http://" + socketInfo.LocalAddress + ":" + socketInfo.LocalPort + request);
+                            Uri uri = new Uri("http://1.2.3.4:8000" + request);
                             var parameters = helper.ParseGetParametersFromUrl(uri);
                             try
                             {
