@@ -57,7 +57,7 @@ namespace SecuritySystemUWP
                 {
                     html += "<tr>";
                     html += "<td>";
-                    html += "<tr><td><b>" + info.Name + "</b>    ";
+                    html += "<b>" + info.Name + "</b>    ";
                     html += "</td><td>";
 
                     // Create textbox for strings
@@ -133,7 +133,7 @@ namespace SecuritySystemUWP
             string html = "";
 
             // Display login status
-            html += "<tr><td><b>OneDrive Status:</b></td><td>" + (isOneDriveLoggedIn ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br>";
+            html += "<b>OneDrive Status:&nbsp;&nbsp;</b>" + (isOneDriveLoggedIn ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br>";
 
             // Create OneDrive URL for logging in
             string uri = string.Format(AppSettings.OneDriveLoginUrl, App.Controller.XmlSettings.OneDriveClientId, AppSettings.OneDriveScope, AppSettings.OneDriveRedirectUrl);
@@ -180,7 +180,7 @@ namespace SecuritySystemUWP
 
             // Show controller status
             html += "<tr><td><b>Status:</b></td><td>&nbsp;&nbsp;" + ((App.Controller.IsInitialized) ? "<span style='color:Green'>Running" : "<span style='color:Red'>Not Running") + "</span></td></tr>";
-            
+
             // Show free space
             var freeSpaceProperty = "System.FreeSpace";
             var capacityProperty = "System.Capacity";
@@ -209,7 +209,7 @@ namespace SecuritySystemUWP
 
             // Show storage type on status page
             html += "<tr><td><b>Storage Type:</b></td><td>&nbsp;&nbsp;" + App.Controller.Storage.GetType().Name + "</td></tr>";
-            
+
             return GeneratePage("Security System", "Home", html);
         }
 
@@ -243,7 +243,7 @@ namespace SecuritySystemUWP
             html += "<tr><td>";
             // Create breadcrumbs for folder nav
             var temp = folder;
-            string breadcrumbs = "<tr><td><b>"+ ((subFolders.Count > 0) ? "<a onclick='toggleSubfolderList()' href='javascript:void(0);'>" + temp.Name + "</a>" : temp.Name) + "</b>";
+            string breadcrumbs = "<b>"+ ((subFolders.Count > 0) ? "<a onclick='toggleSubfolderList()' href='javascript:void(0);'>" + temp.Name + "</a>" : temp.Name) + "</b>";
             while(!temp.Path.Equals(picturesLibPath, StringComparison.OrdinalIgnoreCase))
             {
                 temp = await temp.GetParentAsync();
@@ -320,7 +320,7 @@ namespace SecuritySystemUWP
                         html += "<div class='img'>";
                         html += "<a target='_blank' href='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "'>";
                         html += "<img src='/api/gallery/" + WebUtility.UrlEncode(file.Path) + "' alt='" + file.Name + "' width='190'>";
-                        html += "<div class='desc'><tr><td><b>File Name:</b> " + file.Name + "<br><tr><td><b>Date Created:</b> " + file.DateCreated + "</div>";
+                        html += "<div class='desc'><b>File Name:</b> " + file.Name + "<br><b>Date Created:</b> " + file.DateCreated + "</div>";
                         html += "</a>";
                         html += "</div>";
                     }
