@@ -163,16 +163,23 @@ namespace SecuritySystemUWP
         /// <returns></returns>
         public async Task<string> GenerateStatusPage()
         {
-            string html = "";
+            string html = "<table>";
+            // Device Name
+            html += "<tr><td><b>Device Name:</b></td><td>&nbsp;&nbsp;" + EnvironmentSettings.GetDeviceName() + "</td></tr>";
 
-            // Show camera type on status page
-            html += "<b>Camera Type:&nbsp;&nbsp;</b>" + App.Controller.Camera.GetType().Name + "<br>";
+            // IP Address
+            html += "<tr><td><b>IP Address:</b></td><td>&nbsp;&nbsp;" + EnvironmentSettings.GetIPAddress() + "</td></tr>";
 
-            // Show storage type on status page
-            html += "<b>Storage Type:&nbsp;&nbsp;</b>" + App.Controller.Storage.GetType().Name + "<br><br>";
+            // App Version
+            html += "<tr><td><b>App Version:</b></td><td>&nbsp;&nbsp;" + EnvironmentSettings.GetAppVersion() + "</td></tr>";
+
+            // OS Version
+            html += "<tr><td><b>OS Version:</b></td><td>&nbsp;&nbsp;" + EnvironmentSettings.GetOSVersion() + "</td></tr>";
+
+            html += "<tr><td>&nbsp;</td></tr>";
 
             // Show controller status
-            html += "<b>Status:&nbsp;&nbsp;</b>" + ((App.Controller.IsInitialized) ? "<span style='color:Green'>Running" : "<span style='color:Red'>Not Running") + "</span><br>";
+            html += "<tr><td><b>Status:</b></td><td>&nbsp;&nbsp;" + ((App.Controller.IsInitialized) ? "<span style='color:Green'>Running" : "<span style='color:Red'>Not Running") + "</span></td></tr>";
 
             // Show free space
             var freeSpaceProperty = "System.FreeSpace";
@@ -182,18 +189,26 @@ namespace SecuritySystemUWP
             var result = await properties.RetrievePropertiesAsync(new string[] { freeSpaceProperty, capacityProperty });
             double freeSpaceInGb = Convert.ToDouble(result[freeSpaceProperty]) / 1000000000.0;
             double capacityInGb = Convert.ToDouble(result[capacityProperty]) / 1000000000.0;
-            html += "<b>Space:&nbsp;&nbsp;</b>" + freeSpaceInGb.ToString("#.##")  + " GB free of " + capacityInGb.ToString("#.##") + " GB<br>";
+            html += "<tr><td><b>Space:</b></td><td>&nbsp;&nbsp;" + freeSpaceInGb.ToString("#.##") + " GB free of " + capacityInGb.ToString("#.##") + " GB</td></tr>";
 
             // Show up time
-            html += "<b>Up Time:&nbsp;&nbsp;</b>" + App.GlobalStopwatch.Elapsed.ToString() + "<br>";
+            html += "<tr><td><b>Up Time:</b></td><td>&nbsp;&nbsp;" + App.GlobalStopwatch.Elapsed.ToString() + "</td></tr>";
 
 
             // Show OneDrive status if the Storage Provider selected is OneDrive
             if (App.Controller.Storage.GetType() == typeof(OneDrive))
             {
                 var oneDrive = App.Controller.Storage as OneDrive;
-                html += "<b>OneDrive Status:&nbsp;&nbsp;</b>" + (oneDrive.IsLoggedIn() ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span><br>";
+                html += "<tr><td><b>OneDrive Status:</b></td><td>&nbsp;&nbsp;" + (oneDrive.IsLoggedIn() ? "<span style='color:Green'>Logged In" : "<span style='color:Red'>Not Logged In") + "</span></td></tr>";
             }
+
+            html += "<tr><td>&nbsp;</td></tr>";
+
+            // Show camera type on status page
+            html += "<tr><td><b>Camera Type:</b></td><td>&nbsp;&nbsp;" + App.Controller.Camera.GetType().Name + "</td></tr>";
+
+            // Show storage type on status page
+            html += "<tr><td><b>Storage Type:</b></td><td>&nbsp;&nbsp;" + App.Controller.Storage.GetType().Name + "</td></tr>";
 
             return GeneratePage("Security System", "Home", html);
         }
