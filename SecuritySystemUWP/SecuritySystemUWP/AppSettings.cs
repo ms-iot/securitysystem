@@ -32,7 +32,7 @@ namespace SecuritySystemUWP
         // Future add-on, should remain unchanged for now.
         public int NumberOfCameras = 1;
 
-        [Description("Type of camera you're using (e.g. IP, USB).<br>If you select IP camera, please set the IP camera's FTP path to \\Users\\DefaultAccount\\Pictures\\securitysystem-cameradrop.")]
+        [Description("Type of camera you're using (e.g. IP, USB).<br>If you select IP camera, please set the IP camera's FTP path to \\Users\\DefaultAccount\\Pictures\\" + FolderName + ".")]
         public CameraType CameraType = CameraType.Usb;
 
         [Description("This is the storage provider that you will use to store your photos.<br>If you select OneDrive and save, make sure to go to the OneDrive tab in the left navigation bar to log in and complete configuration.")]
