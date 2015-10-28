@@ -17,7 +17,7 @@ namespace SecuritySystemUWP
 {
     public class WebHelper
     {
-        private string picturesLibPath = "C:\\Users\\DefaultAccount\\Pictures";
+        private StorageFolder rootFolder;
         private string htmlTemplate;
         private Dictionary<string, string> links = new Dictionary<string, string>
             {
@@ -39,6 +39,8 @@ namespace SecuritySystemUWP
             var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
             var file = await folder.GetFileAsync(filePath);
             htmlTemplate = await FileIO.ReadTextAsync(file);
+
+            rootFolder = await KnownFolders.PicturesLibrary.GetFolderAsync(AppSettings.FolderName);
         }
         
         /// <summary>
@@ -244,11 +246,11 @@ namespace SecuritySystemUWP
             // Create breadcrumbs for folder nav
             var temp = folder;
             string breadcrumbs = "<b>"+ ((subFolders.Count > 0) ? "<a onclick='toggleSubfolderList()' href='javascript:void(0);'>" + temp.Name + "</a>" : temp.Name) + "</b>";
-            while(!temp.Path.Equals(picturesLibPath, StringComparison.OrdinalIgnoreCase))
+            while(!temp.Path.Equals(rootFolder.Path, StringComparison.OrdinalIgnoreCase))
             {
                 temp = await temp.GetParentAsync();
                 string hyperlink = MakeHyperlink(temp.Name, "/gallery.htm?folder=" + WebUtility.UrlEncode(temp.Path), false);
-                breadcrumbs = ((!isPicturesFolder(temp)) ? hyperlink : temp.Name) + " > " + breadcrumbs;
+                breadcrumbs = hyperlink + " > " + breadcrumbs;
             }
             html += breadcrumbs + "<br>";
 
@@ -575,7 +577,7 @@ namespace SecuritySystemUWP
         /// <returns></returns>
         private bool isPicturesFolder(StorageFolder folder)
         {
-            return folder.Path.Equals(picturesLibPath, StringComparison.OrdinalIgnoreCase);
+            return folder.Path.Equals(rootFolder.Path, StringComparison.OrdinalIgnoreCase);
         }
         
     }
