@@ -94,7 +94,7 @@ namespace SecuritySystemUWP
 
                     if (oneDrive != null)
                     {
-                        if (oneDrive.IsLoggedIn())
+                        if (!oneDrive.IsLoggedIn())
                         {
                             try
                             {
