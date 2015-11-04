@@ -289,6 +289,7 @@ namespace SecuritySystemUWP
                     string responseContentString = await responseMessage.Content.ReadAsStringAsync();
                     App.Controller.XmlSettings.OneDriveAccessToken = getAccessToken(responseContentString);
                     App.Controller.XmlSettings.OneDriveRefreshToken = getRefreshToken(responseContentString);
+                    await AppSettings.SaveAsync(App.Controller.XmlSettings, "Settings.xml");
                 }
             }
         }

@@ -89,9 +89,10 @@ namespace SecuritySystemUWP
         /// <summary>
         /// Invoked when the application resumes from suspend.
         /// </summary>
-        private void OnResuming(Object sender, Object e)
+        private async void OnResuming(Object sender, Object e)
         {
             GlobalStopwatch.Start();
+            await Controller.Initialize();
         }
 
         /// <summary>
