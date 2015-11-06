@@ -11,7 +11,7 @@
     <AssemblyName>SecuritySystemUWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.10240.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.10581.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
@@ -91,6 +91,7 @@
     <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AllJoynManager.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -123,6 +124,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="SecuritySystemIntrospection.xml" />
     <Content Include="settings.xml" />
     <None Include="project.json">
       <SubType>Designer</SubType>
@@ -157,15 +159,21 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <SDKReference Include="WindowsIoT, Version=10.0.10240.0">
-      <Name>Windows IoT Extension SDK</Name>
-    </SDKReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Themes\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="WindowsIoT, Version=10.0.10581.0">
+      <Name>Windows IoT Extensions for the UWP</Name>
+    </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\com.microsoft.maker.SecuritySystem\com.microsoft.maker.SecuritySystem.vcxproj">
+      <Project>{3875dc40-e7c8-49ec-890d-d3fd0e5637f4}</Project>
+      <Name>com.microsoft.maker.SecuritySystem</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

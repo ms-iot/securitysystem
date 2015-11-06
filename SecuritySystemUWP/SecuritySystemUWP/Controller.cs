@@ -1,10 +1,13 @@
-﻿using System;
+﻿using com.microsoft.maker.SecuritySystem;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
+using Windows.Devices.AllJoyn;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.UI.Xaml;
@@ -37,6 +40,8 @@ namespace SecuritySystemUWP
         /// Server that runs the web interface
         /// </summary>
         public WebServer Server;
+
+        private AllJoynManager alljoynManager;
 
         /// <summary>
         /// Provides status if the controller has been initialized or not
@@ -111,6 +116,9 @@ namespace SecuritySystemUWP
                         }
                     }
                 }
+
+                this.alljoynManager = new AllJoynManager();
+                await this.alljoynManager.Initialize(this.Camera, this.Storage);
 
                 //Timer controlling camera pictures with motion
                 uploadPicturesTimer = new DispatcherTimer();

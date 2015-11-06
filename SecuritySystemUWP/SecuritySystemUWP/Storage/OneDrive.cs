@@ -21,12 +21,12 @@ namespace SecuritySystemUWP
         private bool isLoggedIn = false;
         private Mutex uploadPicturesMutexLock = new Mutex();
         private DispatcherTimer refreshTimer;
-
         private int numberUploaded = 0;
-        
+        private DateTime lastUploadTime = DateTime.MinValue;
+
         /*******************************************************************************************
-        * PUBLIC METHODS
-        *******************************************************************************************/
+* PUBLIC METHODS
+*******************************************************************************************/
         public OneDrive()
         {
             //Set up timer to reauthenticate OneDrive login
@@ -44,6 +44,14 @@ namespace SecuritySystemUWP
             refreshTimer.Stop();
             cts.Dispose();
             httpClient.Dispose();
+        }
+
+        public DateTime LastUploadTime
+        {
+            get
+            {
+                return this.lastUploadTime;
+            }
         }
 
         public async void UploadPictures(string camera)
@@ -81,6 +89,7 @@ namespace SecuritySystemUWP
                             var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
                             App.Controller.TelemetryClient.TrackEvent("FailedToUploadPicture", events);
                         }
+                        this.lastUploadTime = DateTime.Now;
                     }
                 }
                 catch (Exception ex)

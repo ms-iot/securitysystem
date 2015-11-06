@@ -16,7 +16,8 @@ namespace SecuritySystemUWP
         private CloudStorageAccount storageAccount;
         private CloudBlobClient blobClient;
         private CloudBlobContainer blobContainer;
-        
+        private DateTime lastUploadTime = DateTime.MinValue;
+
         public Azure()
         {
             //Get the connection settings information using account name and key
@@ -32,6 +33,14 @@ namespace SecuritySystemUWP
         /*******************************************************************************************
         * PUBLIC METHODS
         *******************************************************************************************/
+        public DateTime LastUploadTime
+        {
+            get
+            {
+                return this.lastUploadTime;
+            }
+        }
+
         public async void UploadPictures(string camera)
         {
             uploadPicturesMutexLock.WaitOne();
@@ -59,6 +68,8 @@ namespace SecuritySystemUWP
                         await file.DeleteAsync();
                     }
                 }
+
+                this.lastUploadTime = DateTime.Now;
             }
             catch (Exception ex)
             {
