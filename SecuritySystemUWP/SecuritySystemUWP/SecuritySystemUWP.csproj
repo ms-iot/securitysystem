@@ -96,11 +96,10 @@
     </Compile>
     <Compile Include="Camera\ICamera.cs" />
     <Compile Include="Camera\IpCamera.cs" />
-    <Compile Include="Camera\UsbCamera.cs" />
+    <Compile Include="Camera\Webcam.cs" />
     <Compile Include="Camera\CameraFactory.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="EnvironmentSettings.cs" />
-    <Compile Include="MotionSensor.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -166,6 +165,16 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\motion-sensor\PirSensor\PirSensor.csproj">
+      <Project>{45dac222-16a5-4745-8c94-8c9dc0abe033}</Project>
+      <Name>PirSensor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\usb-camera\UsbCamera\UsbCamera.csproj">
+      <Project>{c00c9943-2bdc-4fe8-b69e-09fc2b272cc2}</Project>
+      <Name>UsbCamera</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
