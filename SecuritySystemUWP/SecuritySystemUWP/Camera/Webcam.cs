@@ -14,7 +14,7 @@ namespace SecuritySystemUWP
     {
         private UsbCamera webcam;
         private PirSensor pirSensor;
-        private bool isCapturing;
+        private int isCapturing;
         private AsyncSemaphore captureLock;
         /*******************************************************************************************
         * PUBLIC METHODS
@@ -36,7 +36,7 @@ namespace SecuritySystemUWP
             pirSensor = new PirSensor(App.Controller.XmlSettings.GpioMotionPin, PirSensor.SensorType.ActiveLow);
             pirSensor.motionDetected += PirSensor_MotionDetected;
 
-            isCapturing = false;
+            Interlocked.Exchange(ref isCapturing, 0);
             captureLock = new AsyncSemaphore(1);
         }
 
@@ -56,43 +56,45 @@ namespace SecuritySystemUWP
 
         private async Task TakePhotoAsync()
         {
-            if(isCapturing)
+            if (0 == Interlocked.CompareExchange(ref isCapturing, 1, 0))
             {
-                return;
-            }
-            await captureLock.WaitAsync();
-            try
-            {
-                isCapturing = true;
-
-                //Use current time in ticks as image name
-                string imageName = DateTime.UtcNow.Ticks.ToString() + ".jpg";
-
-                //Get folder to store images
-                var cacheFolder = KnownFolders.PicturesLibrary;
-                cacheFolder = await cacheFolder.GetFolderAsync("securitysystem-cameradrop");
-                StorageFile temp = null;
+                await captureLock.WaitAsync();
                 try
                 {
-                    temp = await webcam.CapturePhoto();
-                    if (temp != null)
+
+                    //Use current time in ticks as image name
+                    string imageName = DateTime.UtcNow.Ticks.ToString() + ".jpg";
+
+                    //Get folder to store images
+                    var cacheFolder = KnownFolders.PicturesLibrary;
+                    cacheFolder = await cacheFolder.GetFolderAsync("securitysystem-cameradrop");
+                    StorageFile temp = null;
+                    try
                     {
-                        await temp.RenameAsync(imageName);
-                        await temp.MoveAsync(cacheFolder);
+                        temp = await webcam.CapturePhoto();
+                        if (temp != null)
+                        {
+                            await temp.RenameAsync(imageName);
+                            await temp.MoveAsync(cacheFolder);
+                        }
                     }
+                    catch (Exception e)
+                    {
+                        if (temp != null)
+                        {
+                            await temp.DeleteAsync();
+                        }
+                    }
+                    Interlocked.Exchange(ref isCapturing, 0);
                 }
-                catch (Exception e)
+                finally
                 {
-                    if (temp != null)
-                    {
-                        await temp.DeleteAsync();
-                    }
+                    captureLock.Release();
                 }
-                isCapturing = false;
             }
-            finally
+            else
             {
-                captureLock.Release();
+                return;
             }
         }
     }
