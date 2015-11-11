@@ -94,7 +94,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AsyncHelpers.cs" />
     <Compile Include="Camera\ICamera.cs" />
     <Compile Include="Camera\IpCamera.cs" />
     <Compile Include="Camera\Webcam.cs" />
