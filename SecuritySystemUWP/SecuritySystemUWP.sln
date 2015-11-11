@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecuritySystemUWP", "Securi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsbCamera", "usb-camera\UsbCamera\UsbCamera.csproj", "{C00C9943-2BDC-4FE8-B69E-09FC2B272CC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PirSensor", "motion-sensor\PirSensor\PirSensor.csproj", "{45DAC222-16A5-4745-8C94-8C9DC0ABE033}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PirSensor", "pir-sensor\PirSensor\PirSensor.csproj", "{45DAC222-16A5-4745-8C94-8C9DC0ABE033}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
