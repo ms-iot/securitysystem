@@ -73,19 +73,16 @@ namespace SecuritySystemUWP
                 // Load settings from file
                 XmlSettings = await AppSettings.RestoreAsync("Settings.xml");
 
-                // Start web server on port 8000
-                if (!Server.IsRunning)
-                    Server.Start(8000);
-
-                // Create local storage folder if it doesn't exist
+                // Create securitysystem-cameradrop sub folder if it doesn't exist
                 StorageFolder folder = KnownFolders.PicturesLibrary;
-                try
-                {
-                    await folder.GetFolderAsync(AppSettings.FolderName);
-                }catch(System.IO.FileNotFoundException)
+                if (await folder.TryGetItemAsync(AppSettings.FolderName) == null)
                 {
                     await folder.CreateFolderAsync(AppSettings.FolderName);
                 }
+
+                // Start web server on port 8000
+                if (!Server.IsRunning)
+                    Server.Start(8000);                
 
                 Camera = CameraFactory.Get(XmlSettings.CameraType);
                 Storage = StorageFactory.Get(XmlSettings.StorageProvider);
