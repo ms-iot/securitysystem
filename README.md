@@ -9,4 +9,4 @@ This project support several configurations:
   3. Additionally, photos can be stored in OneDrive
   4. Additionally, photos can be stored in Azure blob storage, and a website can be deployed to Azure ot view the photos
 
-The step-by-step instruction for building this project can be found on http://microsoft.hackster.io/en-US/windowsiot/security-system.
+The step-by-step instruction for building this project can be found on https://www.hackster.io/windowsiot/security-camera.

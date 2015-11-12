@@ -8,9 +8,20 @@ namespace SecuritySystemUWP
 {
     public class LocalStorage : IStorage
     {
+        // Local storage never uploads
+        private DateTime lastUploadTime = DateTime.MinValue;
+
         /*******************************************************************************************
-        * PUBLIC METHODS
-        *******************************************************************************************/
+* PUBLIC METHODS
+*******************************************************************************************/
+        public DateTime LastUploadTime
+        {
+            get
+            {
+                return this.lastUploadTime;
+            }
+        }
+
         public void UploadPictures(string camera)
         {
             //The pictures are automatically stored in the local storage during image capture.
