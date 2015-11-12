@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24630.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecuritySystemUWP", "SecuritySystemUWP\SecuritySystemUWP.csproj", "{4E560089-56BC-4CE4-9CDE-4BF1FB2DAA08}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "com.microsoft.maker.SecuritySystem", "com.microsoft.maker.SecuritySystem\com.microsoft.maker.SecuritySystem.vcxproj", "{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,18 @@ Global
 		{4E560089-56BC-4CE4-9CDE-4BF1FB2DAA08}.Release|x86.ActiveCfg = Release|x86
 		{4E560089-56BC-4CE4-9CDE-4BF1FB2DAA08}.Release|x86.Build.0 = Release|x86
 		{4E560089-56BC-4CE4-9CDE-4BF1FB2DAA08}.Release|x86.Deploy.0 = Release|x86
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|ARM.ActiveCfg = Debug|ARM
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|ARM.Build.0 = Debug|ARM
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|x64.ActiveCfg = Debug|x64
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|x64.Build.0 = Debug|x64
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|x86.ActiveCfg = Debug|Win32
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|x86.Build.0 = Debug|Win32
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|ARM.ActiveCfg = Release|ARM
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|ARM.Build.0 = Release|ARM
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|x64.ActiveCfg = Release|x64
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|x64.Build.0 = Release|x64
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|x86.ActiveCfg = Release|Win32
+		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

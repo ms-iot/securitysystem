@@ -1,0 +1,30 @@
+﻿<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://standards.freedesktop.org/dbus/introspect-1.0.dtd">
+<node name="/SecuritySystem">
+  <interface name="com.microsoft.maker.SecuritySystem">
+    <annotation name="org.alljoyn.Bus.Secure" value="false"/>
+    <description language="en">Interface for an Alljoyn Security Camera System</description>
+    <property name="Version" type="q" access="read">
+      <description>Interface version</description>
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="const"/>
+    </property>
+    <method name="TriggerCapture">
+      <description language="en">Triggers the camera to capture an image</description>
+    </method>
+    <property name="IsEnabled" type="b" access="readwrite">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+      <description language="en"></description>
+    </property>
+    <property name="LastCaptureFileName" type="s" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+      <description language="en"></description>
+    </property>
+    <property name="LastCaptureTime" type="s" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+      <description language="en"></description>
+    </property>
+    <property name="LastUploadTime" type="s" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+      <description language="en"></description>
+    </property>
+  </interface>
+</node>

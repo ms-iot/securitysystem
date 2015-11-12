@@ -19,9 +19,24 @@ namespace SecuritySystemUWP
         private MediaCapture mediaCapture;
         private MotionSensor pirSensor;
         private static Mutex pictureMutexLock = new Mutex();
+        private bool isEnabled;
+
+        public bool IsEnabled
+        {
+            get
+            {
+                return isEnabled;
+            }
+
+            set
+            {
+                isEnabled = value;
+            }
+        }
+
         /*******************************************************************************************
-        * PUBLIC METHODS
-        *******************************************************************************************/
+* PUBLIC METHODS
+*******************************************************************************************/
         public async Task Initialize()
         {
             //Initialize Camera
@@ -66,6 +81,8 @@ namespace SecuritySystemUWP
             //Initialize PIR Sensor
             pirSensor = new MotionSensor();
             pirSensor.OnChanged += PirSensor_OnChanged;
+
+            this.isEnabled = true;
         }
 
         public void Dispose()
@@ -103,6 +120,9 @@ namespace SecuritySystemUWP
         }
         private async Task TakePhotoAsync()
         {
+            if (!this.isEnabled)
+                return;
+
             //Use current time in ticks as image name
             string imageName = DateTime.UtcNow.Ticks.ToString() + ".jpg";
 
@@ -122,6 +142,11 @@ namespace SecuritySystemUWP
                 //Expected Exception. If image capture was unsuccessful, delete the blank file created
                 await image.DeleteAsync();
             }
+        }
+
+        public async Task TriggerCapture()
+        {
+            await TakePhotoAsync();
         }
     }
 }
