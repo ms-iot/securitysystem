@@ -1,6 +1,6 @@
-[submodule "SecuritySystemUWP/usb-camera"]
-	path = SecuritySystemUWP/usb-camera
-	url = https://github.com/ms-iot/usb-camera
-[submodule "SecuritySystemUWP/pir-sensor"]
-	path = SecuritySystemUWP/pir-sensor
+[submodule "pir-sensor"]
+	path = pir-sensor
 	url = https://github.com/ms-iot/pir-sensor
+[submodule "usb-camera"]
+	path = usb-camera
+	url = https://github.com/ms-iot/usb-camera
