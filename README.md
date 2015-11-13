@@ -14,7 +14,7 @@ This project support several configurations:
 - Use Command Prompt to navigate to the folder where you want the project:  
   ```cd <your folder path>```  
 - Run the git clone command:  
-  ```git clone https://github.com/apdutta/securitysystem.git```  
+  ```git clone https://github.com/ms-iot/securitysystem.git```  
 - Change directory to the project root folder:  
   ```cd securitysystem```  
 - Get the submodules for the USB camera and the PIR sensor by running the following commands:  
