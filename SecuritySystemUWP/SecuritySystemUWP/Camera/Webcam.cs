@@ -15,6 +15,21 @@ namespace SecuritySystemUWP
         private UsbCamera webcam;
         private PirSensor pirSensor;
         private int isCapturing;
+        private bool isEnabled;
+        
+        public bool IsEnabled
+        {
+            get
+            {
+                return isEnabled;
+            }
+
+            set
+            {
+                isEnabled = value;
+            }
+        }
+
         /*******************************************************************************************
         * PUBLIC METHODS
         *******************************************************************************************/
@@ -24,6 +39,7 @@ namespace SecuritySystemUWP
             try
             {
                 await webcam.InitializeAsync();
+                this.isEnabled = true;
             }
             catch (Exception ex)
             {
@@ -38,6 +54,10 @@ namespace SecuritySystemUWP
             Interlocked.Exchange(ref isCapturing, 0);
         }
 
+        public async Task TriggerCapture()
+        {
+            await TakePhotoAsync();
+        }
         public void Dispose()
         {
             webcam?.Dispose();
@@ -54,6 +74,8 @@ namespace SecuritySystemUWP
 
         private async Task TakePhotoAsync()
         {
+            if (!this.isEnabled)
+                return;
             if (0 == Interlocked.CompareExchange(ref isCapturing, 1, 0))
             {
                 //Use current time in ticks as image name
