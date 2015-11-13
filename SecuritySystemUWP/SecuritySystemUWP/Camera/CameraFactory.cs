@@ -18,7 +18,7 @@ namespace SecuritySystemUWP
         {
             switch (type)
             {
-                case CameraType.Usb: return new UsbCamera(); //If using webcam
+                case CameraType.Usb: return new Webcam(); //If using webcam
                 case CameraType.Ip: return new IpCamera(); //If using D-LINK DCS930 or DCS932
                 default: throw new ArgumentNullException("Camera Type not supported. Set Camera Type in Settings.");
             }
