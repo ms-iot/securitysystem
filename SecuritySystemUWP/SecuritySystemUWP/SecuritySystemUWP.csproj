@@ -164,17 +164,17 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\pir-sensor\PirSensor\PirSensor.csproj">
+    <ProjectReference Include="..\..\pir-sensor\PirSensor\PirSensor.csproj">
       <Project>{45dac222-16a5-4745-8c94-8c9dc0abe033}</Project>
       <Name>PirSensor</Name>
     </ProjectReference>
-    <ProjectReference Include="..\usb-camera\UsbCamera\UsbCamera.csproj">
+    <ProjectReference Include="..\..\usb-camera\UsbCamera\UsbCamera.csproj">
       <Project>{c00c9943-2bdc-4fe8-b69e-09fc2b272cc2}</Project>
       <Name>UsbCamera</Name>
     </ProjectReference>
     <ProjectReference Include="..\com.microsoft.maker.SecuritySystem\com.microsoft.maker.SecuritySystem.vcxproj">
-       <Project>{3875dc40-e7c8-49ec-890d-d3fd0e5637f4}</Project>
-       <Name>com.microsoft.maker.SecuritySystem</Name>
+      <Project>{3875dc40-e7c8-49ec-890d-d3fd0e5637f4}</Project>
+      <Name>com.microsoft.maker.SecuritySystem</Name>
     </ProjectReference>
     <SDKReference Include="WindowsIoT, Version=10.0.10240.0">
       <Name>Windows IoT Extensions for the UWP</Name>
