@@ -97,11 +97,10 @@
     </Compile>
     <Compile Include="Camera\ICamera.cs" />
     <Compile Include="Camera\IpCamera.cs" />
-    <Compile Include="Camera\UsbCamera.cs" />
+    <Compile Include="Camera\Webcam.cs" />
     <Compile Include="Camera\CameraFactory.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="EnvironmentSettings.cs" />
-    <Compile Include="MotionSensor.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -165,15 +164,21 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <SDKReference Include="WindowsIoT, Version=10.0.10240.0">
-      <Name>Windows IoT Extensions for the UWP</Name>
-    </SDKReference>
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\..\pir-sensor\PirSensor\PirSensor.csproj">
+      <Project>{45dac222-16a5-4745-8c94-8c9dc0abe033}</Project>
+      <Name>PirSensor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\usb-camera\UsbCamera\UsbCamera.csproj">
+      <Project>{c00c9943-2bdc-4fe8-b69e-09fc2b272cc2}</Project>
+      <Name>UsbCamera</Name>
+    </ProjectReference>
     <ProjectReference Include="..\com.microsoft.maker.SecuritySystem\com.microsoft.maker.SecuritySystem.vcxproj">
       <Project>{3875dc40-e7c8-49ec-890d-d3fd0e5637f4}</Project>
       <Name>com.microsoft.maker.SecuritySystem</Name>
     </ProjectReference>
+    <SDKReference Include="WindowsIoT, Version=10.0.10240.0">
+      <Name>Windows IoT Extensions for the UWP</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

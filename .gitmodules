@@ -1,0 +1,6 @@
+[submodule "pir-sensor"]
+	path = pir-sensor
+	url = https://github.com/ms-iot/pir-sensor
+[submodule "usb-camera"]
+	path = usb-camera
+	url = https://github.com/ms-iot/usb-camera
