@@ -9,4 +9,11 @@ This project support several configurations:
   3. Additionally, photos can be stored in OneDrive
   4. Additionally, photos can be stored in Azure blob storage, and a website can be deployed to Azure ot view the photos
 
+To build this project, clone/download the project then use Command Prompt to navigate to the root folder of the project:  
+```cd <your folder path>\securitysystem-master```  
+
+Next, get the submodules for the USB camera and the PIR sensor by running the following commands:  
+```git submodule init```  
+```git submodule update```  
+
 The step-by-step instruction for building this project can be found on https://www.hackster.io/windowsiot/security-camera.
