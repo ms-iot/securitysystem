@@ -12,7 +12,6 @@ namespace SecuritySystemUWP
 {
     public class Azure : IStorage
     {
-        private static Mutex uploadPicturesMutexLock = new Mutex();
         private CloudStorageAccount storageAccount;
         private CloudBlobClient blobClient;
         private CloudBlobContainer blobContainer;
@@ -43,7 +42,8 @@ namespace SecuritySystemUWP
 
         public async void UploadPictures(string camera)
         {
-            uploadPicturesMutexLock.WaitOne();
+            // Stop timer to allow time for uploading pictures in case next timer tick overlaps with this ongoing one
+            AppController.uploadPicturesTimer.Stop();
 
             try
             {
@@ -81,7 +81,7 @@ namespace SecuritySystemUWP
             }
             finally
             {
-                uploadPicturesMutexLock.ReleaseMutex();
+                AppController.uploadPicturesTimer.Start();
             }
         }
 

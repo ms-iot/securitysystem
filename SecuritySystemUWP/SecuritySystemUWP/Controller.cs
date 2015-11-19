@@ -49,7 +49,7 @@ namespace SecuritySystemUWP
         public bool IsInitialized { get; private set; } = false;
 
         private string[] cameras = { "Cam1" };
-        private static DispatcherTimer uploadPicturesTimer;
+        internal static DispatcherTimer uploadPicturesTimer;
         private static DispatcherTimer deletePicturesTimer;
         private const int uploadInterval = 10; //Value in seconds
         private const int deleteInterval = 1; //Value in hours
@@ -167,7 +167,6 @@ namespace SecuritySystemUWP
 
         private void uploadPicturesTimer_Tick(object sender, object e)
         {
-            uploadPicturesTimer.Stop();
 
             try
             {
@@ -181,7 +180,6 @@ namespace SecuritySystemUWP
                 App.Controller.TelemetryClient.TrackEvent("FailedToUploadPicture", events);
             }
 
-            uploadPicturesTimer.Start();
         }
 
         private void deletePicturesTimer_Tick(object sender, object e)
