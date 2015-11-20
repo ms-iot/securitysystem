@@ -55,7 +55,8 @@ namespace SecuritySystemUWP
             var images = await this.dropFolder.GetFilesAsync();
             var orderedImages = images.OrderByDescending(x => x.DateCreated);
             var file = orderedImages.FirstOrDefault();
-            if (null != file && file.Name != this.newestImage.Name)
+
+            if ((null == this.newestImage) || (null != file && file.Name != this.newestImage.Name))
             {
                 this.newestImage = file;
                 this.producer.EmitLastCaptureFileNameChanged();
