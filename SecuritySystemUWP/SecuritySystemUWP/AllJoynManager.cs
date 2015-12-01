@@ -56,7 +56,7 @@ namespace SecuritySystemUWP
             var orderedImages = images.OrderByDescending(x => x.DateCreated);
             var file = orderedImages.FirstOrDefault();
 
-            if ((null == this.newestImage) || (null != file && file.Name != this.newestImage.Name))
+            if ((null != file) && (null == this.newestImage || file.Name != this.newestImage.Name))
             {
                 this.newestImage = file;
                 this.producer.EmitLastCaptureFileNameChanged();
