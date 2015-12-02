@@ -19,7 +19,6 @@ namespace SecuritySystemUWP
         private HttpClient httpClient;
         private CancellationTokenSource cts;
         private bool isLoggedIn = false;
-        private Mutex uploadPicturesMutexLock = new Mutex();
         private DispatcherTimer refreshTimer;
         private int numberUploaded = 0;
         private DateTime lastUploadTime = DateTime.MinValue;
@@ -58,7 +57,9 @@ namespace SecuritySystemUWP
         {
             if (isLoggedIn)
             {
-                uploadPicturesMutexLock.WaitOne();
+                // Stop timer to allow time for uploading pictures in case next timer tick overlaps with this ongoing one
+                AppController.uploadPicturesTimer.Stop();
+
 
                 try
                 {
@@ -102,7 +103,7 @@ namespace SecuritySystemUWP
                 }
                 finally
                 {
-                    uploadPicturesMutexLock.ReleaseMutex();
+                    AppController.uploadPicturesTimer.Start();
                 }
             }
         }
