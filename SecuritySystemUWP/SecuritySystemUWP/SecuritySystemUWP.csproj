@@ -164,6 +164,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\onedrive-connector\OneDriveConnector\OneDriveConnector\OneDriveConnector.csproj">
+      <Project>{0bff7810-2be6-4778-a32b-e9b1b0f3982e}</Project>
+      <Name>OneDriveConnector</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\pir-sensor\PirSensor\PirSensor.csproj">
       <Project>{45dac222-16a5-4745-8c94-8c9dc0abe033}</Project>
       <Name>PirSensor</Name>
