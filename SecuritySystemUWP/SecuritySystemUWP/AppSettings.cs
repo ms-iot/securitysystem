@@ -50,6 +50,9 @@ namespace SecuritySystemUWP
         [Description("OneDrive Secret - Only required if you selected OneDrive as the Storage Provider")]
         public string OneDriveClientSecret = "****";
 
+        [Description("OneDrive Folder Path - This is the path in which you would like photos placed on your cloud storage account. This will be automatically appended with a folder for each day's pictures")]
+        public string OneDriveFolderPath = "/Pictures/SecurityCamera/";
+
         [Description("Number of days to store your pictures before they are deleted")]
         public int StorageDuration = 7;
         
