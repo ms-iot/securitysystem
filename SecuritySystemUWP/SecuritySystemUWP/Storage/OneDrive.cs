@@ -124,7 +124,7 @@ namespace SecuritySystemUWP
 
         public async Task Authorize(string accessCode)
         {
-            await oneDriveConnector.LoginAsync(App.Controller.XmlSettings.OneDriveClientId, App.Controller.XmlSettings.OneDriveClientSecret, AppSettings.OneDriveRedirectUrl, App.Controller.XmlSettings.OneDriveAccessToken);
+            await oneDriveConnector.LoginAsync(App.Controller.XmlSettings.OneDriveClientId, App.Controller.XmlSettings.OneDriveClientSecret, AppSettings.OneDriveRedirectUrl, accessCode);
         }
 
         public async Task AuthorizeWithRefreshToken(string refreshToken)
