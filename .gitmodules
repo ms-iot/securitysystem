@@ -4,6 +4,3 @@
 [submodule "usb-camera"]
 	path = usb-camera
 	url = https://github.com/ms-iot/usb-camera
-[submodule "onedrive-connector"]
-	path = onedrive-connector
-	url = https://github.com/mwmckee/onedrive-connector
