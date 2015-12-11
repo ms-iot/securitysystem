@@ -142,8 +142,8 @@ namespace SecuritySystemUWP
             await oneDriveConnector.LogoutAsync();
 
             //Clear tokens
-            App.Controller.XmlSettings.OneDriveAccessToken = "";
-            App.Controller.XmlSettings.OneDriveRefreshToken = "";
+            App.Controller.XmlSettings.OneDriveAccessToken = string.Empty;
+            App.Controller.XmlSettings.OneDriveRefreshToken = string.Empty;
 
         }
 
