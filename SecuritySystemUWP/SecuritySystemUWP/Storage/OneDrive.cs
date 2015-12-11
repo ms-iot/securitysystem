@@ -43,7 +43,7 @@ namespace SecuritySystemUWP
             }
         }
 
-        public async void UploadPictures(string cameraName)
+        public async void UploadPictures()
         {
             if (oneDriveConnector.isLoggedIn)
             {
@@ -96,7 +96,7 @@ namespace SecuritySystemUWP
             }
         }
 
-        public async void DeleteExpiredPictures(string camera)
+        public async void DeleteExpiredPictures()
         {
             try
             {
