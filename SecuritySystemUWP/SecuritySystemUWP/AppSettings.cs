@@ -50,6 +50,9 @@ namespace SecuritySystemUWP
         [Description("OneDrive Secret - Only required if you selected OneDrive as the Storage Provider")]
         public string OneDriveClientSecret = "****";
 
+        [Description("OneDrive Folder Path - This is the path in which you would like photos placed on your cloud storage account. This will be automatically appended with a folder for each day's pictures")]
+        public string OneDriveFolderPath = "/Pictures/SecurityCamera";
+
         [Description("Number of days to store your pictures before they are deleted")]
         public int StorageDuration = 7;
         
@@ -70,7 +73,7 @@ namespace SecuritySystemUWP
         public const string OneDriveRootUrl = "https://api.onedrive.com/v1.0/drive/root:";
         public const string OneDriveTokenUrl = "https://login.live.com/oauth20_token.srf";
         public const string OneDriveTokenContent = "client_id={0}&redirect_uri={1}&client_secret={2}&{3}={4}&grant_type={5}";
-        public const string ImageNameFormat = "{0}/{1}_{2}.jpg";
+        public const string ImageNameFormat = "{0}/{1}.jpg";
 
         public static readonly StorageFolder SettingsFolder = ApplicationData.Current.LocalFolder;
 

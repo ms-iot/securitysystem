@@ -40,7 +40,7 @@ namespace SecuritySystemUWP
             }
         }
 
-        public async void UploadPictures(string camera)
+        public async void UploadPictures()
         {
             // Stop timer to allow time for uploading pictures in case next timer tick overlaps with this ongoing one
             AppController.uploadPicturesTimer.Stop();
@@ -59,7 +59,7 @@ namespace SecuritySystemUWP
                 foreach (StorageFile file in files)
                 {
                     //Image name contains creation time
-                    string imageName = string.Format(AppSettings.ImageNameFormat, camera, DateTime.Now.ToString("MM_dd_yyyy/HH"), DateTime.UtcNow.Ticks.ToString());
+                    string imageName = string.Format(AppSettings.ImageNameFormat, DateTime.Now.ToString("yyyy_MM_dd/HH"), DateTime.UtcNow.Ticks.ToString());
                     if (file.IsAvailable)
                     {
                         //Upload image to blob storage
@@ -85,7 +85,7 @@ namespace SecuritySystemUWP
             }
         }
 
-        public async void DeleteExpiredPictures(string camera)
+        public async void DeleteExpiredPictures()
         {
             try
             {
