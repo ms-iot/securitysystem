@@ -100,7 +100,7 @@ namespace SecuritySystemUWP
         {
             try
             {
-                string folder = string.Format("{0}/{1}", App.Controller.XmlSettings.OneDriveFolderPath,  DateTime.Now.Subtract(TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration)).ToString("yyyy_MM_dd"));
+                string folder = string.Format(AppSettings.ImageNameFormat, App.Controller.XmlSettings.OneDriveFolderPath,  DateTime.Now.Subtract(TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration)).ToString("yyyy_MM_dd"));
                 //List pictures in old day folder
                 List<string> pictures = new List<string>(await oneDriveConnector.ListFilesAsync(folder));
                 if (pictures != null)
