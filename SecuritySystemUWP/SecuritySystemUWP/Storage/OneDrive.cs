@@ -64,7 +64,7 @@ namespace SecuritySystemUWP
                     {
                         try
                         {
-                            await oneDriveConnector.UploadFileAsync(file, String.Format("{0}/{1}", App.Controller.XmlSettings.OneDriveFolderPath, DateTime.Now.ToString("MM_dd_yyyy")));
+                            await oneDriveConnector.UploadFileAsync(file, String.Format("{0}/{1}", App.Controller.XmlSettings.OneDriveFolderPath, DateTime.Now.ToString("yyyy_MM_dd")));
                             numberUploaded++;
 
                             // uploadPictureToOnedrive should throw an exception if it fails, so it's safe to delete
@@ -100,7 +100,7 @@ namespace SecuritySystemUWP
         {
             try
             {
-                string folder = string.Format("{0}/{1}", App.Controller.XmlSettings.OneDriveFolderPath,  DateTime.Now.Subtract(TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration)).ToString("MM_dd_yyyy"));
+                string folder = string.Format("{0}/{1}", App.Controller.XmlSettings.OneDriveFolderPath,  DateTime.Now.Subtract(TimeSpan.FromDays(App.Controller.XmlSettings.StorageDuration)).ToString("yyyy_MM_dd"));
                 //List pictures in old day folder
                 List<string> pictures = new List<string>(await oneDriveConnector.ListFilesAsync(folder));
                 if (pictures != null)
