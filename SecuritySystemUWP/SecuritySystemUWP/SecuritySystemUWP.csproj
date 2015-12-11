@@ -23,8 +23,6 @@
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|arm</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>236C318509851D688163F2B175610C141957469F</PackageCertificateThumbprint>
-    <PackageCertificateKeyFile>SecuritySystemUWP_TemporaryKey.pfx</PackageCertificateKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -138,7 +136,6 @@
     <None Include="project.json">
       <SubType>Designer</SubType>
     </None>
-    <None Include="SecuritySystemUWP_TemporaryKey.pfx" />
     <None Include="Service References\Application Insights\ConnectedService.json" />
   </ItemGroup>
   <ItemGroup>
