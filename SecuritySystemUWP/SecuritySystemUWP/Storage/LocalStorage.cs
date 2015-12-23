@@ -58,7 +58,7 @@ namespace SecuritySystemUWP
 
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "LocalStorage", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToDeletePicture", events);
+                TelemetryHelper.TrackEvent("FailedToDeletePicture", events);
             }
         }
 

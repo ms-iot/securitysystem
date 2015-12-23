@@ -73,17 +73,8 @@ namespace SecuritySystemUWP
         void HeartbeatTimer_Tick(object sender, object e)
         {
             // Log telemetry event that the device is alive
-            Dictionary<string, string> properties = new Dictionary<string, string>
-            {
-                { "userAlias", App.Controller.XmlSettings.MicrosoftAlias },                
-                { "Custom_AppVersion", appVersion },
-#if MS_INTERNAL_ONLY // do not send this app insights telemetry data for external customers
-                { "Custom_DeviceName", deviceName }, 
-                { "Custom_IPAddress", ipAddress }, 
-#endif
-                { "Custom_OSVersion", OSVersion },
-            };
-            App.Controller.TelemetryClient.TrackMetric("DeviceHeartbeat", heartbeatInterval, properties);
+
+            TelemetryHelper.TrackMetric("DeviceHeartbeat", heartbeatInterval);
         }
 
         /// <summary>
@@ -106,8 +97,7 @@ namespace SecuritySystemUWP
 
             await Controller.Initialize();
 
-            Dictionary<string, string> properties = new Dictionary<string, string> { { "userAlias", App.Controller.XmlSettings.MicrosoftAlias } };
-            App.Controller.TelemetryClient.TrackTrace("Start Info", properties);
+            TelemetryHelper.TrackEvent("Application Launched");
 
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
@@ -168,10 +158,10 @@ namespace SecuritySystemUWP
         {
             // Track App suspension/exit:
             GlobalStopwatch.Stop();
-            App.Controller.TelemetryClient.TrackMetric("AppRuntime", GlobalStopwatch.Elapsed.TotalMilliseconds);
+            TelemetryHelper.TrackMetric("AppRuntime", GlobalStopwatch.Elapsed.TotalMilliseconds);
 
             var metrics = new Dictionary<string, string> { { "userAlias", App.Controller.XmlSettings.MicrosoftAlias }, { "appRuntime", GlobalStopwatch.Elapsed.TotalMilliseconds.ToString() } };
-            App.Controller.TelemetryClient.TrackEvent("UserRuntime", metrics);
+            TelemetryHelper.TrackEvent("UserRuntime", metrics);
 
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity

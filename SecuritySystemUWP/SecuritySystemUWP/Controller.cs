@@ -17,11 +17,6 @@ namespace SecuritySystemUWP
     public class AppController
     {
         /// <summary>
-        /// Allows tracking page views, exceptions and other telemetry through the Microsoft Application Insights service.
-        /// </summary>
-        public Microsoft.ApplicationInsights.TelemetryClient TelemetryClient;
-
-        /// <summary>
         /// Configuration settings for app
         /// </summary>
         public AppSettings XmlSettings;
@@ -56,7 +51,6 @@ namespace SecuritySystemUWP
         
         public AppController()
         {
-            TelemetryClient = new Microsoft.ApplicationInsights.TelemetryClient();
             Server = new WebServer();
             XmlSettings = new AppSettings();
         }
@@ -108,7 +102,7 @@ namespace SecuritySystemUWP
 
                                 // Log telemetry event about this exception
                                 var events = new Dictionary<string, string> { { "Controller", ex.Message } };
-                                App.Controller.TelemetryClient.TrackEvent("FailedToLoginOneDrive", events);
+                                TelemetryHelper.TrackEvent("FailedToLoginOneDrive", events);
                             }
                         }
                     }
@@ -137,7 +131,7 @@ namespace SecuritySystemUWP
 
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "Controller", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToInitialize", events);
+                TelemetryHelper.TrackEvent("FailedToInitialize", events);
             }
         }
 
@@ -159,7 +153,7 @@ namespace SecuritySystemUWP
 
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "Controller", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToDispose", events);
+                TelemetryHelper.TrackEvent("FailedToDispose", events);
             }
 
             IsInitialized = false;
@@ -177,7 +171,7 @@ namespace SecuritySystemUWP
 
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "Controller", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToUploadPicture", events);
+                TelemetryHelper.TrackEvent("FailedToDispose", events);
             }
 
         }

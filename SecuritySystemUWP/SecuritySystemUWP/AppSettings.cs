@@ -122,7 +122,7 @@ namespace SecuritySystemUWP
 
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "AppSettings", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToRestoreSettings", events);
+                TelemetryHelper.TrackEvent("FailedToRestoreSettings", events);
 
                 // If settings.xml file is corrupted and cannot be read - behave as if it does not exist.
                 return new AppSettings();

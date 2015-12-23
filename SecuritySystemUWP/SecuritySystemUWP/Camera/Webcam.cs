@@ -44,7 +44,7 @@ namespace SecuritySystemUWP
             catch (Exception ex)
             {
                 var events = new Dictionary<string, string> { { "UsbCamera", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToInitializeMediaCapture", events);
+                TelemetryHelper.TrackEvent("FailedToInitializeMediaCapture", events);
             }
 
             //Initialize PIR Sensor

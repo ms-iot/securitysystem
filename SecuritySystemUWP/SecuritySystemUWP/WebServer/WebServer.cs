@@ -132,7 +132,7 @@ namespace SecuritySystemUWP
                 /*
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "WebServer", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToProcessRequestAsync", events);
+                TelemetryHelper.TrackEvent("FailedToProcessRequestAsync", events);
                 */
             }
         }
@@ -282,7 +282,7 @@ namespace SecuritySystemUWP
 
                                 // Log telemetry event about this exception
                                 var events = new Dictionary<string, string> { { "WebServer", ex.Message } };
-                                App.Controller.TelemetryClient.TrackEvent("FailedToGetFolderFromPath", events);
+                                TelemetryHelper.TrackEvent("FailedToGetFolderFromPath", events);
                             }
                         }
                         else
@@ -326,7 +326,7 @@ namespace SecuritySystemUWP
 
                         // Log telemetry event about this exception
                         var events = new Dictionary<string, string> { { "WebServer", ex.Message } };
-                        App.Controller.TelemetryClient.TrackEvent("FailedToProcessApiRequest", events);
+                        TelemetryHelper.TrackEvent("FailedToProcessApiRequest", events);
                     }
                 }
                 // Request for a file that is in the Assets\Web folder (e.g. logo, css file)
@@ -361,7 +361,7 @@ namespace SecuritySystemUWP
 
                             // Log telemetry event about this exception
                             var events = new Dictionary<string, string> { { "WebServer", ex.Message } };
-                            App.Controller.TelemetryClient.TrackEvent("FailedToOpenStream", events);
+                            TelemetryHelper.TrackEvent("FailedToOpenStream", events);
                         }
 
                         // Send 404 not found if can't find file
@@ -384,7 +384,7 @@ namespace SecuritySystemUWP
 
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "WebServer", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToWriteResponse", events);
+                TelemetryHelper.TrackEvent("FailedToWriteResponse", events);
 
                 try
                 {
@@ -394,7 +394,7 @@ namespace SecuritySystemUWP
                 }
                 catch (Exception e)
                 {
-                    App.Controller.TelemetryClient.TrackException(e);
+                    TelemetryHelper.TrackException(e);
                 }
             }
         }
