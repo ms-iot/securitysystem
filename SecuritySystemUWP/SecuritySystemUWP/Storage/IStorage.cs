@@ -9,9 +9,9 @@ namespace SecuritySystemUWP
 {
     public interface IStorage
     {
-        void UploadPictures(string camera);
+        void UploadPictures();
         DateTime LastUploadTime { get; }
-        void DeleteExpiredPictures(string camera);
+        void DeleteExpiredPictures();
         void Dispose();
     }
 }

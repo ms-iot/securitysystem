@@ -170,7 +170,7 @@ namespace SecuritySystemUWP
 
             try
             {
-                Storage.UploadPictures(cameras[0]);
+                Storage.UploadPictures();
             }catch(Exception ex)
             {
                 Debug.WriteLine("uploadPicturesTimer_Tick() Exception: " + ex.Message);
@@ -184,7 +184,7 @@ namespace SecuritySystemUWP
 
         private void deletePicturesTimer_Tick(object sender, object e)
         {
-            Storage.DeleteExpiredPictures(cameras[0]);
+            Storage.DeleteExpiredPictures();
         }
     }
 }

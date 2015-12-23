@@ -22,13 +22,13 @@ namespace SecuritySystemUWP
             }
         }
 
-        public void UploadPictures(string camera)
+        public void UploadPictures()
         {
             //The pictures are automatically stored in the local storage during image capture.
             return;
         }
 
-        public async void DeleteExpiredPictures(string camera)
+        public async void DeleteExpiredPictures()
         {
             //Delete older images
             try

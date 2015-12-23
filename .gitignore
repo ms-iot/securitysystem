@@ -21,6 +21,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+BundleArtifacts/
 project.lock.json
 
 # Visual Studo 2015 cache/options directory
