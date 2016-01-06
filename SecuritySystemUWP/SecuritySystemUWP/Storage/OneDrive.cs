@@ -76,7 +76,7 @@ namespace SecuritySystemUWP
 
                             // Log telemetry event about this exception
                             var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
-                            App.Controller.TelemetryClient.TrackEvent("FailedToUploadPicture", events);
+                            TelemetryHelper.TrackEvent("FailedToUploadPicture", events);
                         }
                         this.lastUploadTime = DateTime.Now;
                     }
@@ -87,7 +87,7 @@ namespace SecuritySystemUWP
 
                     // Log telemetry event about this exception
                     var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
-                    App.Controller.TelemetryClient.TrackEvent("FailedToUploadPicture", events);
+                    TelemetryHelper.TrackEvent("FailedToUploadPicture", events);
                 }
                 finally
                 {
@@ -118,7 +118,7 @@ namespace SecuritySystemUWP
 
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToDeletePicture", events);
+                TelemetryHelper.TrackEvent("FailedToDeletePicture", events);
             }
         }
 

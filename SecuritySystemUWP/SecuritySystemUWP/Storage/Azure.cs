@@ -77,7 +77,7 @@ namespace SecuritySystemUWP
 
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "Azure", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToUploadPicture", events);
+                TelemetryHelper.TrackEvent("FailedToUploadPicture", events);
             }
             finally
             {
@@ -109,7 +109,7 @@ namespace SecuritySystemUWP
 
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "Azure", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToDeletePicture", events);
+                TelemetryHelper.TrackEvent("FailedToDeletePicture", events);
             }
         }
 
@@ -127,7 +127,7 @@ namespace SecuritySystemUWP
             //Log data for upload attempt
             Windows.Storage.FileProperties.BasicProperties fileProperties = await imageFile.GetBasicPropertiesAsync();
             Dictionary<string, string> properties = new Dictionary<string, string> { { "File Size", fileProperties.Size.ToString() } };
-            App.Controller.TelemetryClient.TrackEvent("Azure picture upload attempt", properties);
+            TelemetryHelper.TrackEvent("Azure picture upload attempt", properties);
             try
             {
                 //Create a blank blob
@@ -142,7 +142,7 @@ namespace SecuritySystemUWP
                 throw new Exception("Exception in uploading pictures to Azure: " + ex.Message);
             }
             //Log successful upload event
-            App.Controller.TelemetryClient.TrackEvent("Azure picture upload success", properties);
+            TelemetryHelper.TrackEvent("Azure picture upload success", properties);
         }
 
         private async Task<List<string>> listPictures(string folderPath)
