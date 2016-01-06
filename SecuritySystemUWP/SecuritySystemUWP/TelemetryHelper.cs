@@ -17,9 +17,9 @@ namespace SecuritySystemUWP
         internal static Microsoft.ApplicationInsights.TelemetryClient _TelemetryClient = new TelemetryClient();
 
         /// <summary>
-        /// Helper private method to add additional common properties to all telemetry events
+        /// Helper private method to add additional common properties to all telemetry events via ref param
         /// </summary>
-        /// <param name="properties">common global telemetry properties to log</param>
+        /// <param name="properties">original properties to add to</param>
         private static void AddCommonProperties(ref IDictionary<string, string> properties)
         {
             
@@ -41,7 +41,7 @@ namespace SecuritySystemUWP
         internal static void TrackEvent(string eventName)
         {
             Dictionary<string, string> properties = new Dictionary<string, string>();
-            // call helper method to add common properties
+            // call overloaded internal helper method
             TrackEvent(eventName, properties);
         }
 
@@ -53,6 +53,7 @@ namespace SecuritySystemUWP
         /// <param name="properties"></param>
         internal static void TrackEvent(string eventName, IDictionary<string, string> properties)
         {
+            // add common properties
             AddCommonProperties(ref properties);
             _TelemetryClient.TrackEvent(eventName, properties);
         }
@@ -66,7 +67,7 @@ namespace SecuritySystemUWP
         internal static void TrackMetric(string metricName, double value)
         {
             Dictionary<string, string> properties = new Dictionary<string, string>();
-            // call helper method to add common properties
+            // call overloaded internal helper method
             TrackMetric(metricName, value, properties);
         }
 
@@ -79,6 +80,7 @@ namespace SecuritySystemUWP
         /// <param name="properties"></param>
         internal static void TrackMetric(string metricName, double value, IDictionary<string, string> properties)
         {
+            // add common properties
             AddCommonProperties(ref properties);
             _TelemetryClient.TrackMetric(metricName, value, properties);
         }
@@ -91,7 +93,7 @@ namespace SecuritySystemUWP
         internal static void TrackException(Exception exception)
         {
             Dictionary<string, string> properties = new Dictionary<string, string>();
-            // call helper method to add common properties
+            // call overloaded internal helper method
             TrackException(exception, properties);
         }
 
@@ -103,6 +105,7 @@ namespace SecuritySystemUWP
         /// <param name="properties"></param>
         internal static void TrackException(Exception exception, IDictionary<string, string> properties)
         {
+            // add common properties
             AddCommonProperties(ref properties);
             _TelemetryClient.TrackException(exception, properties);
         }
