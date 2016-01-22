@@ -22,14 +22,28 @@ namespace SecuritySystemUWP
         /// <param name="properties">original properties to add to</param>
         private static void AddCommonProperties(ref IDictionary<string, string> properties)
         {
-            
-            properties.Add("Custom_AppVersion", EnvironmentSettings.GetAppVersion());
-            properties.Add("Custom_OSVersion", EnvironmentSettings.GetOSVersion());
-
+            // add common properties as long as they don't already exist in the original properties passed in
+            if (!properties.ContainsKey("Custom_AppVersion"))
+            {
+                properties.Add("Custom_AppVersion", EnvironmentSettings.GetAppVersion());
+            }
+            if (!properties.ContainsKey("Custom_OSVersion"))
+            {
+                properties.Add("Custom_OSVersion", EnvironmentSettings.GetOSVersion());
+            }
 #if MS_INTERNAL_ONLY // Do not send this app insights telemetry data for external customers. Microsoft only.
-            properties.Add("userAlias", App.Controller.XmlSettings.MicrosoftAlias);
-            properties.Add("Custom_DeviceName", EnvironmentSettings.GetDeviceName());
-            properties.Add("Custom_IPAddress", EnvironmentSettings.GetIPAddress());
+            if (!properties.ContainsKey("userAlias"))
+            {
+                properties.Add("userAlias", App.Controller.XmlSettings.MicrosoftAlias);
+            }
+            if (!properties.ContainsKey("Custom_DeviceName"))
+            {
+                properties.Add("Custom_DeviceName", EnvironmentSettings.GetDeviceName());
+            }
+            if (!properties.ContainsKey("Custom_IPAddress"))
+            {
+                properties.Add("Custom_IPAddress", EnvironmentSettings.GetIPAddress());
+            }
 #endif
         }
 

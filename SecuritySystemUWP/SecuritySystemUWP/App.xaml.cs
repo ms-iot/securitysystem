@@ -160,7 +160,7 @@ namespace SecuritySystemUWP
             GlobalStopwatch.Stop();
             TelemetryHelper.TrackMetric("AppRuntime", GlobalStopwatch.Elapsed.TotalMilliseconds);
 
-            var metrics = new Dictionary<string, string> { { "userAlias", App.Controller.XmlSettings.MicrosoftAlias }, { "appRuntime", GlobalStopwatch.Elapsed.TotalMilliseconds.ToString() } };
+            var metrics = new Dictionary<string, string> {{ "appRuntime", GlobalStopwatch.Elapsed.TotalMilliseconds.ToString() } };
             TelemetryHelper.TrackEvent("UserRuntime", metrics);
 
             var deferral = e.SuspendingOperation.GetDeferral();
