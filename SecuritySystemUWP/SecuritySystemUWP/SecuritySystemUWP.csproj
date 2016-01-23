@@ -111,6 +111,7 @@
     <Compile Include="Storage\OneDrive.cs" />
     <Compile Include="Storage\StorageFactory.cs" />
     <Compile Include="AppSettings.cs" />
+    <Compile Include="TelemetryHelper.cs" />
     <Compile Include="WebServer\NavConstants.cs" />
     <Compile Include="WebServer\WebHelper.cs" />
     <Compile Include="WebServer\WebServer.cs" />

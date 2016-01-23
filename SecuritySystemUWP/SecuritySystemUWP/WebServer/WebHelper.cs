@@ -419,7 +419,7 @@ namespace SecuritySystemUWP
             {
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "WebHelper", ex.Message } };
-                App.Controller.TelemetryClient.TrackEvent("FailedToParseOneDriveUri", events);
+                TelemetryHelper.TrackEvent("FailedToParseOneDriveUri", events);
             }
 
         }
@@ -472,7 +472,7 @@ namespace SecuritySystemUWP
                            0 != entry.Value.CompareTo(App.Controller.XmlSettings.MicrosoftAlias))
                         {
                             Dictionary<string, string> properties = new Dictionary<string, string> { { "Alias", entry.Value } };
-                            App.Controller.TelemetryClient.TrackEvent("Alias Changed", properties);
+                            TelemetryHelper.TrackEvent("Alias Changed", properties);
                         }
                         field.SetValue(App.Controller.XmlSettings, entry.Value);
                     }
@@ -483,7 +483,7 @@ namespace SecuritySystemUWP
 
                     // Log telemetry event about this exception
                     var events = new Dictionary<string, string> { { "WebHelper", ex.Message } };
-                    App.Controller.TelemetryClient.TrackEvent("FailedToParseUriIntoSettings", events);
+                    TelemetryHelper.TrackEvent("FailedToParseUriIntoSettings", events);
                 }
             }
         }
@@ -542,7 +542,7 @@ namespace SecuritySystemUWP
 
                     // Log telemetry event about this exception
                     var events = new Dictionary<string, string> { { "WebHelper", ex.Message } };
-                    App.Controller.TelemetryClient.TrackEvent("FailedToWriteFileToStream", events);
+                    TelemetryHelper.TrackEvent("FailedToWriteFileToStream", events);
                 }
 
                 if (!exists)
