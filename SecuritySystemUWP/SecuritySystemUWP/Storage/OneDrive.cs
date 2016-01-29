@@ -105,7 +105,7 @@ namespace SecuritySystemUWP
                     //Delete all pictures from the day
                     foreach (string picture in pictures)
                     {
-                        await oneDriveConnector.DeleteFileAsync(picture, folder);
+                        await deleteWithRetry(picture, folder, 1);
                     }
                 }
             }
@@ -176,8 +176,30 @@ namespace SecuritySystemUWP
             else
             {
                 events.Add("Max upload attempts reached", tryNumber.ToString());
-                TelemetryHelper.TrackEvent("FailedToUploadPicture", events);
-                TelemetryHelper.TrackEvent("FailedToUploadPicture - total failure");
+                TelemetryHelper.TrackEvent("FailedToUploadPicture - total failure", events);
+            }
+        }
+
+        private async Task deleteWithRetry(string picture, string folder, int tryNumber)
+        {
+            HttpResponseMessage response = await oneDriveConnector.DeleteFileAsync(picture, folder);
+            bool success = await parseResponse(response, tryNumber);
+            var events = new Dictionary<string, string>();
+
+            if (success)
+            {
+                //no additional action needed
+            }
+            else if (tryNumber <= MaxTries)
+            {
+                events.Add("Retrying delete", tryNumber.ToString());
+                TelemetryHelper.TrackEvent("FailedToDeletePicture", events);
+                await deleteWithRetry(picture, folder, ++tryNumber);
+            }
+            else
+            {
+                events.Add("Max delete attempts reached", tryNumber.ToString());
+                TelemetryHelper.TrackEvent("FailedToDeletePicture - total failure", events);
             }
         }
 
