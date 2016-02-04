@@ -17,6 +17,7 @@ namespace SecuritySystemUWP
 {
     public class OneDrive : IStorage
     {
+        private const int MaxTries = 3;
         private int numberUploaded = 0;
         private DateTime lastUploadTime = DateTime.MinValue;
         private OneDriveConnector oneDriveConnector;
@@ -64,11 +65,7 @@ namespace SecuritySystemUWP
                     {
                         try
                         {
-                            await oneDriveConnector.UploadFileAsync(file, String.Format("{0}/{1}", App.Controller.XmlSettings.OneDriveFolderPath, DateTime.Now.ToString("yyyy_MM_dd")));
-                            numberUploaded++;
-
-                            // uploadPictureToOnedrive should throw an exception if it fails, so it's safe to delete
-                            await file.DeleteAsync();
+                            await uploadWithRetry(file);
                         }
                         catch (Exception ex)
                         {
@@ -76,9 +73,10 @@ namespace SecuritySystemUWP
 
                             // Log telemetry event about this exception
                             var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                            events.Add("File Failure", "File name: " + file.Name);
                             TelemetryHelper.TrackEvent("FailedToUploadPicture", events);
+                            TelemetryHelper.TrackException(ex);
                         }
-                        this.lastUploadTime = DateTime.Now;
                     }
                 }
                 catch (Exception ex)
@@ -87,7 +85,9 @@ namespace SecuritySystemUWP
 
                     // Log telemetry event about this exception
                     var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                    events.Add("Setup routine failure", "Exception thrown getting file list from pictures library");
                     TelemetryHelper.TrackEvent("FailedToUploadPicture", events);
+                    TelemetryHelper.TrackException(ex);
                 }
                 finally
                 {
@@ -109,7 +109,20 @@ namespace SecuritySystemUWP
                     //Delete all pictures from the day
                     foreach (string picture in pictures)
                     {
-                        await oneDriveConnector.DeleteFileAsync(picture, folder);
+                        try
+                        {
+                            await deleteWithRetry(picture, folder);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("Exception in deleteExpiredPictures() " + ex.Message);
+
+                            // Log telemetry event about this exception
+                            var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                            events.Add("File Failure", "File name: " + picture);
+                            TelemetryHelper.TrackEvent("FailedToDeletePicture", events);
+                            TelemetryHelper.TrackException(ex);
+                        }
                     }
                 }
             }
@@ -119,7 +132,9 @@ namespace SecuritySystemUWP
 
                 // Log telemetry event about this exception
                 var events = new Dictionary<string, string> { { "OneDrive", ex.Message } };
+                events.Add("Setup routine failure", "Exception thrown getting file list from OneDrive");
                 TelemetryHelper.TrackEvent("FailedToDeletePicture", events);
+                TelemetryHelper.TrackException(ex);
             }
         }
 
@@ -157,6 +172,119 @@ namespace SecuritySystemUWP
         {
             App.Controller.XmlSettings.OneDriveAccessToken = oneDriveConnector.accessToken;
             App.Controller.XmlSettings.OneDriveRefreshToken = oneDriveConnector.refreshToken;
+        }
+
+
+        /// <summary>
+        /// Attempts to upload the given file, and will recursively retry until the MaxRetries limit is reached. 
+        /// </summary>
+        /// <param name="file">The file to upload. Assumes calling method has sole access to the file. Will delete the file after uploading</param>
+        /// <param name="tryNumber">The number of the attempt being made. Should always initially be called with a value of 1</param>
+        /// <returns></returns>
+        private async Task uploadWithRetry(StorageFile file, int tryNumber = 1)
+        {
+            HttpResponseMessage response = await oneDriveConnector.UploadFileAsync(file, String.Format("{0}/{1}", App.Controller.XmlSettings.OneDriveFolderPath, DateTime.Now.ToString("yyyy_MM_dd")));
+            bool success = await parseResponse(response, tryNumber);
+            var events = new Dictionary<string, string>();
+
+            if (success)
+            {
+                numberUploaded++;
+                await file.DeleteAsync();
+                this.lastUploadTime = DateTime.Now;
+            }
+            else if (tryNumber <= MaxTries)
+            {
+                events.Add("Retrying upload", tryNumber.ToString());
+                TelemetryHelper.TrackEvent("FailedToUploadPicture - Next Retry Beginning", events);
+                await uploadWithRetry(file, ++tryNumber);
+            }
+            else
+            {
+                events.Add("Max upload attempts reached", tryNumber.ToString());
+                TelemetryHelper.TrackEvent("FailedToUploadPicture - All Retries failed", events);
+            }
+        }
+
+        /// <summary>
+        /// Attempts to delete the given picture from the given folder, and will recursively retry until the MaxRetries limit is reached. 
+        /// </summary>
+        /// <param name="picture">The name of the picture to delete</param>
+        /// <param name="folder">The name and path of the folder from which to delete the picture</param>
+        /// <param name="tryNumber">The number of the attempt being made. Should always initially be called with a value of 1</param>
+        /// <returns></returns>
+        private async Task deleteWithRetry(string picture, string folder, int tryNumber = 1)
+        {
+            HttpResponseMessage response = await oneDriveConnector.DeleteFileAsync(picture, folder);
+            bool success = await parseResponse(response, tryNumber);
+            var events = new Dictionary<string, string>();
+
+            if (success)
+            {
+                //no additional action needed
+            }
+            else if (tryNumber <= MaxTries)
+            {
+                events.Add("Retrying delete", tryNumber.ToString());
+                TelemetryHelper.TrackEvent("FailedToDeletePicture - Next Retry Beginning", events);
+                await deleteWithRetry(picture, folder, ++tryNumber);
+            }
+            else
+            {
+                events.Add("Max delete attempts reached", tryNumber.ToString());
+                TelemetryHelper.TrackEvent("FailedToDeletePicture - All Retries failed", events);
+            }
+        }
+
+        /// <summary>
+        /// Parses the HTTP response from a call one OneDrive, and sends telemetry about the response
+        /// </summary>
+        /// <param name="response">The HTTP response message from the OneDrive call</param>
+        /// <param name="tryNumber">The attempt number of the call (first call is 1, etc)</param>
+        /// <returns>Whether or not the reponse status from the server indicated success</returns>
+        private async Task<bool> parseResponse(HttpResponseMessage response, int tryNumber)
+        {
+            bool successStatus;
+            var events = new Dictionary<string, string>();
+            events.Add("Attempt number", tryNumber.ToString());
+
+            if (response.IsSuccessStatusCode)
+            {
+                successStatus = true;
+                TelemetryHelper.TrackEvent("HttpSuccess", events);
+            }
+            else
+            {
+                successStatus = false;
+                events.Add(response.StatusCode.ToString(), response.ReasonPhrase);
+                events.Add("Original Request", response.RequestMessage.ToString());
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    events.Add("Recovery Attempt", "AuthorizeWithRefreshToken()");
+                    if (App.Controller.XmlSettings.OneDriveRefreshToken == "")
+                    {
+                        events.Add("App.Controller.XmlSettings.OneDriveRefreshToken", "Invalid Empty String");
+                    }
+                    else
+                    {
+                        events.Add("App.Controller.XmlSettings.OneDriveRefreshToken", "Valid String, attempting reauth");
+                        await oneDriveConnector.Reauthorize();
+                    }
+                    TelemetryHelper.TrackEvent("HttpErrorOnRequest", events);
+                }
+                else if ((500 <= (int)response.StatusCode) && ((int)response.StatusCode < 600))
+                {
+                    events.Add("Recovery attempt", "Server side error, automatically attempting again");
+                    TelemetryHelper.TrackEvent("HttpErrorOnRequest", events);
+                }
+                else
+                {
+                    events.Add("Recovery Attempt", "Unexpected HTTP response from server, error thrown");
+                    TelemetryHelper.TrackEvent("HttpErrorOnRequest", events);
+                    throw new System.Net.Http.HttpRequestException("UnexpectedHttpRequestError");
+                }
+            }
+            return successStatus;
         }
     }
 }
