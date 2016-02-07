@@ -16,10 +16,14 @@
   "dependencies": {
     "angular-datepicker": "~1.0.12",
     "angular-material": "~0.10.0",
-    "angular-animate": "~1.4.3",
-    "angular-aria": "~1.4.3",
+    "angular-animate": "~1.4.5",
+    "angular-aria": "~1.4.5",
     "font-awesome": "~4.4.0",
-    "angular": "~1.4.3",
-    "angular-route": "~1.4.3"
+    "angular": "~1.4.5",
+    "angular-route": "~1.4.5",
+    "angular-moment": "~0.10.2"
+  },
+  "resolutions": {
+    "angular": "1.4.5"
   }
 }

@@ -9,17 +9,17 @@ var passport = require('passport');
 var authenticationStrategies = require('./authenticationStrategies.js')
 
 //set to 'true' if you want authentication AND are using Azure Blob storage.
-var authenticationOn = false
+var authenticationOn = false;
 
 // must be set to "oneDrive" or "azure"
-var storageService = "oneDrive"
+var storageService = "azure";
 
 
 //.env file
-env('./.env')
+env('./.env');
 
 var auth = require("./routes/auth");
-var storageServiceRoute = require("./routes/" + storageService)
+var storageServiceRoute = require("./routes/" + storageService);
 
 
 var app = express();
