@@ -17,7 +17,17 @@ namespace SecuritySystemUWP
 {
     public class OneDrive : IStorage
     {
+        // Maximum number of retries for server-side error recovery
         private const int MaxTries = 3;
+        // Maximum number of pictures to upload per upload try
+        // On RPI2, here are the perf results
+        // # of Pictures    |   GetFilesAsync() Memory Consumption (MB)  |   UploadPictures() Time (seconds)
+        // 10               |   86MB                                    |   11
+        // 100              |   92MB                                    |   81
+        // 300              |   95MB                                    |   262
+        // 1000             |   176MB                                   |   840
+        // per results above decided to go with 100 pictures 
+        private const int MaxPictureUpload = 100;
         private int numberUploaded = 0;
         private DateTime lastUploadTime = DateTime.MinValue;
         private OneDriveConnector oneDriveConnector;
@@ -59,7 +69,7 @@ namespace SecuritySystemUWP
                     StorageFolder cacheFolder = KnownFolders.PicturesLibrary;
                     cacheFolder = await cacheFolder.GetFolderAsync(AppSettings.FolderName);
                     var result = cacheFolder.CreateFileQueryWithOptions(querySubfolders);
-                    var files = await result.GetFilesAsync();
+                    var files = await result.GetFilesAsync(0, MaxPictureUpload);
 
                     foreach (StorageFile file in files)
                     {
@@ -257,7 +267,6 @@ namespace SecuritySystemUWP
             {
                 successStatus = false;
                 events.Add(response.StatusCode.ToString(), response.ReasonPhrase);
-                events.Add("Original Request", response.RequestMessage.ToString());
                 if (response.StatusCode == HttpStatusCode.Unauthorized)
                 {
                     events.Add("Recovery Attempt", "AuthorizeWithRefreshToken()");
