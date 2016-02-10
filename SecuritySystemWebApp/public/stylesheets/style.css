@@ -30,8 +30,10 @@ a {
 }
 md-card {
   text-align: center;
-  color:white;
   background-color:rgb(63,81,181);
+}
+md-card > md-content {
+color: white;
 }
 a {
   color:white;

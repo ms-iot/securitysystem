@@ -1,6 +1,6 @@
 var users = {
-"{YOUR_GITHUB_USERNAME}" : "GitHubUsername",
-"{YOUR_FACEBOOK_EMAIL}": "FacebookEmail"
+"YourGithubUsername" : "GitHubUsername",
+"YourFacebookEmail": "FacebookEmail"
 };
 
 module.exports = users;
