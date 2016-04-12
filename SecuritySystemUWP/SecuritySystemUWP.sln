@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecuritySystemUWP", "SecuritySystemUWP\SecuritySystemUWP.csproj", "{4E560089-56BC-4CE4-9CDE-4BF1FB2DAA08}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "com.microsoft.maker.SecuritySystem", "com.microsoft.maker.SecuritySystem\com.microsoft.maker.SecuritySystem.vcxproj", "{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PirSensor", "..\pir-sensor\PirSensor\PirSensor.csproj", "{45DAC222-16A5-4745-8C94-8C9DC0ABE033}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsbCamera", "..\usb-camera\UsbCamera\UsbCamera.csproj", "{C00C9943-2BDC-4FE8-B69E-09FC2B272CC2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneDriveConnector", "..\onedrive-connector\OneDriveConnector\OneDriveConnector\OneDriveConnector.csproj", "{0BFF7810-2BE6-4778-A32B-E9B1B0F3982E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "com.microsoft.maker.SecuritySystem", "com.microsoft.maker.SecuritySystem\com.microsoft.maker.SecuritySystem.vcxproj", "{DDC5CAFC-13CB-44A7-AE07-BE1147217230}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,20 +45,6 @@ Global
 		{4E560089-56BC-4CE4-9CDE-4BF1FB2DAA08}.Release|x86.ActiveCfg = Release|x86
 		{4E560089-56BC-4CE4-9CDE-4BF1FB2DAA08}.Release|x86.Build.0 = Release|x86
 		{4E560089-56BC-4CE4-9CDE-4BF1FB2DAA08}.Release|x86.Deploy.0 = Release|x86
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|ARM.ActiveCfg = Debug|ARM
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|ARM.Build.0 = Debug|ARM
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|x64.ActiveCfg = Debug|x64
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|x64.Build.0 = Debug|x64
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|x86.ActiveCfg = Debug|Win32
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Debug|x86.Build.0 = Debug|Win32
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|Any CPU.ActiveCfg = Release|Win32
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|ARM.ActiveCfg = Release|ARM
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|ARM.Build.0 = Release|ARM
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|x64.ActiveCfg = Release|x64
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|x64.Build.0 = Release|x64
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|x86.ActiveCfg = Release|Win32
-		{3875DC40-E7C8-49EC-890D-D3FD0E5637F4}.Release|x86.Build.0 = Release|Win32
 		{45DAC222-16A5-4745-8C94-8C9DC0ABE033}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{45DAC222-16A5-4745-8C94-8C9DC0ABE033}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45DAC222-16A5-4745-8C94-8C9DC0ABE033}.Debug|ARM.ActiveCfg = Debug|ARM
@@ -107,6 +93,20 @@ Global
 		{0BFF7810-2BE6-4778-A32B-E9B1B0F3982E}.Release|x64.Build.0 = Release|x64
 		{0BFF7810-2BE6-4778-A32B-E9B1B0F3982E}.Release|x86.ActiveCfg = Release|x86
 		{0BFF7810-2BE6-4778-A32B-E9B1B0F3982E}.Release|x86.Build.0 = Release|x86
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Debug|ARM.ActiveCfg = Debug|ARM
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Debug|ARM.Build.0 = Debug|ARM
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Debug|x64.ActiveCfg = Debug|x64
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Debug|x64.Build.0 = Debug|x64
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Debug|x86.ActiveCfg = Debug|Win32
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Debug|x86.Build.0 = Debug|Win32
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Release|Any CPU.ActiveCfg = Release|Win32
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Release|ARM.ActiveCfg = Release|ARM
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Release|ARM.Build.0 = Release|ARM
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Release|x64.ActiveCfg = Release|x64
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Release|x64.Build.0 = Release|x64
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Release|x86.ActiveCfg = Release|Win32
+		{DDC5CAFC-13CB-44A7-AE07-BE1147217230}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
